@@ -1,0 +1,12 @@
+{
+  "name": "grano",
+  "version": "0.1.0",
+  "main": "grano/static/css/main.css",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {
+    "bootstrap": "3.0.0"
+  }
+}
