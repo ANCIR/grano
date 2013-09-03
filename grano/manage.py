@@ -1,7 +1,8 @@
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 
-from grano.core import app, db, assets
+from grano.core import db, assets
+from grano.views import app
 
 manager = Manager(app)
 manager.add_command("assets", ManageAssets(assets))
