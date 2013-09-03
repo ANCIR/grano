@@ -36,3 +36,5 @@ nosetests.xml
 
 # grano specific
 grano/static/vendor/*
+grano/static/gen/*
+grano/static/.webassets-cache/*
