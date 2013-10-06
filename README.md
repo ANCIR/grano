@@ -30,7 +30,7 @@ What are our domain objects?
 * **Fragment** - a piece of text; annotated with references to various entities. 
 * **Reference** - information stored to connect an entity and a fragment.
 
-In essence, there will be two types of entities: proper entites for people, orgs etc. and implicit entities for times and places. 
+In essence, there will be two types of entities: proper entites for people, orgs etc. and implicit entities for times and places. In later stages, Grano may have the **Relationship** domain object common for SNA tools, but for now **Fragments** are a narrative (i.e. humanly typed) replacement for them.
 
 ## Existing Projects
 
