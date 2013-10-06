@@ -40,3 +40,5 @@ grano/static/gen/*
 grano/static/.webassets-cache/*
 
 grano/development.db
+
+*.DS_Store
