@@ -70,9 +70,29 @@
           <div class="fragment">
             <div class="header">
               <span class="pull-right right">
-                <i class="icon-plus-sign-alt"></i> new entry
+                <a class="create-fragment" href="#"><i class="icon-plus-sign-alt"></i> new entry</a>
               </span>
-              <span><i class="icon-sort"></i> Sort by: <a href='#'>time stamp</a></span>
+              <span><i class="icon-sort"></i> Sort by: <a href='#'>event time</a></span>
+            </div>
+          </div>
+          <div id="create-fragment" class="fragment">
+            <div class="body">
+              <textarea>[[Edward Snowden]]</textarea>
+            </div>
+            <div class="context">
+              <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                  <div class="inner">
+                    <input name="date" type="text" class="form-control input-sm" value="June 5, 2013">
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                  <div class="inner pull-right">
+                    <input type="submit" class="btn btn-primary btn-sm quit-editing-create" value="Save">
+                    <input type="reset" class="btn btn-primary btn-sm quit-editing-create" value="Cancel">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div id="sample-fragment" class="fragment">
@@ -185,9 +205,20 @@
 
 
       $('.delete-fragment').click(function() {
-        $('#sample-fragment').slideUp();
+        $('#sample-fragment').slideUp(150);
         return false;
       });
+
+      $('.quit-editing-create').click(function() {
+        $('#create-fragment').slideUp(150);
+        return false;
+      });
+
+      $('.create-fragment').click(function() {
+        $('#create-fragment').slideDown(150);
+        return false;
+      });
+
     });
   </script>
 </body>
