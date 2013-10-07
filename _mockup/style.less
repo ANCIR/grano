@@ -1,16 +1,38 @@
 
 /* Base colors */
-@borderColor: #ddd;
+
+/*
+@ocreMedium: #E6E2AF;
+@ocreDark: #A7A37E;
+@ocreLight: #EFECCA;
+@blue: #046380;
+@green: #002F2F;
+*/
+@fgA: #2C5368;
+@fgB: #FF5E2E;
+@bgA: #EAEFF3;
+@bgB: #FFFFFF;
+@bgC: #F3F7E6;
+
+@borderColor: darken(@bgA, 5%);
+@textColor: #333;
 @borderStyle: 1px solid @borderColor;
 @backgroundColor: lighten(#eee, 5%);
+@backgroundColor: lighten(@bgA, 5%);
+@outsideColor: darken(@backgroundColor, 20%);
+@outsideColor: @fgA;
+@footerTextColor: @textColor;
+@footerTextColor: #fff;
 @panelColor: darken(@backgroundColor, 3%);
 @linkColor: darken(#9df031, 20%);
+@linkColor: @fgB;
 
 /* Base layout */
 body {
-  background-color: darken(@backgroundColor, 20%);
+  background-color: @outsideColor;
   font-family: 'Open Sans';
   font-weight: 300;
+  color: @textColor;
 }
 
 a, .pagination li a {
@@ -66,6 +88,11 @@ a:hover {
     padding: 12px 15px 15px 15px;
     color: #333;
   }
+  
+  input.form-control {
+    border: @borderStyle;
+    border-radius: 0;
+  }
 
   .navbar-search {
     width: 50%;
@@ -78,8 +105,13 @@ a:hover {
 
 footer {
   margin: 1em 0 0 0;
-  font-size: 0.9em;
-  color: #eee;
+  f-ont-size: 0.9em;
+  color: @footerTextColor;
+
+  a {
+    color: @footerTextColor;
+    font-weight: bold;
+  }
 }
 
 .fragment {
@@ -136,12 +168,13 @@ footer {
 .topic {
 
   .title {
+    font-family: Georgia, serif;
     font-size: 2em;
     font-weight: bold;
   }
 
   .tagline {
-    font-style: italic;
+    f-ont-style: italic;
     padding: 0.2em 0 1em 0;
     border-bottom: @borderStyle;
   }
