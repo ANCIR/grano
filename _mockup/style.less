@@ -109,11 +109,32 @@ footer {
   border-bottom: @borderStyle;
   border-right: @borderStyle;
 
+  .read-mode {
+    display: block;
+  }
+
+  .edit-mode {
+    display: none;
+  }
+
+  .edit-mode .inner {
+    padding: 0.3em 1em 0.5em 1em;
+  }
+
   .body {
     padding: 0.5em;
     font-family: Georgia, serif;
     font-size: 1.3em;
     line-height: 1.4em;
+
+    textarea {
+      border: 0;
+      width: 100%;
+      font-family: monospace;
+      font-size: 0.75em;
+      line-height: 1.3em;
+    }
+
   }
 
   .context {
@@ -128,6 +149,13 @@ footer {
     a:hover {
       text-decoration: none;
       color: #000;
+    }
+
+    input.input-sm {
+      display: inline-block;
+      padding: 2px 10px;
+      height: 28px;
+      border: 0px;
     }
 
     span {
@@ -149,10 +177,6 @@ footer {
   }
 }
 
-.fragment.header {
-
-}
-
 
 .topic {
   .title {
@@ -162,10 +186,22 @@ footer {
   }
 
   .tagline {
-    f-ont-style: italic;
     padding: 0.2em 0 1em 0;
     border-bottom: @borderStyle;
   }
+
+  .edit-mode {
+    display: none;
+  }
+
+  .form-bottom {
+    margin: 0 0 0.5em 0;
+  }
+
+  .input-lg {
+    font-weight: bold;
+  }
+
 }
 
 .inline-edit {

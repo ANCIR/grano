@@ -44,14 +44,24 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 topic">
-          <div class="pull-right">
-            <a class="btn btn-primary btn-sm" href='#'><i class="icon-edit"></i> edit</a>
+          <div class="pull-right read-mode">
+            <a class="btn btn-primary btn-sm edit-topic" href='#'><i class="icon-edit"></i> edit</a>
           </div>
-          <div class="title">
-            <!--i class="icon-user"></i--> Edward Snowden
+          <div class="read-mode title">
+            Edward Snowden
           </div>
-          <div class="tagline">
-            Former NSA contractor and leaker.
+          <div class="read-mode tagline">
+           Former NSA contractor and leaker. 
+          </div>
+          <div class="edit-mode">
+            <input name="" value="Edward Snowden" class="form-bottom form-control input-lg">
+            <input name="" value="Former NSA contractor and leaker." class="form-bottom form-control input-sm">
+            <div class="col-xs-12 col-sm-12">
+              <div class="inner pull-right">
+                <input type="submit" class="btn btn-primary btn-sm quit-editing-topic" value="Save">
+                <input type="reset" class="btn btn-primary btn-sm quit-editing-topic" value="Cancel">
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -62,18 +72,36 @@
               <span class="pull-right right">
                 <i class="icon-plus-sign-alt"></i> new entry
               </span>
-              <span>Sort by: <a href='#'>time stamp</a></span>
+              <span><i class="icon-sort"></i> Sort by: <a href='#'>time stamp</a></span>
             </div>
           </div>
-          <div class="fragment">
-            <div class="body">
+          <div id="sample-fragment" class="fragment">
+            <div class="body read-mode">
               <a href="#">Edward Snowden</a> arrived in <strong>Moscow airport</strong> after leaving <strong>Hong Kong</strong>
               on his way to <strong>Venezuela</strong>.
             </div>
+            <div class="body edit-mode">
+              <textarea>[[Edward Snowden]] arrived in [[Moscow airport]] after leaving [[Hong Kong]] on his way to [[Venezuela]]</textarea>
+            </div>
             <div class="context">
-              <span class="date">June 5, 2013</span>
-              <span><a href='#'><i class="icon-edit inline-edit"></i> edit</a></span>
-              <span><a href='#'><i class="icon-trash inline-edit"></i> remove</a></span>
+              <div class="read-mode">
+                <span class="date">June 5, 2013</span>
+                <span><a class="edit-fragment" href='#'><i class="icon-edit inline-edit"></i> edit</a></span>
+                <span><a class="delete-fragment" href='#'><i class="icon-trash inline-edit"></i> remove</a></span>
+              </div>
+              <div class="edit-mode row">
+                <div class="col-xs-12 col-sm-6">
+                  <div class="inner">
+                    <input name="date" type="text" class="form-control input-sm" value="June 5, 2013">
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                  <div class="inner pull-right">
+                    <input type="submit" class="btn btn-primary btn-sm quit-editing" value="Save">
+                    <input type="reset" class="btn btn-primary btn-sm quit-editing" value="Cancel">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="fragment">
@@ -114,7 +142,7 @@
           <p style="text-align: center;">
             <strong>Grano.</strong> A social network toolkit for journalists and
             activists.<br/>
-            <a href="https://github.com/pudo/grano">GitHub</a> &middot;
+            <a href="https://github.com/pudo/grano"><i class="icon-github"></i> GitHub</a> &middot;
             <a href="https://github.com/pudo/grano/issues">Issues</a> &middot;
             <a href="https://pudo.org">pudo.org</a> &middot;
             <a href="http://mozillaopennews.org/">Knight-Mozilla OpenNews</a>.
@@ -126,5 +154,41 @@
 
   <script src="jquery.js" type="text/javascript"></script>
   <script src="bootstrap.min.js" type="text/javascript"></script>
+
+  <script>
+    $(function() {
+      $('.edit-fragment').click(function() {
+        $('#sample-fragment .read-mode').fadeOut(100, function() {
+          $('#sample-fragment .edit-mode').fadeIn();
+        });
+        return false;
+      });
+      $('.quit-editing').click(function() {
+        $('#sample-fragment .edit-mode').fadeOut(100, function() {
+          $('#sample-fragment .read-mode').fadeIn();
+        });
+        return false;
+      });
+
+      $('.edit-topic').click(function() {
+        $('.topic .read-mode').fadeOut(100, function() {
+          $('.topic .edit-mode').fadeIn();
+        });
+        return false;
+      });
+      $('.quit-editing-topic').click(function() {
+        $('.topic .edit-mode').fadeOut(100, function() {
+          $('.topic .read-mode').fadeIn();
+        });
+        return false;
+      });
+
+
+      $('.delete-fragment').click(function() {
+        $('#sample-fragment').slideUp();
+        return false;
+      });
+    });
+  </script>
 </body>
 </html>
