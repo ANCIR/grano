@@ -1,11 +1,16 @@
 
 /* Base colors */
 @borderColor: #ddd;
-@linkColor: #f03162;
+@borderStyle: 1px solid @borderColor;
+@backgroundColor: lighten(#eee, 5%);
+@panelColor: darken(@backgroundColor, 3%);
+@linkColor: darken(#9df031, 20%);
 
 /* Base layout */
 body {
-  background-color: #333;
+  background-color: darken(@backgroundColor, 20%);
+  font-family: 'Open Sans';
+  font-weight: 300;
 }
 
 a, .pagination li a {
@@ -16,12 +21,12 @@ a:hover {
   color: darken(@linkColor, 20%);
 }
 
-.pagination .active a {
+.pagination .active a, .btn-primary {
   background-color: @linkColor;
   border-color: @linkColor;
 }
 
-.pagination .active a:hover {
+.pagination .active a:hover, .btn-primary:hover {
   background-color: darken(@linkColor, 20%);
   border-color: darken(@linkColor, 20%);
 
@@ -29,8 +34,27 @@ a:hover {
 
 .airlock {
   padding: 80px 0 1em 0;
-  background-color: #eee;
-  border-bottom: 1px solid #ddd;
+  background-color: @backgroundColor;
+  border-bottom: 1px solid darken(@backgroundColor, 25%);
+}
+
+.pagination {
+  border-radius: 0px;
+
+  li a {
+    background-color: @panelColor;
+    border: @borderStyle;
+    border-top: 0;
+    border-left: 0;
+  }
+
+  li:first-child a {
+    border-radius: 0px;
+  }
+
+  li:last-child a {
+    border-radius: 0px;
+  }
 }
 
 .navbar {
@@ -38,6 +62,8 @@ a:hover {
 
   .navbar-brand {
     font-weight: bold;
+    font-size: 1.4em;
+    padding: 12px 15px 15px 15px;
     color: #333;
   }
 
@@ -59,20 +85,20 @@ footer {
 .fragment {
   margin: 1em 0em 1em 0em;
   background-color: #fff;
-  border-bottom: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+  border-bottom: @borderStyle;
+  border-right: @borderStyle;
 
   .body {
     padding: 0.5em;
     font-family: Georgia, serif;
-    font-size: 1.2em;
+    font-size: 1.3em;
     line-height: 1.4em;
   }
 
   .context {
     color: #666;
-    border-top: 1px solid #eee;
-    background-color: #f9f9f9;
+    border-top: @borderStyle;
+    background-color: @panelColor;
     
     a {
       color: #666;
@@ -85,12 +111,12 @@ footer {
 
     span {
       padding: 0.3em 1em 0.5em 1em;
-      border-right: 1px solid #eee;
+      border-right: @borderStyle;
       display: inline-block;
     }
 
     span.right {
-      border-left: 1px solid #eee;
+      border-left: @borderStyle;
       border-right: 0;
 
     }
@@ -98,6 +124,7 @@ footer {
 
   .header {
     .context;
+    border-top: 0;
   }
 }
 
@@ -109,15 +136,14 @@ footer {
 .topic {
 
   .title {
-    font-family: Georgia, serif;
-    font-size: 1.8em;
+    font-size: 2em;
     font-weight: bold;
   }
 
   .tagline {
     font-style: italic;
     padding: 0.2em 0 1em 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: @borderStyle;
   }
 }
 
