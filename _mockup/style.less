@@ -1,9 +1,30 @@
 
 /* Base colors */
+@borderColor: #ddd;
+@linkColor: #f03162;
 
 /* Base layout */
 body {
   background-color: #333;
+}
+
+a, .pagination li a {
+  color: @linkColor;
+}
+
+a:hover {
+  color: darken(@linkColor, 20%);
+}
+
+.pagination .active a {
+  background-color: @linkColor;
+  border-color: @linkColor;
+}
+
+.pagination .active a:hover {
+  background-color: darken(@linkColor, 20%);
+  border-color: darken(@linkColor, 20%);
+
 }
 
 .airlock {
@@ -12,11 +33,20 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
-.navbar .navbar-search {
-  width: 50%;
+.navbar {
+  background-color: #fff;
 
-  .form-group {
-    display: block;
+  .navbar-brand {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .navbar-search {
+    width: 50%;
+
+    .form-group {
+      display: block;
+    }
   }
 }
 
