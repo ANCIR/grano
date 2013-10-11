@@ -28,4 +28,39 @@ Next version features
   * "Follow" feature for entities
 
 
+Domain Model
+============
+
+User
+  email
+  display_name
+
+Project
+  slug
+  label
+  description
+
+ProjectMember 
+  email
+  role
+  project
+
+Entity
+  project
+  label
+  tagline
+  description
+  project
+  creator
+
+Fragment
+  text
+  time_from
+  time_until
+  source_url
+  source_label
+
+
+
+
 
