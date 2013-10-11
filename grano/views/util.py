@@ -1,7 +1,7 @@
 from flask import Response, request, url_for
 
-from datawire.exc import NotFound
-from datawire.util import JSONEncoder
+from grano.exc import NotFound
+from grano.util import JSONEncoder
 
 BOOL_TRUISH = ['true', '1', 'yes', 'y', 't']
 
