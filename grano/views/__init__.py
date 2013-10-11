@@ -1,29 +1,19 @@
-#import os
 from flask import request, session, render_template
+from flask.ext.login import LoginManager
+from flask.ext.browserid import BrowserID
+
 #from formencode import Invalid
 
 from grano.core import app
-#from datawire.exc import Unauthorized
-#from datawire.model import User
+from grano.model import user
 
+login_manager = LoginManager()
+login_manager.user_loader(user.login_by_email)
+login_manager.init_app(app)
 
-@app.before_request
-def authentication():
-    """ Attempt HTTP authentication via API keys on a per-request basis. """
-    auth_header = request.headers.get('Authorization')
-    api_key = request.args.get('api_key')
-    if auth_header is not None:
-        auth_type, api_key = auth_header.split(' ', 1)
-    if api_key is not None:
-        try:
-            request.user = User.by_api_key(api_key)
-        except:
-            raise Unauthorized('Invalid API key.')
-    elif 'user_id' in session:
-        request.user = User.by_id(session['user_id'])
-    else:
-        request.user = None
-
+browser_id = BrowserID()
+browser_id.user_loader(user.login_by_browserid)
+browser_id.init_app(app)
 
 
 @app.route("/")

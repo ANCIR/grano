@@ -1,25 +1,8 @@
-import uuid
-from datetime import datetime
-
-from grano.core import db
+from grano.core import mongo
 
 
-class ModelCore(object):
-    id = db.Column(db.Integer, primary_key=True)
+class ModelException(Exception):
+    pass
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
-
-    @classmethod
-    def by_id(cls, id):
-        q = db.session.query(cls).filter_by(id=id)
-        return q.first()
-
-    @classmethod
-    def all(cls):
-        return db.session.query(cls)
-
-
-def make_token():
-    return uuid.uuid4().get_hex()
+class ObjectExists(ModelException):
+    pass
