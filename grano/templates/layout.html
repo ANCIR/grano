@@ -36,8 +36,8 @@
       </form>
       <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
         <ul class="nav navbar-nav">
-            <li><a id="browserid-login" href="#">Sign In</a></li>
-            <li><a id="browserid-logout" href="#">Sign Out</a></li>
+            <li ng-hide="session.logged_in"><a id="browserid-login" href="#">Sign In</a></li>
+            <li ng-show="session.logged_in"><a id="browserid-logout" href="#">Sign Out</a></li>
             <li><a href="#">Help</a></li>
         </ul>
       </div>
@@ -76,6 +76,7 @@
   {% endassets %}
   {% assets output="gen/app.%(version)s.js",
         "js/app.js",
+        "js/services/session.js",
         "js/controllers/app.js",
         "js/controllers/home.js" %}
       <script type="text/javascript" src="{{ ASSET_URL }}"></script>

@@ -1,6 +1,6 @@
 import os 
 
-from flask import request, session, render_template
+from flask import render_template
 from flask.ext.login import LoginManager
 from flask.ext.browserid import BrowserID
 
