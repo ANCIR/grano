@@ -1,3 +1,5 @@
+import os 
+
 from flask import request, session, render_template
 from flask.ext.login import LoginManager
 from flask.ext.browserid import BrowserID
@@ -21,8 +23,8 @@ app.register_blueprint(sessions, url_prefix='/api/1')
 
 
 def angular_templates():
-    if app.config.get('ASSETS_DEBUG'):
-        return
+    #if app.config.get('ASSETS_DEBUG'):
+    #    return
     partials_dir = os.path.join(app.static_folder, 'templates')
     for (root, dirs, files) in os.walk(partials_dir):
         for file_name in files:
