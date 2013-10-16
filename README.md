@@ -26,6 +26,7 @@ Additionally, a reporter can specify structured context, such as a source URL, b
 
 What are our domain objects?
 
+* **Project** - a partitioned section of the other entities with a specific purpose.
 * **Entity** - a thing; such as a person, company or other organisation.
 * **Fragment** - a piece of text; annotated with references to various entities. 
 * **Reference** - information stored to connect an entity and a fragment.
