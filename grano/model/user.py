@@ -12,6 +12,10 @@ class User(GranoDocument):
     display_name = StringField(max_length=200)
     browserid_issuer = StringField(max_length=200)
 
+    @property
+    def api_uri(self):
+        return url_for('users.get', id=self.id, _external=True)
+
     def is_authenticated(self):
         return True
 
