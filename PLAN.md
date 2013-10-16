@@ -28,6 +28,11 @@ Next version features
   * "Follow" feature for entities
 
 
+Smoothing the UI
+================
+
+http://www.nganimate.org/angularjs/ng-repeat/3d-scale vs. jQuery?
+
 Domain Model
 ============
 
