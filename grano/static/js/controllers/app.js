@@ -13,3 +13,5 @@ function AppCtrl($scope, $window, $routeParams, $location, session) {
         }
     });*/
 }
+
+AppCtrl.$inject = ['$scope', '$window', '$routeParams', '$location', 'session'];

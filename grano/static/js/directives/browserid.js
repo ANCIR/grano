@@ -1,4 +1,4 @@
-grano.directive('browserid', function ($window, $http) {
+grano.directive('browserid', ['$window', '$http', function ($window, $http) {
     return {
         restrict: 'A',
         link: function(scope, element, attrs) {
@@ -41,4 +41,4 @@ grano.directive('browserid', function ($window, $http) {
             });
         }
     };
-});
+}]);

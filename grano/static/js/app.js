@@ -1,4 +1,6 @@
-var grano = angular.module('grano', [], function($routeProvider, $locationProvider) {
+var grano = angular.module('grano', []);
+
+grano.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
   $routeProvider.when('/', {
     templateUrl: '/static/templates/home.html',
     controller: HomeCtrl
@@ -9,4 +11,4 @@ var grano = angular.module('grano', [], function($routeProvider, $locationProvid
   });
 
   $locationProvider.html5Mode(true);
-});
+}]);
