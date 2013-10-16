@@ -11,6 +11,7 @@ from grano.model import User
 
 from grano.views.sessions import blueprint as sessions
 from grano.views.users import blueprint as users
+from grano.views.projects import blueprint as projects
 
 login_manager = LoginManager()
 login_manager.user_loader(User.by_email)
@@ -22,6 +23,7 @@ browser_id.init_app(app)
 
 app.register_blueprint(sessions, url_prefix='/api/1')
 app.register_blueprint(users, url_prefix='/api/1')
+app.register_blueprint(projects, url_prefix='/api/1')
 
 
 def angular_templates():
