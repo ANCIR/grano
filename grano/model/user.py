@@ -1,55 +1,19 @@
-from flask import url_for
 from datetime import datetime
 
-#from formencode import Schema, validators
-from grano.core import mongo
-from grano.model.util import ObjectExists
+from flask import url_for
+#from mongoengine import EmbeddedDocument
+from mongoengine import StringField, EmailField
+
+from grano.model.util import GranoDocument, ObjectExists
 
 
-def find_by_email(email):
-    return mongo.db.user.find_one({'email': email})
-
-
-def login_by_email(email):
-    user = find_by_email(email)
-    if user is None:
-        return None
-    return LoginUser(user)
-
-
-def login_by_browserid(browserid):
-    user = mongo.db.user.find_one({
-        'browserid.email': browserid.get('email'),
-        'browserid.issuer': browserid.get('issuer')
-    })
-    if user is None:
-        user = create(browserid.get('email'),
-                      {'browserid': browserid})
-    return LoginUser(user)
-
-
-def create(email, data=None):
-    obj = find_by_email(email)
-    if obj is not None:
-        raise ObjectExists()
-    data = data or {}
-    data.update({
-        'email': email,
-        'display_name': '',
-        'created_at': datetime.utcnow(),
-        'updated_at': datetime.utcnow()
-    })
-    data['_id'] = mongo.db.user.insert(data)
-    return data
-
-
-class LoginUser(object):
-
-    def __init__(self, user):
-        self.user = user
+class User(GranoDocument):
+    email = EmailField(unique=True)
+    display_name = StringField(max_length=200)
+    browserid_issuer = StringField(max_length=200)
 
     def is_authenticated(self):
-        return self.user is not None
+        return True
 
     def is_active(self):
         return self.is_authenticated()
@@ -58,5 +22,28 @@ class LoginUser(object):
         return not self.is_authenticated()
 
     def get_id(self):
-        return self.user.get('email')
+        return self.email
+
+    @classmethod
+    def by_email(cls, email):
+        return cls.objects(email=email).first()
+
+    @classmethod
+    def from_browserid(cls, browserid):
+        user = cls.objects(email=browserid.get('email'),
+                           browserid_issuer=browserid.get('issuer')).first()
+        if user is not None:
+            return user
+        if cls.by_email(browserid.get('email')) is not None:
+            raise ObjectExists()
+        user = cls(email=browserid.get('email'),
+                   browserid_issuer=browserid.get('issuer'))
+        user.save()
+        return user
+
+    def to_json(self):
+        data = super(User, self).to_json()
+        data['email'] = self.email
+        data['display_name'] = self.display_name
+        return data
 

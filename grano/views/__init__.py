@@ -7,16 +7,16 @@ from flask.ext.browserid import BrowserID
 #from formencode import Invalid
 
 from grano.core import app
-from grano.model import user
+from grano.model import User
 
 from grano.views.sessions import sessions
 
 login_manager = LoginManager()
-login_manager.user_loader(user.login_by_email)
+login_manager.user_loader(User.by_email)
 login_manager.init_app(app)
 
 browser_id = BrowserID()
-browser_id.user_loader(user.login_by_browserid)
+browser_id.user_loader(User.from_browserid)
 browser_id.init_app(app)
 
 app.register_blueprint(sessions, url_prefix='/api/1')

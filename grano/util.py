@@ -18,7 +18,7 @@ class JSONEncoder(json.JSONEncoder):
             return str(obj)
         if self.refs and hasattr(obj, 'to_ref'):
             return obj.to_ref()
-        if hasattr(obj, 'to_dict'):
-            return obj.to_dict()
+        if hasattr(obj, 'to_json'):
+            return obj.to_json()
         return json.JSONEncoder.default(self, obj)
 

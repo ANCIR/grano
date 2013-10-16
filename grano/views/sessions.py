@@ -12,5 +12,5 @@ sessions = Blueprint('sessions', __name__)
 def status():
     return jsonify({
         'logged_in': current_user.is_authenticated(),
-        'user': current_user.user if current_user.is_authenticated() else None
+        'user': current_user if current_user.is_authenticated() else None
     })
