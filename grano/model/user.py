@@ -1,7 +1,4 @@
-from datetime import datetime
-
 from flask import url_for
-#from mongoengine import EmbeddedDocument
 from mongoengine import StringField, EmailField
 
 from grano.model.util import GranoDocument, ObjectExists
