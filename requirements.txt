@@ -2,7 +2,6 @@ Flask==0.10.1
 Flask-Assets==0.8
 Flask-OAuth==0.12
 Flask-Script==0.5.3
-Flask-PyMongo==0.3.0
 Flask-BrowserID==0.0.4
 Flask-Login==0.2.7
 Jinja2==2.7.1
@@ -14,3 +13,4 @@ oauth2==1.5.211
 webassets==0.8
 wsgiref==0.1.2
 cssmin==0.1.4
+mongoengine==0.8.4
