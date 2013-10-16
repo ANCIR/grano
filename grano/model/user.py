@@ -29,6 +29,10 @@ class User(GranoDocument):
         return cls.objects(email=email).first()
 
     @classmethod
+    def by_id(cls, id_):
+        return cls.objects(id=id_).first()
+
+    @classmethod
     def from_browserid(cls, browserid):
         user = cls.objects(email=browserid.get('email'),
                            browserid_issuer=browserid.get('issuer')).first()

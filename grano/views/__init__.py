@@ -9,7 +9,8 @@ from flask.ext.browserid import BrowserID
 from grano.core import app
 from grano.model import User
 
-from grano.views.sessions import sessions
+from grano.views.sessions import blueprint as sessions
+from grano.views.users import blueprint as users
 
 login_manager = LoginManager()
 login_manager.user_loader(User.by_email)
@@ -20,6 +21,7 @@ browser_id.user_loader(User.from_browserid)
 browser_id.init_app(app)
 
 app.register_blueprint(sessions, url_prefix='/api/1')
+app.register_blueprint(users, url_prefix='/api/1')
 
 
 def angular_templates():

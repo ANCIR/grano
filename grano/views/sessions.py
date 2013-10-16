@@ -5,10 +5,11 @@ from flask.ext.login import current_user
 
 from grano.views.util import jsonify
 
-sessions = Blueprint('sessions', __name__)
+
+blueprint = Blueprint('sessions', __name__)
 
 
-@sessions.route('/sessions')
+@blueprint.route('/sessions')
 def status():
     return jsonify({
         'logged_in': current_user.is_authenticated(),
