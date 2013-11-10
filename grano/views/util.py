@@ -1,4 +1,6 @@
 from flask import Response, request, url_for
+from flask.ext.utils.serialization import jsonify as _jsonify
+
 
 from grano.exc import NotFound
 from grano.util import JSONEncoder
@@ -36,10 +38,4 @@ def get_offset(default=0):
 
 
 def jsonify(obj, status=200, headers=None, refs=False):
-    """ Custom JSONificaton to support obj.to_dict protocol. """
-    data = JSONEncoder(refs=refs).encode(obj)
-    if 'callback' in request.args:
-        cb = request.args.get('callback')
-        data = '%s && %s(%s)' % (cb, cb, data)
-    return Response(data, headers=headers,
-                    status=status, mimetype='application/json')
+    return _jsonify(obj, status=status, headers=headers, refs=refs, encoder=JSONEncoder)
