@@ -14,3 +14,5 @@ webassets==0.8
 wsgiref==0.1.2
 cssmin==0.1.4
 mongoengine==0.8.4
+Unidecode==0.04.14
+blinker==1.3

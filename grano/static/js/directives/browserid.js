@@ -3,7 +3,6 @@ grano.directive('browserid', ['$window', '$http', function ($window, $http) {
         restrict: 'A',
         link: function(scope, element, attrs) {
             var gotAssertion = function(assertion) {
-                console.log(assertion);
                 if (assertion) {
                     var data = 'assertion=' + assertion,
                         req = $http.post('/api/1/browserid/login', data, {
@@ -33,7 +32,7 @@ grano.directive('browserid', ['$window', '$http', function ($window, $http) {
 
             element.bind('click', function() {
                 if (attrs.browserid==='login') {
-                    navigator.id.get(gotAssertion);
+                    navigator.id.get(gotAssertion, {'siteName': 'grano'});
                 } else {
                     navigator.id.logout(logoutCallback);
                 }

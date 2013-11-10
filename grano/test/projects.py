@@ -9,6 +9,10 @@ class ProjectsTestCase(unittest.TestCase):
 
     def tearDown(self):
         teardown_app(self.app)
+
+    def test_create_project(self):
+        project = Project(label='I am a banana!')
+        assert 'banana' in project.label, project.to_json()
         
     def test_create_project(self):
         project = Project(label='I am a banana!')

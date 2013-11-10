@@ -1,6 +1,6 @@
 import unittest
 import json
-from grano.test.util import make_app, teardown_app
+from grano.test.util import make_app, teardown_app, login_user
 from grano.model import User
 
 
@@ -23,9 +23,7 @@ class UsersTestCase(unittest.TestCase):
         data = json.loads(self.app.get('/api/1/sessions').get_data())
         assert not data.get('logged_in'), data
 
-        with self.app.session_transaction() as sess:
-            sess['user_id'] = user.email
-            sess['_fresh'] = True
+        login_user(self.app, user)
         
         data = json.loads(self.app.get('/api/1/sessions').get_data())
         assert data.get('logged_in'), data

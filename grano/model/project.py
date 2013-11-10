@@ -5,8 +5,9 @@ from grano.model.util import GranoDocument
 
 
 class Project(GranoDocument):
-    label = StringField(max_length=200)
-    slug = StringField(max_length=200)
+    label = StringField(min_length=2, max_length=200)
+    slug = StringField(min_length=2, max_length=200)
+    description = StringField(min_length=2)
 
     @property
     def api_uri(self):

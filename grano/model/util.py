@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from mongoengine import Document, DateTimeField
+from mongoengine import signals
 
 class GranoDocument(Document):
     meta = {
@@ -23,9 +24,18 @@ class GranoDocument(Document):
         return data
 
 
+def pre_save(sender, document, **kw):
+    if hasattr(document, 'updated_at'):
+        document.updated_at = datetime.utcnow()
+
+
+signals.pre_save.connect(pre_save)
+
+
 class ModelException(Exception):
     pass
 
 
 class ObjectExists(ModelException):
     pass
+
