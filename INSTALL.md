@@ -8,8 +8,6 @@ Before installing grano, make sure you have the following dependencies available
 your system (consider using [Vagrant](http://www.vagrantup.com/) to isolate the
 project):
 
-* A recent version of [MongoDB](http://www.mongodb.org/), currently testing with 
-  2.4.5.
 * Python 2.7 and [virtualenv](http://www.virtualenv.org/en/latest/)
 * Twitter's [bower](https://github.com/bower/bower) for installing JS dependencies.
 * [UglifyJS](https://github.com/mishoo/UglifyJS/)
@@ -35,9 +33,9 @@ Open the file and set up the various account configurations.
 Once the new configuration is set up, you need to an environment variables pointing
 grano to the configuration file you've created. 
 
-    export DATAWIRE_SETTINGS=`pwd`/settings.py
+    export GRANO_SETTINGS=`pwd`/settings.py
     
 Finally, you can run grano:
 
-    python datawire/manage.py runserver 
+    python grano/manage.py runserver 
 

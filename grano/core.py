@@ -10,11 +10,3 @@ app.config.from_envvar('GRANO_SETTINGS', silent=True)
 
 assets = Environment(app)
 
-@app.before_request
-def mongo_connect():
-    register_connection('default',
-        app.config.get('MONGODB_DATABASE', 'grano'),
-        host=app.config.get('MONGODB_HOST', 'localhost'),
-        port=app.config.get('MONGODB_PORT', 27017),
-        username=app.config.get('MONGODB_USERNAME'),
-        password=app.config.get('MONGODB_PASSWORD'))
