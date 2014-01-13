@@ -1,7 +1,12 @@
 import uuid
 from datetime import datetime
+from slugify import slugify
 
 from grano.core import db
+
+
+def slugify_column(text):
+    return slugify(text).replace('-', '_')
 
 
 class _CoreBase(object):
