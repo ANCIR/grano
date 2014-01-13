@@ -1,4 +1,4 @@
 
-from grano.model.user import User
-from grano.model.project import Project
+from grano.model.schema import Schema
+from grano.model.attribute import Attribute
 

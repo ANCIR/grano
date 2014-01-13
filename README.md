@@ -12,9 +12,9 @@ All
 * id  
 
 Schema
-* name
+* slug
 * label
-* type
+* obj (enum: Entity, Relation)
   
 Attribute
 * name
@@ -23,7 +23,7 @@ Attribute
 * schema_id
 
 Value
-* parent_id
+* obj_id (either an Entity's or Relation's UUID)
 * name
 * value
 * schema_id
@@ -31,11 +31,12 @@ Value
 * active
 * alias
 
-Entity
-* <only values>
+Entity (UUID)
+* [n Value]
+* [n:n Schema]
 
-Relation
-* <only values>
-
+Relation (UUID)
+* [n Value]
+* schema_id
 
 
