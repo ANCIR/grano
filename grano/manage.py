@@ -1,9 +1,10 @@
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 
-from grano.core import db, assets
-from grano.views import app
-from grano.io import import_schema, export_schema
+from grano.core import db, assets, app
+#from grano.views import app
+#from grano.io import import_schema, export_schema
+
 
 manager = Manager(app)
 manager.add_command("assets", ManageAssets(assets))
