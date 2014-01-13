@@ -1,3 +1,4 @@
+from grano.core import db
 from grano.model.common import IntBase, slugify_column
 
 

@@ -27,11 +27,21 @@ class Schema(db.Model, IntBase):
     		obj = cls()
     	obj.name = name
     	obj.label = data.get('label')
+
+        # TODO validate:
     	obj.obj = data.get('obj')
     	db.session.add(obj)
+        
+        # TODO check that the name is unique across 'obj'
+        names = []
     	for attribute in data.get('attributes', []):
-    		attribute['schema']
-    		obj.attributes.append(Attribute.from_dict(attribute))
+    		attribute['schema'] = obj
+            attr = Attribute.from_dict(attribute)
+    		obj.attributes.append(attr)
+            names.append(attr.name)
+        for attr in obj.attributes:
+            if attr.name not in names:
+                db.session.delete(attr)
     	return obj
 
 
@@ -40,6 +50,6 @@ class Schema(db.Model, IntBase):
     		'id': self.id,
     		'name': self.name,
     		'label': self.label,
-    		'obj': self.obj
+    		'obj': self.obj,
     		'attributes': [a.to_dict() for a in self.attributes]
     	}

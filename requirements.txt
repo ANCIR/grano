@@ -12,3 +12,4 @@ Flask-SQLAlchemy==1.0
 Jinja2==2.7.2
 SQLAlchemy==0.9.1
 python-slugify==0.0.7
+PyYAML==3.10

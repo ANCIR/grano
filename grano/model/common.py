@@ -9,6 +9,10 @@ def slugify_column(text):
     return slugify(text).replace('-', '_')
 
 
+def make_token():
+    return uuid.uuid4().get_hex()[15:]
+
+
 class _CoreBase(object):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
@@ -24,13 +28,9 @@ class _CoreBase(object):
         return db.session.query(cls)
 
 
-class IntBase(object):
+class IntBase(_CoreBase):
     id = db.Column(db.Integer, primary_key=True)
 
 
-class UUIDBase(object):
+class UUIDBase(_CoreBase):
     id = db.Column(db.Unicode, default=make_token, primary_key=True)
-
-
-def make_token():
-    return uuid.uuid4().get_hex()[15:]

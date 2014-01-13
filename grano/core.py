@@ -1,5 +1,6 @@
 from flask import Flask
 from flask.ext.assets import Environment
+from flask.ext.sqlalchemy import SQLAlchemy
 
 from grano import default_settings
 
