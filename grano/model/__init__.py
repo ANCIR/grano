@@ -1,3 +1,5 @@
 from grano.model.schema import Schema
 from grano.model.attribute import Attribute
-
+from grano.model.property import Property
+from grano.model.entity import Entity
+from grano.model.relation import Relation

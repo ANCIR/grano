@@ -27,7 +27,6 @@ class Attribute(db.Model, IntBase):
         return q.first()
 
 
-
     @classmethod
     def from_dict(cls, data):
     	schema = data.get('schema')

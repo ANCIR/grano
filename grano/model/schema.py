@@ -1,6 +1,7 @@
 from grano.core import db
 from grano.model.common import IntBase, slugify_column
 from grano.model.attribute import Attribute
+from grano.model.value import Value
 
 
 class Schema(db.Model, IntBase):
@@ -11,6 +12,8 @@ class Schema(db.Model, IntBase):
     obj = db.Column(db.Unicode())
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic')
+    values = db.relationship(Value, backref='schema', lazy='dynamic')
+    relations = db.relationship('Relation', backref='schema', lazy='dynamic')
 
 
     @classmethod
@@ -21,35 +24,35 @@ class Schema(db.Model, IntBase):
 
     @classmethod
     def from_dict(cls, data):
-    	name = slugify_column(data.get('name', data.get('label')))
-    	obj = cls.by_name(name)
-    	if obj is None:
-    		obj = cls()
-    	obj.name = name
-    	obj.label = data.get('label')
+        name = slugify_column(data.get('name', data.get('label')))
+        obj = cls.by_name(name)
+        if obj is None:
+            obj = cls()
+        obj.name = name
+        obj.label = data.get('label')
 
         # TODO validate:
-    	obj.obj = data.get('obj')
-    	db.session.add(obj)
+        obj.obj = data.get('obj')
+        db.session.add(obj)
         
         # TODO check that the name is unique across 'obj'
         names = []
-    	for attribute in data.get('attributes', []):
-    		attribute['schema'] = obj
+        for attribute in data.get('attributes', []):
+            attribute['schema'] = obj
             attr = Attribute.from_dict(attribute)
-    		obj.attributes.append(attr)
+            obj.attributes.append(attr)
             names.append(attr.name)
         for attr in obj.attributes:
             if attr.name not in names:
                 db.session.delete(attr)
-    	return obj
+        return obj
 
 
     def to_dict(self):
-    	return {
-    		'id': self.id,
-    		'name': self.name,
-    		'label': self.label,
-    		'obj': self.obj,
-    		'attributes': [a.to_dict() for a in self.attributes]
-    	}
+        return {
+            'id': self.id,
+            'name': self.name,
+            'label': self.label,
+            'obj': self.obj,
+            'attributes': [a.to_dict() for a in self.attributes]
+        }
