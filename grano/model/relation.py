@@ -9,6 +9,6 @@ class Relation(db.Model, UUIDBase):
     source_id = db.Column(db.Unicode, db.ForeignKey('entity.id'), index=True)
     target_id = db.Column(db.Unicode, db.ForeignKey('entity.id'), index=True)
 
-    properties = db.relationship('EntityProperty', backref='entity', lazy='dynamic')
+    properties = db.relationship('EntityProperty', backref='relation', lazy='dynamic')
 
 
