@@ -23,6 +23,14 @@ class Schema(db.Model, IntBase):
 
 
     @classmethod
+    def by_obj_name(cls, obj, name):
+        q = db.session.query(cls)
+        q = q.filter_by(name=name)
+        q = q.filter_by(obj=obj)
+        return q.first()
+
+
+    @classmethod
     def from_dict(cls, data):
         name = slugify_column(data.get('name', data.get('label')))
         obj = cls.by_name(name)

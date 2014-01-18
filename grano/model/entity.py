@@ -7,12 +7,13 @@ entity_schema = db.Table('entity_schema',
 )
 
 class Entity(db.Model, UUIDBase):
-    __tablename__ = 'entity'
+    OBJ = __tablename__ = 'entity'
 
-    schemas = db.relationship('Schema', secondary=entity_schema,
+    schemata = db.relationship('Schema', secondary=entity_schema,
         backref=db.backref('entities', lazy='dynamic'))
     
     inbound = db.relationship('Entity', backref='target', lazy='dynamic')
     outbound = db.relationship('Entity', backref='source', lazy='dynamic')
 
-    properties = db.relationship('Property', lazy='dynamic')
+    properties = db.relationship('EntityProperty', backref='entity', lazy='dynamic')
+
