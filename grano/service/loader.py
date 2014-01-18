@@ -18,18 +18,36 @@ class SchemaCache(object):
         return cls.SCHEMATA[(obj, name)]
 
 
-class EntityLoader(object):
+class _Properties(object):
+
+    def _setup(self):
+        self.properties = []
+
+
+    def set(self, name, value, source_url=None, active=True, key=False):
+        self.properties.append({
+            'name': name,
+            'value': value,
+            'source_url': source_url or self.source_url,
+            'active': active,
+            'key': key
+            })
+
+
+class EntityLoader(_Properties):
     
     def __init__(self, schemata, source_url=None):
+        self._setup()
         self.source_url = source_url
         schemata = set(schemata + ['base'])
         self.schemata = [SchemaCache.get(Entity, s) for s in schemata]
 
 
 
-class RelationLoader(object):
+class RelationLoader(_Properties):
     
     def __init__(self, schema, source, target, source_url=None):
+        self._setup()
         self.source_url = source_url
         self.source = source 
         self.target = target
