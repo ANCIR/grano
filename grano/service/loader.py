@@ -14,15 +14,15 @@ class SchemaCache(object):
             schema = Schema.by_obj_name(obj, name)
             if schema is None:
                 raise ValueError("Unknown schema: %s" % name)
-            SCHEMATA[(obj, name)] = schema
-        return SCHEMATA[(obj, name)]
+            cls.SCHEMATA[(obj, name)] = schema
+        return cls.SCHEMATA[(obj, name)]
 
 
 class EntityLoader(object):
     
     def __init__(self, schemata, source_url=None):
         self.source_url = source_url
-        schemata = set(schemata + ['entity_base'])
+        schemata = set(schemata + ['base'])
         self.schemata = [SchemaCache.get(Entity, s) for s in schemata]
 
 

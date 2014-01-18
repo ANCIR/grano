@@ -1,4 +1,4 @@
-  - name: core
+  - name: Base
     label: Entity Base
     obj: entity
     attributes:
@@ -7,7 +7,7 @@
       - name: tagline
         label: Short description
 
-  - name: person
+  - name: Person
     label: Person
     obj: entity
     attributes:
