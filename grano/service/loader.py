@@ -40,7 +40,7 @@ class ObjectLoader(object):
             raise ValueError('Invalud attribute name: %s' % name)
         self.properties.append({
             'name': name,
-            'value': value,
+            'value': value if value is None else unicode(value),
             'source_url': source_url or self.source_url,
             'active': active,
             'key': key
@@ -52,6 +52,17 @@ class EntityLoader(ObjectLoader):
     def __init__(self, schemata, source_url=None):
         self._setup(Entity, set(schemata + ['base']))
         self.source_url = source_url
+        self._entity = None
+
+    @property
+    def entity(self):
+        if self._entity is None:
+            self.save()
+        return self._entity
+
+    def save(self):
+        self._entity = Entity.save(self.schemata, self.properties)
+        db.session.flush()
 
 
 class RelationLoader(ObjectLoader):
@@ -61,6 +72,11 @@ class RelationLoader(ObjectLoader):
         self.source_url = source_url
         self.source = source 
         self.target = target
+
+    def save(self):
+        self.relation = Relation.save(self.schemata.pop(),
+            self.properties, self.source.entity, self.target.entity)
+        db.session.flush()
 
 
 class Loader(object):
@@ -79,11 +95,11 @@ class Loader(object):
         self.entities.append(entity)
         return entity
 
-    def make_relation(self, source, target, source_url=None):
+    def make_relation(self, schema, source, target, source_url=None):
         relation = RelationLoader(schema, source, target,
             source_url=source_url or self.source_url)
         self.relations.append(relation)
         return relation
 
     def persist(self):
-        pass
+        db.session.commit()

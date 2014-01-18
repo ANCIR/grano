@@ -1,5 +1,6 @@
 from grano.core import db
 from grano.model.common import UUIDBase
+from grano.model.property import RelationProperty
 
 
 class Relation(db.Model, UUIDBase):
@@ -11,4 +12,15 @@ class Relation(db.Model, UUIDBase):
 
     properties = db.relationship('EntityProperty', backref='relation', lazy='dynamic')
 
+
+    @classmethod
+    def save(cls, schema, properties, source, target):
+        obj = cls()
+        obj.source = source
+        obj.target = target
+        obj.schema = schema
+        for prop in properties:
+            RelationProperty.save(obj, prop)
+        db.session.add(obj)
+        return obj
 

@@ -16,6 +16,12 @@ class Schema(db.Model, IntBase):
     relations = db.relationship('Relation', backref='schema', lazy='dynamic')
 
 
+    def get_attribute(self, name):
+        for attribute in self.attributes:
+            if attribute.name == name:
+                return attribute
+
+
     @classmethod
     def by_name(cls, name):
         q = db.session.query(cls).filter_by(name=name)
