@@ -18,13 +18,26 @@ class SchemaCache(object):
         return cls.SCHEMATA[(obj, name)]
 
 
-class _Properties(object):
+class ObjectLoader(object):
 
-    def _setup(self):
+    def _setup(self, type, schemata):
+        self.schemata = [SchemaCache.get(type, s) for s in schemata]
         self.properties = []
 
+    @property
+    def attributes(self):
+        for schema in self.schemata:
+            for attribute in schema.attributes:
+                yield attribute
+
+    @property
+    def attribute_names(self):
+        for attribute in self.attributes:
+            yield attribute.name
 
     def set(self, name, value, source_url=None, active=True, key=False):
+        if name not in self.attribute_names:
+            raise ValueError('Invalud attribute name: %s' % name)
         self.properties.append({
             'name': name,
             'value': value,
@@ -34,24 +47,20 @@ class _Properties(object):
             })
 
 
-class EntityLoader(_Properties):
+class EntityLoader(ObjectLoader):
     
     def __init__(self, schemata, source_url=None):
-        self._setup()
+        self._setup(Entity, set(schemata + ['base']))
         self.source_url = source_url
-        schemata = set(schemata + ['base'])
-        self.schemata = [SchemaCache.get(Entity, s) for s in schemata]
 
 
-
-class RelationLoader(_Properties):
+class RelationLoader(ObjectLoader):
     
     def __init__(self, schema, source, target, source_url=None):
-        self._setup()
+        self._setup(Relation, [schema])
         self.source_url = source_url
         self.source = source 
         self.target = target
-        self.schema = SchemaCache.get(Relation, schema)
 
 
 class Loader(object):
@@ -64,20 +73,17 @@ class Loader(object):
         self.entities = []
         self.relations = []
 
-
     def make_entity(self, schemata, source_url=None):
         entity = EntityLoader(schemata,
             source_url=source_url or self.source_url)
         self.entities.append(entity)
         return entity
 
-
     def make_relation(self, source, target, source_url=None):
         relation = RelationLoader(schema, source, target,
             source_url=source_url or self.source_url)
         self.relations.append(relation)
         return relation
-
 
     def persist(self):
         pass
