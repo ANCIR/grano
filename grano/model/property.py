@@ -22,6 +22,15 @@ class Property(db.Model, IntBase):
         self.active = prop.get('active')
         db.session.add(self)
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'schema': self.schema.name,
+            'value': self.value,
+            'source_url': self.source_url,
+            'active': self.active
+        }
+
 
 class EntityProperty(Property):
     __mapper_args__ = {'polymorphic_identity': 'entity'}

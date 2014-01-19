@@ -41,3 +41,14 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         obj.schemata = list(set(obj.schemata + schemata))
         obj._update_properties(properties)
         return obj
+
+
+    def to_basic_dict(self):
+        data = {}
+        for prop in self.active_properties:
+            data[prop.name] = prop.value
+        return {
+            'id': self.id,
+            'schemata': [s.name for s in self.schemata],
+            'properties': data
+        }

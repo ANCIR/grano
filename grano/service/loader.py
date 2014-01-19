@@ -3,25 +3,11 @@ from grano.core import db
 from grano.model import Schema, Entity, Relation
 
 
-class SchemaCache(object):
-    # TODO: move to model?
-    SCHEMATA = {}
-
-    @classmethod
-    def get(cls, type, name):
-        obj = type.OBJ
-        if not (obj, name) in cls.SCHEMATA:
-            schema = Schema.by_obj_name(obj, name)
-            if schema is None:
-                raise ValueError("Unknown schema: %s" % name)
-            cls.SCHEMATA[(obj, name)] = schema
-        return cls.SCHEMATA[(obj, name)]
-
-
 class ObjectLoader(object):
+    # Abstract parent
 
     def _setup(self, type, schemata):
-        self.schemata = [SchemaCache.get(type, s) for s in schemata]
+        self.schemata = [Schema.cached(type, s) for s in schemata]
         self.properties = {}
         self.update_criteria = set()
 
