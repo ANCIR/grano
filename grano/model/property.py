@@ -2,6 +2,13 @@ from grano.core import db
 from grano.model.common import IntBase
 
 
+# Rules for updating properties
+# * If a property with the given name does not exist, create it.
+# * If a property exists and the value of the active property is different
+#   set the active property to in-active, and create a new property.
+# * If a property isn't present, don't touch it. (Maybe a flag?)
+
+
 class Property(db.Model, IntBase):
     __tablename__ = 'property'
 
@@ -14,8 +21,9 @@ class Property(db.Model, IntBase):
     obj = db.Column(db.String(20))
     __mapper_args__ = {'polymorphic_on': obj}
 
-    def _apply_properties(self, prop):
-        self.name = prop.get('name')
+    def _apply_properties(self, name, prop):
+        self.name = name
+        self.schema = prop.get('schema')
         self.value = prop.get('value')
         self.source_url = prop.get('source_url')
         self.active = prop.get('active')
@@ -28,13 +36,10 @@ class EntityProperty(Property):
     entity_id = db.Column(db.Unicode(), db.ForeignKey('entity.id'), index=True)
 
     @classmethod
-    def save(cls, entity, prop):
+    def save(cls, entity, name, prop):
         obj = cls()
         obj.entity = entity
-        for schema in entity.schemata:
-            if schema.get_attribute(prop.get('name')):
-                obj.schema = schema
-        obj._apply_properties(prop)
+        obj._apply_properties(name, prop)
 
 
 class RelationProperty(Property):
@@ -44,8 +49,7 @@ class RelationProperty(Property):
                             index=True)
 
     @classmethod
-    def save(cls, relation, prop):
+    def save(cls, relation, name, prop):
         obj = cls()
         obj.relation = relation
-        obj.schema = relation.schema
-        obj._apply_properties(prop)
+        obj._apply_properties(name, prop)

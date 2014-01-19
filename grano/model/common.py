@@ -31,6 +31,34 @@ class _CoreBase(object):
 class IntBase(_CoreBase):
     id = db.Column(db.Integer, primary_key=True)
 
+    def __repr__(self):
+        return '<%s(%s)>' % (self.__class__.__name__, self.id)
+
 
 class UUIDBase(_CoreBase):
     id = db.Column(db.Unicode, default=make_token, primary_key=True)
+
+    def __repr__(self):
+        return '<%s(%s)>' % (self.__class__.__name__, self.id)
+
+
+class PropertyBase(object):
+
+    @property
+    def active_properties(self):
+        q = self.properties.filter_by(active=True)
+        return q
+
+
+    @classmethod
+    def by_property(cls, name, value, only_active=True):
+        from grano.model.property import Property
+        q = db.session.query(cls)
+        q = q.join(cls.properties)
+
+        q = q.filter(Property.name==name)
+        q = q.filter(Property.value==value)
+        if only_active:
+            q = q.filter(Property.active==True)
+            return q.first()
+        return q

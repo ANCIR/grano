@@ -22,7 +22,13 @@ class ObjectLoader(object):
 
     def _setup(self, type, schemata):
         self.schemata = [SchemaCache.get(type, s) for s in schemata]
-        self.properties = []
+        self.properties = {}
+
+    def get_schema(self, name):
+        for schema in self.schemata:
+            for attribute in schema.attributes:
+                if attribute.name == name:
+                    yield schema
 
     @property
     def attributes(self):
@@ -36,15 +42,17 @@ class ObjectLoader(object):
             yield attribute.name
 
     def set(self, name, value, source_url=None, active=True, key=False):
-        if name not in self.attribute_names:
+        schema = self.get_schema(name)
+        if name is None:
             raise ValueError('Invalud attribute name: %s' % name)
-        self.properties.append({
+        self.properties[name] = {
             'name': name,
             'value': value if value is None else unicode(value),
             'source_url': source_url or self.source_url,
             'active': active,
+            'schema': schema,
             'key': key
-            })
+            }
 
 
 class EntityLoader(ObjectLoader):
@@ -61,6 +69,7 @@ class EntityLoader(ObjectLoader):
         return self._entity
 
     def save(self):
+        #print Entity.by_property('name', self.properties.get('name').get('value'))
         self._entity = Entity.save(self.schemata, self.properties)
         db.session.flush()
 

@@ -1,9 +1,9 @@
 from grano.core import db
-from grano.model.common import UUIDBase
+from grano.model.common import UUIDBase, PropertyBase
 from grano.model.property import RelationProperty
 
 
-class Relation(db.Model, UUIDBase):
+class Relation(db.Model, UUIDBase, PropertyBase):
     OBJ = __tablename__ = 'relation'
 
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'), index=True)
@@ -19,8 +19,7 @@ class Relation(db.Model, UUIDBase):
         obj.source = source
         obj.target = target
         obj.schema = schema
-        for prop in properties:
-            RelationProperty.save(obj, prop)
+        for name, prop in properties.items():
+            RelationProperty.save(obj, name, prop)
         db.session.add(obj)
         return obj
-

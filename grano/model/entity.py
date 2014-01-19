@@ -1,5 +1,5 @@
 from grano.core import db
-from grano.model.common import UUIDBase
+from grano.model.common import UUIDBase, PropertyBase
 
 from grano.model.relation import Relation
 from grano.model.property import EntityProperty
@@ -11,7 +11,7 @@ entity_schema = db.Table('entity_schema',
 )
 
 
-class Entity(db.Model, UUIDBase):
+class Entity(db.Model, UUIDBase, PropertyBase):
     OBJ = __tablename__ = 'entity'
 
     schemata = db.relationship('Schema', secondary=entity_schema,
@@ -29,8 +29,8 @@ class Entity(db.Model, UUIDBase):
     @classmethod
     def save(cls, schemata, properties):
         obj = cls()
-        obj.schemata = schemata
-        for prop in properties:
-            EntityProperty.save(obj, prop)
+        obj.schemata = list(set(obj.schemata + schemata))
+        for name, prop in properties.items():
+            EntityProperty.save(obj, name, prop)
         db.session.add(obj)
         return obj
