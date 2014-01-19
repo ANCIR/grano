@@ -49,16 +49,33 @@ class PropertyBase(object):
         q = self.properties.filter_by(active=True)
         return q
 
+    def _update_properties(self, properties):
+        objs = list(self.active_properties)
+        for name, prop in properties.items():
+            create = True
+            for obj in objs:
+                if obj.name != name:
+                    continue
+                if obj.value == prop.get('value'):
+                    create = False
+                else:
+                    obj.active = False
+            if create and prop.get('value') is not None:
+                self.PROPERTIES.save(self, name, prop)
+
+    @classmethod
+    def _filter_property(cls, q, name, value, only_active=True):
+        q = q.join(cls.properties, aliased=True)
+        q = q.filter(cls.PROPERTIES.name==name)
+        q = q.filter(cls.PROPERTIES.value==value)
+        if only_active:
+            q = q.filter(cls.PROPERTIES.active==True)
+        q = q.reset_joinpoint()
+        return q
+
 
     @classmethod
     def by_property(cls, name, value, only_active=True):
-        from grano.model.property import Property
         q = db.session.query(cls)
-        q = q.join(cls.properties)
-
-        q = q.filter(Property.name==name)
-        q = q.filter(Property.value==value)
-        if only_active:
-            q = q.filter(Property.active==True)
-            return q.first()
+        q = cls._filter_property(q, name, value, only_active=only_active)
         return q

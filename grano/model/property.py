@@ -2,13 +2,6 @@ from grano.core import db
 from grano.model.common import IntBase
 
 
-# Rules for updating properties
-# * If a property with the given name does not exist, create it.
-# * If a property exists and the value of the active property is different
-#   set the active property to in-active, and create a new property.
-# * If a property isn't present, don't touch it. (Maybe a flag?)
-
-
 class Property(db.Model, IntBase):
     __tablename__ = 'property'
 

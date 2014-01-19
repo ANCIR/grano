@@ -23,6 +23,7 @@ class ObjectLoader(object):
     def _setup(self, type, schemata):
         self.schemata = [SchemaCache.get(type, s) for s in schemata]
         self.properties = {}
+        self.update_criteria = set()
 
     def get_schema(self, name):
         for schema in self.schemata:
@@ -30,18 +31,10 @@ class ObjectLoader(object):
                 if attribute.name == name:
                     yield schema
 
-    @property
-    def attributes(self):
-        for schema in self.schemata:
-            for attribute in schema.attributes:
-                yield attribute
+    def unique(self, name, only_active=True):
+        self.update_criteria.add((name, only_active))
 
-    @property
-    def attribute_names(self):
-        for attribute in self.attributes:
-            yield attribute.name
-
-    def set(self, name, value, source_url=None, active=True, key=False):
+    def set(self, name, value, source_url=None, key=False):
         schema = self.get_schema(name)
         if name is None:
             raise ValueError('Invalud attribute name: %s' % name)
@@ -49,7 +42,7 @@ class ObjectLoader(object):
             'name': name,
             'value': value if value is None else unicode(value),
             'source_url': source_url or self.source_url,
-            'active': active,
+            'active': True,
             'schema': schema,
             'key': key
             }
@@ -59,6 +52,7 @@ class EntityLoader(ObjectLoader):
     
     def __init__(self, schemata, source_url=None):
         self._setup(Entity, set(schemata + ['base']))
+        self.unique('name', only_active=False)
         self.source_url = source_url
         self._entity = None
 
@@ -69,8 +63,8 @@ class EntityLoader(ObjectLoader):
         return self._entity
 
     def save(self):
-        #print Entity.by_property('name', self.properties.get('name').get('value'))
-        self._entity = Entity.save(self.schemata, self.properties)
+        self._entity = Entity.save(self.schemata, self.properties,
+            self.update_criteria)
         db.session.flush()
 
 
@@ -84,7 +78,8 @@ class RelationLoader(ObjectLoader):
 
     def save(self):
         self.relation = Relation.save(self.schemata.pop(),
-            self.properties, self.source.entity, self.target.entity)
+            self.properties, self.source.entity, self.target.entity,
+            self.update_criteria)
         db.session.flush()
 
 
