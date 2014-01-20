@@ -29,18 +29,43 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
 
     @classmethod
-    def save(cls, schemata, properties, update_criteria):
+    def by_name(cls, name, only_active=False):
         q = db.session.query(cls)
-        for name, only_active in update_criteria:
-            value = properties.get(name).get('value')
-            q = cls._filter_property(q, name, value, only_active=only_active)
-        obj = q.first()
+        q = cls._filter_property(q, 'name', name, only_active=only_active)
+        return q.first()
+
+
+    @classmethod
+    def save(cls, schemata, properties, update_criteria):
+        obj = None
+        if len(update_criteria):
+            q = db.session.query(cls)
+            for name, only_active in update_criteria:
+                value = properties.get(name).get('value')
+                q = cls._filter_property(q, name, value, only_active=only_active)
+            obj = q.first()
         if obj is None:
             obj = cls()
             db.session.add(obj)
         obj.schemata = list(set(obj.schemata + schemata))
         obj._update_properties(properties)
         return obj
+
+
+    def merge_into(self, target):
+        target_active = [p.name for p in target.active_properties]
+        target.schemata = list(set(target.schemata + self.schemata))
+        for prop in self.properties:
+            if prop.name in target_active:
+                prop.entity = target
+        for rel in self.inbound:
+            # TODO: what if this relation now points at the same thing on both ends?
+            rel.target = target
+        for rel in self.outbound:
+            rel.source = target
+        # Authorization code RIKER B4921A
+        db.session.delete(self)
+        #return target
 
 
     def to_basic_dict(self):

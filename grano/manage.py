@@ -3,6 +3,7 @@ from flask.ext.assets import ManageAssets
 
 from grano.core import db, assets, app
 from grano.service import import_schema, export_schema
+from grano.service import import_aliases, export_aliases
 
 
 manager = Manager(app)
@@ -25,6 +26,18 @@ def schema_import(path):
 def schema_export(path):
     """ Export the current schema to a YAML file. """
     export_schema(path)
+
+
+@manager.command
+def alias_import(path):
+    """ Load a set of entity aliases from a CSV file. """
+    import_aliases(path)
+
+
+@manager.command
+def alias_export(path):
+    """ Export all known entity aliases to a CSV file. """
+    export_aliases(path)
 
 
 if __name__ == "__main__":
