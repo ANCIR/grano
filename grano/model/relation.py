@@ -45,3 +45,14 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     		'schema': self.schema.name,
     		'properties': data
     	}
+
+    def to_index(self):
+        data = {
+            'id': self.id,
+            'source': self.source_id,
+            'target': self.target_id,
+            'schema': self.schema.to_dict(shallow=True),
+        }        
+        for prop in self.active_properties:
+            data[prop.qualified_name] = prop.value
+        return data

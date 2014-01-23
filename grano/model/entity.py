@@ -77,3 +77,37 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             'schemata': [s.name for s in self.schemata],
             'properties': data
         }
+
+    def to_index(self):
+        data = {
+            'id': self.id,
+            'schemata': [s.to_dict(shallow=True) for s in self.schemata if s.name != 'base'],
+            'num_schemata': len(self.schemata),
+            'num_properties': 0,
+            'inbound': [],
+            'outbound': [],
+            'relations': [],
+            'names': []
+            }
+
+        # TODO: relations
+        for rel in self.inbound:
+            rel_data = rel.to_index()
+            data['inbound'].append(rel_data)
+            data['relations'].append(rel_data)
+
+        for rel in self.outbound:
+            rel_data = rel.to_index()
+            data['outbound'].append(rel_data)
+            data['relations'].append(rel_data)
+
+        data['num_relations'] = len(data['relations'])
+
+        for prop in self.properties:
+            if prop.name == 'name':
+                data['names'].append(prop.value)
+            if prop.active and prop.qualified_name not in data:
+                data[prop.qualified_name] = prop.value
+                data['num_properties'] += 1
+        
+        return data
