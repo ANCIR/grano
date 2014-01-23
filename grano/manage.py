@@ -4,6 +4,7 @@ from flask.ext.assets import ManageAssets
 from grano.core import db, assets, app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
+from grano.service import index_entities
 
 
 manager = Manager(app)
@@ -38,6 +39,12 @@ def alias_import(path):
 def alias_export(path):
     """ Export all known entity aliases to a CSV file. """
     export_aliases(path)
+
+
+@manager.command
+def index():
+    """ (Re-)create a full text search index. """
+    index_entities()
 
 
 if __name__ == "__main__":
