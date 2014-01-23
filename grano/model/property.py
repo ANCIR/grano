@@ -14,6 +14,13 @@ class Property(db.Model, IntBase):
     obj = db.Column(db.String(20))
     __mapper_args__ = {'polymorphic_on': obj}
 
+    @property
+    def qualified_name(self):
+        name = self.name
+        if self.schema is not None:
+            name = self.schema.name + '.' + name
+        return name
+
     def _apply_properties(self, name, prop):
         self.name = name
         self.schema = prop.get('schema')
