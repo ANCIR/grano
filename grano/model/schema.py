@@ -1,7 +1,7 @@
 from grano.core import db
 from grano.model.common import IntBase, slugify_column
 from grano.model.attribute import Attribute
-from grano.model.value import Value
+from grano.model.property import Property
 
 
 class Schema(db.Model, IntBase):
@@ -13,7 +13,7 @@ class Schema(db.Model, IntBase):
     obj = db.Column(db.Unicode())
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic')
-    values = db.relationship(Value, backref='schema', lazy='dynamic')
+    properties = db.relationship(Property, backref='schema', lazy='dynamic')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic')
 
 
@@ -74,11 +74,13 @@ class Schema(db.Model, IntBase):
         return obj
 
 
-    def to_dict(self):
-        return {
+    def to_dict(self, shallow=False):
+        data = {
             'id': self.id,
             'name': self.name,
             'label': self.label,
-            'obj': self.obj,
-            'attributes': [a.to_dict() for a in self.attributes]
+            'obj': self.obj
         }
+        if not shallow:
+            data['attributes'] = [a.to_dict() for a in self.attributes]
+        return data
