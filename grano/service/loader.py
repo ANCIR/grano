@@ -15,7 +15,7 @@ class ObjectLoader(object):
         for schema in self.schemata:
             for attribute in schema.attributes:
                 if attribute.name == name:
-                    yield schema
+                    return schema
 
     def unique(self, name, only_active=True):
         self.update_criteria.add((name, only_active))
