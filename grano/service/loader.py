@@ -1,6 +1,10 @@
+import logging
 
 from grano.core import db
 from grano.model import Schema, Entity, Relation
+
+
+log = logging.getLogger(__name__)
 
 
 class ObjectLoader(object):
@@ -24,10 +28,13 @@ class ObjectLoader(object):
         schema = self.get_schema(name)
         if name is None:
             raise ValueError('Invalud attribute name: %s' % name)
+        source_url = source_url or self.source_url
+        if source_url is None:
+            log.warning('No source for property %s.', name)
         self.properties[name] = {
             'name': name,
             'value': value if value is None else unicode(value),
-            'source_url': source_url or self.source_url,
+            'source_url': source_url,
             'active': True,
             'schema': schema,
             'key': key
