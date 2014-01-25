@@ -19,3 +19,8 @@ def index_entities():
         if i % 100 == 0:
             log.info("Indexed: %s entities", i)
     es.indices.refresh(index=es_index)
+
+
+def flush_entities():
+    query = {'query': {"match_all": {}}}
+    es.delete_by_query(index=es_index, doc_type='entity', q='*:*')

@@ -43,7 +43,7 @@ class ESSearcher(object):
             }
         else:
             query['query'] = {"match_all": {}}
-        self.results = es.search(index=es_index, body=query)
+        self.results = es.search(index=es_index, doc_type='entity', body=query)
 
     def __iter__(self):
         if self.results is None:

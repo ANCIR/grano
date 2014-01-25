@@ -6,7 +6,7 @@ from flask.ext.assets import ManageAssets
 from grano.core import db, assets, app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
-from grano.service import index_entities, search_entities
+from grano.service import index_entities, search_entities, flush_entities
 
 
 log = logging.getLogger('grano')
@@ -48,6 +48,13 @@ def alias_export(path):
 def index():
     """ (Re-)create a full text search index. """
     index_entities()
+
+
+@manager.command
+def flush_index():
+    """ Delete the full text search index. """
+    flush_entities()
+
 
 @manager.command
 def search(text):
