@@ -28,7 +28,7 @@ def import_alias(data):
     # old entities whenever that makes sense.
     canonical = Entity.by_name(data.get('canonical'))
     if canonical is None:
-        schema = Schema.cached('entity', 'base')
+        schema = Schema.cached(Entity, 'base')
         prop = {
             'name': 'name', 
             'value': data.get('canonical'),
@@ -42,7 +42,7 @@ def import_alias(data):
     alias = Entity.by_name(data.get('alias'))
     if alias is None:
         Entity.PROPERTIES.save(canonical, 'name', {
-            'schema': Schema.cached('entity', 'base'),
+            'schema': Schema.cached(Entity, 'base'),
             'value': data.get('alias'),
             'active': False,
             'source_url': data.get('source_url')
