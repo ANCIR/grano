@@ -47,6 +47,7 @@ class PropertyBase(object):
     @property
     def active_properties(self):
         q = self.properties.filter_by(active=True)
+        q = q.order_by(self.PROPERTIES.name.desc())
         return q
 
     def _update_properties(self, properties):

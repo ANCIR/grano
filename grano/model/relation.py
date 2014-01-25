@@ -16,6 +16,12 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     	backref='relation', lazy='dynamic')
 
 
+    def get_attribute(self, prop_name):
+        for attribute in self.schema.attributes:
+            if attribute.name == prop_name:
+                return attribute
+
+
     @classmethod
     def save(cls, schema, properties, source, target, update_criteria):
     	q = db.session.query(cls)

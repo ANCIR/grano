@@ -34,7 +34,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         q = cls._filter_property(q, 'name', name, only_active=only_active)
         return q.first()
 
-
     @classmethod
     def save(cls, schemata, properties, update_criteria):
         obj = None
@@ -51,7 +50,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         obj._update_properties(properties)
         return obj
 
-
     def merge_into(self, target):
         target_active = [p.name for p in target.active_properties]
         target.schemata = list(set(target.schemata + self.schemata))
@@ -67,6 +65,25 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         db.session.delete(self)
         #return target
 
+    def get_attribute(self, prop_name):
+        for schema in self.schemata:
+            for attribute in schema.attributes:
+                if attribute.name == prop_name:
+                    return attribute
+
+    def __getitem__(self, name):
+        for prop in self.active_properties:
+            if prop.name == name:
+                return prop
+
+    def has_property(self, name):
+        return self[name] is not None
+
+    def has_schema(self, name):
+        for schema in self.schemata:
+            if schema.name == name:
+                return True
+        return False
 
     def to_basic_dict(self):
         data = {}
@@ -109,5 +126,5 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             if prop.active and prop.qualified_name not in data:
                 data[prop.qualified_name] = prop.value
                 data['num_properties'] += 1
-        
+
         return data
