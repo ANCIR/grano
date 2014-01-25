@@ -8,6 +8,7 @@ class Attribute(db.Model, IntBase):
     name = db.Column(db.Unicode())
     label = db.Column(db.Unicode())
     description = db.Column(db.Unicode())
+    hidden = db.Column(db.Boolean())
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
 
 
@@ -15,6 +16,7 @@ class Attribute(db.Model, IntBase):
         return {
             'name': self.name,
             'label': self.label,
+            'hidden': self.hidden,
             'description': self.description
         }
 
@@ -36,6 +38,7 @@ class Attribute(db.Model, IntBase):
             obj = cls()
         obj.name = name
         obj.label = data.get('label')
+        obj.hidden = data.get('hidden')
         obj.description = data.get('description')
         obj.schema = schema
         db.session.add(obj)

@@ -10,6 +10,8 @@ class Schema(db.Model, IntBase):
 
     name = db.Column(db.Unicode())
     label = db.Column(db.Unicode())
+    label_in = db.Column(db.Unicode())
+    label_out = db.Column(db.Unicode())
     obj = db.Column(db.Unicode())
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic')
@@ -56,6 +58,8 @@ class Schema(db.Model, IntBase):
             obj = cls()
         obj.name = name
         obj.label = data.get('label')
+        obj.label_in = data.get('label_in', obj.label)
+        obj.label_out = data.get('label_out', obj.label)
 
         # TODO validate:
         obj.obj = data.get('obj')

@@ -1,6 +1,7 @@
 from grano.core import db
 from grano.model.common import UUIDBase, PropertyBase
 
+from grano.model.schema import Schema
 from grano.model.relation import Relation
 from grano.model.property import EntityProperty
 
@@ -64,6 +65,30 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         # Authorization code RIKER B4921A
         db.session.delete(self)
         #return target
+
+    @property
+    def inbound_schemata(self):
+        from grano.model.relation import Relation
+        q = db.session.query(Schema)
+        q = q.join(Schema.relations)
+        q = q.filter(Relation.target_id==self.id)
+        return q.distinct()
+
+    def inbound_by_schema(self, schema):
+        q = self.inbound.filter_by(schema=schema)
+        return q
+
+    @property
+    def outbound_schemata(self):
+        from grano.model.relation import Relation
+        q = db.session.query(Schema)
+        q = q.join(Schema.relations)
+        q = q.filter(Relation.source_id==self.id)
+        return q.distinct()
+
+    def outbound_by_schema(self, schema):
+        q = self.outbound.filter_by(schema=schema)
+        return q
 
     def get_attribute(self, prop_name):
         for schema in self.schemata:
