@@ -4,18 +4,19 @@ from flask import url_for, request
 
 class Pager(object):
 
-    def __init__(self, query, limit=25, pager_range=3, **kwargs):
+    def __init__(self, query, name, limit=25, pager_range=3, **kwargs):
         self.args = request.args
+        self.name = name
         self.query = query
         self.kwargs = kwargs
         self.pager_range = pager_range
 
         try:
-            self.page = int(request.args.get('page'))
+            self.page = int(request.args.get(name + '_page'))
         except:
             self.page = 1
         try:
-            self.limit = min(int(request.args.get('limit')), 200)
+            self.limit = min(int(request.args.get(name + '_limit')), 200)
         except:
             self.limit = limit
 
@@ -48,7 +49,7 @@ class Pager(object):
     @property
     def query_args(self):
         return [(k, v.encode('utf-8')) for k, v in self.args.items() \
-                if k != 'page']
+                if k != self.name + '_page']
 
     @property
     def range(self):
@@ -77,7 +78,7 @@ class Pager(object):
         return self.url(query_args)
 
     def page_url(self, page):
-        return self.add_url_state('page', page)
+        return self.add_url_state(self.name + '_page', page)
 
     def url(self, query):
         kw = dict(query)
