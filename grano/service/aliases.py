@@ -30,13 +30,12 @@ def import_alias(data):
     if canonical is None:
         schema = Schema.cached(Entity, 'base')
         prop = {
-            'name': 'name', 
             'value': data.get('canonical'),
             'active': True,
             'schema': schema,
             'source_url': data.get('source_url')
             }
-        canonical = Entity.save([schema], [prop], [])
+        canonical = Entity.save([schema], {'name': prop}, [])
         db.session.flush()
 
     alias = Entity.by_name(data.get('alias'))
