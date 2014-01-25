@@ -83,7 +83,7 @@ class Pager(object):
     def url(self, query):
         kw = dict(query)
         kw.update(self.kwargs)
-        return url_for(request.endpoint, **dict(kw))
+        return url_for(request.endpoint, **dict(kw)) + '#' + self.name
 
     def __iter__(self):
         query = self.query
