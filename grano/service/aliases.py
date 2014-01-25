@@ -19,7 +19,7 @@ def import_aliases(path):
             assert 'canonical' in data, 'No "canonical" column!'
             assert 'alias' in data, 'No "alias" column!'
             import_alias(data)
-        db.session.commit()
+            db.session.commit()
 
 
 def import_alias(data):
