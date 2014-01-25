@@ -1,12 +1,15 @@
+import logging 
+
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 
 from grano.core import db, assets, app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
-from grano.service import index_entities
+from grano.service import index_entities, search_entities
 
 
+log = logging.getLogger('grano')
 manager = Manager(app)
 manager.add_command("assets", ManageAssets(assets))
 
@@ -45,6 +48,16 @@ def alias_export(path):
 def index():
     """ (Re-)create a full text search index. """
     index_entities()
+
+@manager.command
+def search(text):
+    """ Search for a query string. """
+    res = search_entities({'q': text})
+
+    for hit in res.get('hits'):
+        log.info("%s: %s", hit.get('_id'), hit.get('_source').get('name'))
+
+    log.info("Total hits: %s", res.get('total'))
 
 
 if __name__ == "__main__":

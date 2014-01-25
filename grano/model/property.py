@@ -16,10 +16,11 @@ class Property(db.Model, IntBase):
 
     @property
     def qualified_name(self):
-        name = self.name
-        if self.schema is not None:
-            name = self.schema.name + '.' + name
-        return name
+        return self.name
+        #name = self.name
+        #if self.schema is not None:
+        #    name = self.schema.name + '.' + name
+        #return name
 
     def _apply_properties(self, name, prop):
         self.name = name
