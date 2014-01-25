@@ -56,7 +56,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         target.schemata = list(set(target.schemata + self.schemata))
         for prop in self.properties:
             if prop.name in target_active:
-                prop.entity = target
+                prop.active = False
+            prop.entity = target
         for rel in self.inbound:
             # TODO: what if this relation now points at the same thing on both ends?
             rel.target = target
@@ -64,7 +65,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             rel.source = target
         # Authorization code RIKER B4921A
         db.session.delete(self)
-        #return target
 
     @property
     def inbound_schemata(self):
@@ -95,14 +95,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             for attribute in schema.attributes:
                 if attribute.name == prop_name:
                     return attribute
-
-    def __getitem__(self, name):
-        for prop in self.active_properties:
-            if prop.name == name:
-                return prop
-
-    def has_property(self, name):
-        return self[name] is not None
 
     def has_schema(self, name):
         for schema in self.schemata:

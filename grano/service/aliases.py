@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 def import_aliases(path):
     with open(path, 'r') as fh:
         reader = DictReader(fh)
-        for row in reader:
+        for i, row in enumerate(reader):
             data = {}
             for k, v in row.items():
                 k = k.lower().strip()
@@ -19,18 +19,27 @@ def import_aliases(path):
             assert 'canonical' in data, 'No "canonical" column!'
             assert 'alias' in data, 'No "alias" column!'
             import_alias(data)
-            db.session.commit()
+            if i % 1000 == 0:
+                db.session.commit()
+        db.session.commit()
 
 
 def import_alias(data):
     # TODO: this actually deleted old entities, i.e. makes invalid 
     # entities - we should try and either re-direct them, or keep 
     # old entities whenever that makes sense.
-    canonical = Entity.by_name(data.get('canonical'))
+    canonical_name = data.get('canonical').strip()
+    alias_name = data.get('alias').strip()
+
+    if canonical_name == alias_name or not len(canonical_name):
+        log.info("SKIP: %s", canonical_name)
+        return
+
+    canonical = Entity.by_name(canonical_name)
     if canonical is None:
         schema = Schema.cached(Entity, 'base')
         prop = {
-            'value': data.get('canonical'),
+            'value': canonical_name,
             'active': True,
             'schema': schema,
             'source_url': data.get('source_url')
@@ -38,7 +47,7 @@ def import_alias(data):
         canonical = Entity.save([schema], {'name': prop}, [])
         db.session.flush()
 
-    alias = Entity.by_name(data.get('alias'))
+    alias = Entity.by_name(alias_name)
     if alias is None:
         Entity.PROPERTIES.save(canonical, 'name', {
             'schema': Schema.cached(Entity, 'base'),
@@ -46,12 +55,9 @@ def import_alias(data):
             'active': False,
             'source_url': data.get('source_url')
             })
-        return
-
-    elif alias.id != canonical.id:
+        log.info("Aliased.")
+    else:
         alias.merge_into(canonical)
-
-    if alias.id != canonical.id:
         log.info("Mapped: %s -> %s", alias.id, canonical.id)
 
 

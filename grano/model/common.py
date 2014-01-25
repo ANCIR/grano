@@ -50,6 +50,15 @@ class PropertyBase(object):
         q = q.order_by(self.PROPERTIES.name.desc())
         return q
 
+    def __getitem__(self, name):
+        for prop in self.active_properties:
+            if prop.name == name:
+                return prop
+
+    def has_property(self, name):
+        return self[name] is not None
+
+
     def _update_properties(self, properties):
         objs = list(self.active_properties)
         for name, prop in properties.items():
