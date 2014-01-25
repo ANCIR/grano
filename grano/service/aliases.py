@@ -46,6 +46,7 @@ def import_alias(data):
             'active': False,
             'source_url': data.get('source_url')
             })
+        return
 
     elif alias.id != canonical.id:
         alias.merge_into(canonical)
