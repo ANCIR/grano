@@ -64,7 +64,6 @@ class Pager(object):
             high = self.pages
             low = max(1, self.pages - (2*self.pager_range)+1)
 
-        print range(low, high+1), self.pages
         return range(low, high+1)
 
 
