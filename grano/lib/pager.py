@@ -1,5 +1,6 @@
 import math
 
+from urllib import urlencode
 from flask import url_for, request
 
 class Pager(object):
@@ -48,8 +49,13 @@ class Pager(object):
 
     @property
     def query_args(self):
-        return [(k, v.encode('utf-8')) for k, v in self.args.items() \
-                if k != self.name + '_page']
+        args = []
+        for key in self.args:
+            if key == self.name + '_page':
+                continue
+            for value in self.args.getlist(key):
+                args.append((key, value.encode('utf-8')))
+        return args
 
     @property
     def range(self):
@@ -66,6 +72,8 @@ class Pager(object):
 
         return range(low, high+1)
 
+    def has_url_state(self, arg, value):
+        return (arg, unicode(value).encode('utf-8')) in self.query_args
 
     def add_url_state(self, arg, value):
         query_args = self.query_args
@@ -81,9 +89,11 @@ class Pager(object):
         return self.add_url_state(self.name + '_page', page)
 
     def url(self, query):
-        kw = dict(query)
-        kw.update(self.kwargs)
-        return url_for(request.endpoint, **dict(kw)) + '#' + self.name
+        url = url_for(request.endpoint, **dict(self.kwargs))
+        if len(query):
+            qs = urlencode(query)
+            url = url + '?' + qs
+        return url + '#' + self.name
 
     def __iter__(self):
         query = self.query

@@ -18,7 +18,6 @@ class ESSearcher(object):
         self._offset = 0
         self._facets = []
 
-
     def limit(self, limit):
         self.results = None
         self._limit = limit
@@ -36,6 +35,19 @@ class ESSearcher(object):
     def query_text(self):
         return self.args.get('q', '').strip()
 
+    @property
+    def filters(self):
+        _filters = []
+        for q, v in self.args.items():
+            if not q.startswith('filter-'):
+                continue
+            _, field = q.split('filter-', 1)
+            _filters.append({
+                "term": { field: v }
+                })
+        return _filters
+
+
     def _run(self):
         query = {'from': self._offset, 'size': self._limit}
         qt = self.query_text
@@ -47,9 +59,21 @@ class ESSearcher(object):
             }
         else:
             query['query'] = {"match_all": {}}
+
         query['facets'] = {}
         for facet, size in self._facets:
             query['facets'][facet] = {'terms': {'field': facet, 'size': size}}
+        
+        if len(self.filters):
+            _filters = self.filters if len(self.filters) == 1 else {"and": self.filters}
+            base_query = query.pop('query')
+            query['query'] = {
+                "filtered": {
+                    "query": base_query,
+                    "filter": _filters
+                }
+            }
+
         self.results = es.search(index=es_index, doc_type='entity', body=query)
 
     def get_facet(self, name):
