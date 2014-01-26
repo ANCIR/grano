@@ -38,7 +38,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         return q.first()
 
     @classmethod
-    def save(cls, schemata, properties, update_criteria):
+    def save(cls, schemata, properties, update_criteria, no_replace=[]):
         obj = None
         if len(update_criteria):
             q = db.session.query(cls)
@@ -50,7 +50,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             obj = cls()
             db.session.add(obj)
         obj.schemata = list(set(obj.schemata + schemata))
-        obj._update_properties(properties)
+        obj._update_properties(properties, no_replace=no_replace)
         return obj
 
     def merge_into(self, target):

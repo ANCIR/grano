@@ -24,7 +24,7 @@ class ObjectLoader(object):
     def unique(self, name, only_active=True):
         self.update_criteria.add((name, only_active))
 
-    def set(self, name, value, source_url=None, key=False):
+    def set(self, name, value, source_url=None):
         schema = self.get_schema(name)
         if name is None:
             raise ValueError('Invalud attribute name: %s' % name)
@@ -36,8 +36,7 @@ class ObjectLoader(object):
             'value': value if value is None else unicode(value),
             'source_url': source_url,
             'active': True,
-            'schema': schema,
-            'key': key
+            'schema': schema
             }
 
 
@@ -57,7 +56,7 @@ class EntityLoader(ObjectLoader):
 
     def save(self):
         self._entity = Entity.save(self.schemata, self.properties,
-            self.update_criteria)
+            self.update_criteria, no_replace=['name'])
         db.session.flush()
 
 

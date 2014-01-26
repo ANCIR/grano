@@ -71,7 +71,7 @@ class PropertyBase(object):
                 if prop.name == name:
                     prop.active = False
 
-    def _update_properties(self, properties):
+    def _update_properties(self, properties, no_replace=[]):
         objs = list(self.active_properties)
         for name, prop in properties.items():
             create = True
@@ -80,6 +80,8 @@ class PropertyBase(object):
                     continue
                 if obj.value == prop.get('value'):
                     create = False
+                elif name in inactive:
+                    prop['active'] = False
                 else:
                     obj.active = False
             if create and prop.get('value') is not None:
