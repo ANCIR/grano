@@ -12,6 +12,7 @@ class Schema(db.Model, IntBase):
     label = db.Column(db.Unicode())
     label_in = db.Column(db.Unicode())
     label_out = db.Column(db.Unicode())
+    hidden = db.Column(db.Boolean())
     obj = db.Column(db.Unicode())
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic')
@@ -63,6 +64,7 @@ class Schema(db.Model, IntBase):
 
         # TODO validate:
         obj.obj = data.get('obj')
+        obj.hidden = data.get('hidden')
         db.session.add(obj)
         
         # TODO check that the name is unique across 'obj'
@@ -83,6 +85,9 @@ class Schema(db.Model, IntBase):
             'id': self.id,
             'name': self.name,
             'label': self.label,
+            'label_in': self.label_in,
+            'label_out': self.label_out,
+            'hidden': self.hidden,
             'obj': self.obj
         }
         if not shallow:
