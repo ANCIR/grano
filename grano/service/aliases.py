@@ -70,7 +70,7 @@ def export_aliases(path):
     with open(path, 'w') as fh:
         writer = DictWriter(fh, ['entity_id', 'alias', 'canonical', 'schemata'])
         writer.writeheader()
-        for i, entity in enumerate(Entity.all()):
+        for i, entity in enumerate(Entity.all().filter_by(same_as=None)):
             export_entity(entity, writer)
             if i % 100 == 0:
                 log.info("Dumped %s entity names...", i)
