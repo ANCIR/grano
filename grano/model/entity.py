@@ -16,6 +16,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     OBJ = __tablename__ = 'entity'
     PROPERTIES = EntityProperty
 
+    same_as = db.Column(db.Unicode, db.ForeignKey('entity.id'), nullable=True)
+
     schemata = db.relationship('Schema', secondary=entity_schema,
         backref=db.backref('entities', lazy='dynamic'))
     
@@ -63,8 +65,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             rel.target = target
         for rel in self.outbound:
             rel.source = target
-        # Authorization code RIKER B4921A
-        db.session.delete(self)
+        self.same_as = target.id
+        db.session.flush()
 
     @property
     def inbound_schemata(self):

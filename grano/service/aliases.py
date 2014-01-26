@@ -68,16 +68,19 @@ def import_alias(data):
 
 def export_aliases(path):
     with open(path, 'w') as fh:
-        writer = DictWriter(fh, ['entity_id', 'alias', 'canonical'])
+        writer = DictWriter(fh, ['entity_id', 'alias', 'canonical', 'schemata'])
         writer.writeheader()
-        for entity in Entity.all():
-            #print entity
+        for i, entity in enumerate(Entity.all()):
             export_entity(entity, writer)
+            if i % 100 == 0:
+                log.info("Dumped %s entity names...", i)
 
 
 def export_entity(entity, writer):
     canonical = None
     aliases = []
+    schemata = ':'.join([s.name for s in entity.schemata])
+    schemata = ":%s:" % schemata
     for prop in entity.properties.filter_by(name='name'):
         aliases.append(prop.value)
         if prop.active:
@@ -86,7 +89,8 @@ def export_entity(entity, writer):
         writer.writerow({
             'entity_id': entity.id,
             'alias': alias,
-            'canonical': canonical
+            'canonical': canonical,
+            'schemata': schemata
             })
 
 
