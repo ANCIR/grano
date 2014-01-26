@@ -58,6 +58,18 @@ class PropertyBase(object):
     def has_property(self, name):
         return self[name] is not None
 
+    def create_property(self, name, schema, value, active=True,
+            source_url=None):
+        self.PROPERTIES.save(self, 'name', {
+            'schema': schema,
+            'value': value,
+            'active': active,
+            'source_url': source_url
+            })
+        if active:
+            for prop in self.properties:
+                if prop.name == name:
+                    prop.active = False
 
     def _update_properties(self, properties):
         objs = list(self.active_properties)
