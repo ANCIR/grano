@@ -4,7 +4,7 @@ from grano.model.property import RelationProperty
 
 
 class Relation(db.Model, UUIDBase, PropertyBase):
-    OBJ = __tablename__ = 'relation'
+    __tablename__ = 'relation'
     PropertyClass = RelationProperty
 
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'), index=True)

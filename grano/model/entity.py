@@ -13,7 +13,7 @@ entity_schema = db.Table('entity_schema',
 
 
 class Entity(db.Model, UUIDBase, PropertyBase):
-    OBJ = __tablename__ = 'entity'
+    __tablename__ = 'entity'
     PropertyClass = EntityProperty
 
     same_as = db.Column(db.Unicode, db.ForeignKey('entity.id'), nullable=True)

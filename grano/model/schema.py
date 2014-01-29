@@ -29,7 +29,7 @@ class Schema(db.Model, IntBase):
 
     @classmethod
     def cached(cls, type, name):
-        obj = type.OBJ
+        obj = type.__tablename__
         if not (obj, name) in cls.SCHEMATA:
             schema = Schema.by_obj_name(obj, name)
             if schema is None:
