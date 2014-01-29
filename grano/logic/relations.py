@@ -1,5 +1,6 @@
 from grano.core import db
 from grano.model import Relation
+from grano.logic import properties as properties_logic
 
 
 def save(schema, properties, source, target, update_criteria):
@@ -20,7 +21,7 @@ def save(schema, properties, source, target, update_criteria):
     obj.source = source
     obj.target = target
     obj.schema = schema
-    obj._update_properties(properties)
+    properties_logic.set_many(obj, properties)
     return obj
 
 
@@ -36,6 +37,6 @@ def to_index(relation):
     }
 
     for prop in relation.active_properties:
-        data[prop.qualified_name] = prop.value
+        data[prop.name] = prop.value
 
     return data

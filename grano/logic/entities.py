@@ -3,6 +3,8 @@ import logging
 from grano.core import db
 from grano.model import Entity, Schema
 from grano.logic import relations
+from grano.logic import properties as properties_logic
+
 
 log = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ def save(schemata, properties, update_criteria):
         db.session.flush()
     
     obj.schemata = list(set(obj.schemata + schemata))
-    obj._update_properties(properties)
+    properties_logic.set_many(obj, properties)
     return obj
 
 
@@ -71,8 +73,8 @@ def apply_alias(canonical_name, alias_name):
 
     # Rename an alias to its new, canonical name.
     if canonical is None:
-        alias.create_property('name', schema, canonical_name,
-            active=True, source_url=data.get('source_url'))
+        properties_logic.set(alias, 'name', schema, canonical_name,
+            active=True, source_url=None)
         return log.info("Renamed: %s", alias_name)
 
     # Already done, thanks.
@@ -116,7 +118,7 @@ def to_index(entity):
         if prop.name == 'name':
             data['names'].append(prop.value)
         if prop.active and prop.qualified_name not in data:
-            data[prop.qualified_name] = prop.value
+            data[prop.name] = prop.value
             data['num_properties'] += 1
 
     return data

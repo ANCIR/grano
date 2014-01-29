@@ -49,37 +49,9 @@ class PropertyBase(object):
     def has_property(self, name):
         return self[name] is not None
 
-    def create_property(self, name, schema, value, active=True,
-            source_url=None):
-        self.PropertyClass.save(self, 'name', {
-            'schema': schema,
-            'value': value,
-            'active': active,
-            'source_url': source_url
-            })
-        if active:
-            for prop in self.properties:
-                if prop.name == name:
-                    prop.active = False
-
-    def _update_properties(self, properties, no_replace=[]):
-        objs = list(self.active_properties)
-        for name, prop in properties.items():
-            create = True
-            for obj in objs:
-                if obj.name != name:
-                    continue
-                if obj.value == prop.get('value'):
-                    create = False
-                #elif name in inactive:
-                #    prop['active'] = False
-                else:
-                    obj.active = False
-            if create and prop.get('value') is not None:
-                self.PropertyClass.save(self, name, prop)
-
     @classmethod
     def _filter_property(cls, q, name, value, only_active=True):
+        # TODO: move to logic layer?
         q = q.join(cls.properties, aliased=True)
         q = q.filter(cls.PropertyClass.name==name)
         q = q.filter(cls.PropertyClass.value==value)

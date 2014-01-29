@@ -14,18 +14,6 @@ class Property(db.Model, IntBase):
     obj = db.Column(db.String(20))
     __mapper_args__ = {'polymorphic_on': obj}
 
-    @property
-    def qualified_name(self):
-        return self.name
-
-    def _apply_properties(self, name, prop):
-        self.name = name
-        self.schema = prop.get('schema')
-        self.value = prop.get('value')
-        self.source_url = prop.get('source_url')
-        self.active = prop.get('active')
-        db.session.add(self)
-
     def to_dict(self):
         return {
             'name': self.name,
@@ -41,11 +29,8 @@ class EntityProperty(Property):
 
     entity_id = db.Column(db.Unicode(), db.ForeignKey('entity.id'), index=True)
 
-    @classmethod
-    def save(cls, entity, name, prop):
-        obj = cls()
-        obj.entity = entity
-        obj._apply_properties(name, prop)
+    def _set_obj(self, obj):
+        self.entity = obj
 
 
 class RelationProperty(Property):
@@ -54,8 +39,5 @@ class RelationProperty(Property):
     relation_id = db.Column(db.Unicode(), db.ForeignKey('relation.id'),
                             index=True)
 
-    @classmethod
-    def save(cls, relation, name, prop):
-        obj = cls()
-        obj.relation = relation
-        obj._apply_properties(name, prop)
+    def _set_obj(self, obj):
+        self.relation = obj
