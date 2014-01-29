@@ -71,8 +71,8 @@ class PropertyBase(object):
                     continue
                 if obj.value == prop.get('value'):
                     create = False
-                elif name in inactive:
-                    prop['active'] = False
+                #elif name in inactive:
+                #    prop['active'] = False
                 else:
                     obj.active = False
             if create and prop.get('value') is not None:
