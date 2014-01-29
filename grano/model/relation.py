@@ -40,17 +40,6 @@ class Relation(db.Model, UUIDBase, PropertyBase):
         obj._update_properties(properties)
         return obj
 
-    def to_basic_dict(self):
-    	data = {}
-    	for prop in self.active_properties:
-    		data[prop.name] = prop.value
-    	return {
-    		'id': self.id,
-    		'source': self.source_id,
-    		'target': self.target_id,
-    		'schema': self.schema.name,
-    		'properties': data
-    	}
 
     def to_index(self):
         data = {

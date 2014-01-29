@@ -108,15 +108,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     def degree(self):
         return self.inbound.count() + self.outbound.count()
 
-    def to_basic_dict(self):
-        data = {}
-        for prop in self.active_properties:
-            data[prop.name] = prop.value
-        return {
-            'id': self.id,
-            'schemata': [s.name for s in self.schemata],
-            'properties': data
-        }
 
     def to_index(self):
         data = {
