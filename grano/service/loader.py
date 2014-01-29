@@ -2,6 +2,7 @@ import logging
 
 from grano.core import db
 from grano.model import Schema, Entity, Relation
+from grano.logic import entities, relations
 
 
 log = logging.getLogger(__name__)
@@ -55,8 +56,7 @@ class EntityLoader(ObjectLoader):
         return self._entity
 
     def save(self):
-        self._entity = Entity.save(self.schemata, self.properties,
-            self.update_criteria, no_replace=['name'])
+        self._entity = entities.save(self.schemata, self.properties, self.update_criteria)
         db.session.flush()
 
 
@@ -69,9 +69,8 @@ class RelationLoader(ObjectLoader):
         self.target = target
 
     def save(self):
-        self.relation = Relation.save(self.schemata.pop(),
-            self.properties, self.source.entity, self.target.entity,
-            self.update_criteria)
+        self._relation = relations.save(self.schemata.pop(), self.properties, self.source.entity,
+            self.target.entity, self.update_criteria)
         db.session.flush()
 
 

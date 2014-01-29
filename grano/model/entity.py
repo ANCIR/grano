@@ -30,43 +30,11 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         order_by=EntityProperty.created_at.desc(),
         lazy='dynamic')
 
-
     @classmethod
     def by_name(cls, name, only_active=False):
         q = db.session.query(cls)
         q = cls._filter_property(q, 'name', name, only_active=only_active)
         return q.first()
-
-    @classmethod
-    def save(cls, schemata, properties, update_criteria, no_replace=[]):
-        obj = None
-        if len(update_criteria):
-            q = db.session.query(cls)
-            for name, only_active in update_criteria:
-                value = properties.get(name).get('value')
-                q = cls._filter_property(q, name, value, only_active=only_active)
-            obj = q.first()
-        if obj is None:
-            obj = cls()
-            db.session.add(obj)
-        obj.schemata = list(set(obj.schemata + schemata))
-        obj._update_properties(properties, no_replace=no_replace)
-        return obj
-
-    def merge_into(self, target):
-        target_active = [p.name for p in target.active_properties]
-        target.schemata = list(set(target.schemata + self.schemata))
-        for prop in self.properties:
-            if prop.name in target_active:
-                prop.active = False
-            prop.entity = target
-        for rel in self.inbound:
-            # TODO: what if this relation now points at the same thing on both ends?
-            rel.target = target
-        for rel in self.outbound:
-            rel.source = target
-        self.same_as = target.id
-        db.session.flush()
 
     @property
     def inbound_schemata(self):
@@ -109,36 +77,4 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         return self.inbound.count() + self.outbound.count()
 
 
-    def to_index(self):
-        data = {
-            'id': self.id,
-            'schemata': [s.to_dict(shallow=True) for s in self.schemata if s.name != 'base'],
-            'num_schemata': len(self.schemata),
-            'num_properties': 0,
-            'inbound': [],
-            'outbound': [],
-            'relations': [],
-            'names': []
-            }
 
-        # TODO: relations
-        for rel in self.inbound:
-            rel_data = rel.to_index()
-            data['inbound'].append(rel_data)
-            data['relations'].append(rel_data)
-
-        for rel in self.outbound:
-            rel_data = rel.to_index()
-            data['outbound'].append(rel_data)
-            data['relations'].append(rel_data)
-
-        data['num_relations'] = len(data['relations'])
-
-        for prop in self.properties:
-            if prop.name == 'name':
-                data['names'].append(prop.value)
-            if prop.active and prop.qualified_name not in data:
-                data[prop.qualified_name] = prop.value
-                data['num_properties'] += 1
-
-        return data
