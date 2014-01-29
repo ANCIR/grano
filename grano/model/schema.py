@@ -1,5 +1,6 @@
 from grano.core import db
-from grano.model.common import IntBase, slugify_column
+from grano.model.common import IntBase
+from grano.model.util import slugify_column
 from grano.model.attribute import Attribute
 from grano.model.property import Property
 

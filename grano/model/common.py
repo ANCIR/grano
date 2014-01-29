@@ -1,16 +1,7 @@
-import uuid
 from datetime import datetime
-from slugify import slugify
 
 from grano.core import db
-
-
-def slugify_column(text):
-    return slugify(text).replace('-', '_')
-
-
-def make_token():
-    return uuid.uuid4().get_hex()[15:]
+from grano.model.util import make_token
 
 
 class _CoreBase(object):
