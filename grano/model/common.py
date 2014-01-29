@@ -47,7 +47,7 @@ class PropertyBase(object):
     @property
     def active_properties(self):
         q = self.properties.filter_by(active=True)
-        q = q.order_by(self.PROPERTIES.name.desc())
+        q = q.order_by(self.PropertyClass.name.desc())
         return q
 
     def __getitem__(self, name):
@@ -60,7 +60,7 @@ class PropertyBase(object):
 
     def create_property(self, name, schema, value, active=True,
             source_url=None):
-        self.PROPERTIES.save(self, 'name', {
+        self.PropertyClass.save(self, 'name', {
             'schema': schema,
             'value': value,
             'active': active,
@@ -85,15 +85,15 @@ class PropertyBase(object):
                 else:
                     obj.active = False
             if create and prop.get('value') is not None:
-                self.PROPERTIES.save(self, name, prop)
+                self.PropertyClass.save(self, name, prop)
 
     @classmethod
     def _filter_property(cls, q, name, value, only_active=True):
         q = q.join(cls.properties, aliased=True)
-        q = q.filter(cls.PROPERTIES.name==name)
-        q = q.filter(cls.PROPERTIES.value==value)
+        q = q.filter(cls.PropertyClass.name==name)
+        q = q.filter(cls.PropertyClass.value==value)
         if only_active:
-            q = q.filter(cls.PROPERTIES.active==True)
+            q = q.filter(cls.PropertyClass.active==True)
         q = q.reset_joinpoint()
         return q
 

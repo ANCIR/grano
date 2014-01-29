@@ -14,7 +14,7 @@ entity_schema = db.Table('entity_schema',
 
 class Entity(db.Model, UUIDBase, PropertyBase):
     OBJ = __tablename__ = 'entity'
-    PROPERTIES = EntityProperty
+    PropertyClass = EntityProperty
 
     same_as = db.Column(db.Unicode, db.ForeignKey('entity.id'), nullable=True)
 
@@ -103,6 +103,10 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             if schema.name == name:
                 return True
         return False
+
+    @property
+    def degree(self):
+        return self.inbound.count() + self.outbound.count()
 
     def to_basic_dict(self):
         data = {}
