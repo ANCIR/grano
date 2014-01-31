@@ -21,6 +21,10 @@ influence. For example, consider the following contexts:
 * Newspaper articles often establish narrative bridges between various actors,
   a short summary can often be given as a graph.
 
+
+A toolkit for understanding networks
+------------------------------------
+
 Grano is not intended as a stand-alone solution to analyze all of these types 
 of structures. Rather, the software can be seen as a building block that can 
 help to build bespoke interfaces that ideally match the domain that needs to 
