@@ -8,7 +8,7 @@ grano: facebook, for terrorists!
 .. toctree::
    :hidden:
 
-grano web-based framework for the storage, analysis and presentation of social 
+``grano`` web-based framework for the storage, analysis and presentation of social 
 network information. Many types of interactions between people, organisations 
 and institutions can be understood in terms of network structures. Such graphs
 provide an apt metaphor for the distribution of political, social and economic
@@ -25,10 +25,10 @@ influence. For example, consider the following contexts:
 A toolkit for understanding networks
 ------------------------------------
 
-Grano is not intended as a stand-alone solution to analyze all of these types 
+``grano`` is not intended as a stand-alone solution to analyze all of these types 
 of structures. Rather, the software can be seen as a building block that can 
 help to build bespoke interfaces that ideally match the domain that needs to 
-be explored. To support the analysis of such structures, grano provides a set
+be explored. To support the analysis of such structures, ``grano`` provides a set
 of services:
 
 * A basic network data store with custom configurable schemata for any use 
@@ -56,7 +56,32 @@ Contents
    install
    api
 
+
+Related projects
+----------------
+
+The idea behind ``grano`` is not new, and a number of similar services have served
+as an inspiration:
+
+* `LittleSis <http://littlesis.org>`_, tracks people, companies and their 
+  connections in the United States.
+* `Poderopedia <http://poderopedia.org>`_, tracks connections between people 
+  and companies in Chilean politics.
+* `detective.io <http://detective.io>`_, allows journalists to build their own 
+  data models for investigations, then fill them.
+
+Many other tools are listed in the `SNA survey <https://docs.google.com/spreadsheet/ccc?key=0AplklDf0nYxWdFhmTWZUc0o0SzAzMkRuMTZCUVBVeHc&usp=drive_web#gid=0>`_, and
+some analysis of the different approaches can be found on the
+`Knight Labs' Untangled <http://untangled.knightlab.com/>`_ site.
+
+``grano`` aims to fill a niche in this domain by providing an easily re-usable, 
+well-documented solution that can handle bulk data imports and messy data particularly 
+well.
+
+
 Contributors
 ------------
 
 ``grano`` is written and maintained by `Friedrich Lindenberg <http://pudo.org>`_.
+Please feel free to contribute any improvements as pull requests on GitHub, or
+create an issue to discuss them first.
