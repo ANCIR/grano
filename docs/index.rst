@@ -12,7 +12,9 @@ grano: facebook, for terrorists!
 network information. Many types of interactions between people, organisations 
 and institutions can be understood in terms of network structures. Such graphs
 provide an apt metaphor for the distribution of political, social and economic
-influence. For example, consider the following contexts:
+influence. ``grano`` is aimed at journalists, activists and researchers who
+want to explore and explain such structures. For example, consider the following
+contexts:
 
 * Lobby registers disclose connections between lobbyists, lobbying firms, their
   clients and political actors.
