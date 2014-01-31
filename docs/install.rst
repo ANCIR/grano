@@ -36,6 +36,11 @@ Once the new configuration is set up, you need to an environment variables point
 grano to the configuration file you've created::
 
     export GRANO_SETTINGS=`pwd`/settings.py
+
+Once this is done, you can create the database and import schema specifications::
+
+    python grano/manage.py createdb
+    python grano/manage.py schema_import <YOUR_MODEL.yaml>
     
 Finally, you can run grano::
 
