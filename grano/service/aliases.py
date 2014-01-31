@@ -32,6 +32,8 @@ def import_aliases(path):
 ## Export commands
 
 def export_aliases(path):
+    """ Dump a list of all entity names to a CSV file. The table will contain the 
+    active name of each entity, and one of the other existing names as an alias. """
     with open(path, 'w') as fh:
         writer = DictWriter(fh, ['entity_id', 'alias', 'canonical', 'schemata'])
         writer.writeheader()

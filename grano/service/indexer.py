@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 
 
 def index_entities():
+    """ Re-build an index for all enitites from scratch. """
     for i, entity in enumerate(Entity.all().filter_by(same_as=None).yield_per(1000)):
         body = entities.to_index(entity)
         es.index(index=es_index, doc_type='entity', id=body.pop('id'), body=body)
@@ -22,5 +23,6 @@ def index_entities():
 
 
 def flush_entities():
+    """ Delete the entire index. """
     query = {'query': {"match_all": {}}}
     es.delete_by_query(index=es_index, doc_type='entity', q='*:*')
