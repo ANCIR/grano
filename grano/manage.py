@@ -3,10 +3,12 @@ import logging
 from flask.ext.script import Manager
 from flask.ext.assets import ManageAssets
 
-from grano.core import db, assets, app
+from grano.core import db, assets
+from grano.views import app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
 from grano.service import index_entities, search_entities, flush_entities
+from grano.service import generate_sitemap
 
 
 log = logging.getLogger('grano')
@@ -54,6 +56,12 @@ def index():
 def flush_index():
     """ Delete the full text search index. """
     flush_entities()
+
+
+@manager.command
+def sitemap(count=20000):
+    """ Generate a static sitemap for SEO. """
+    generate_sitemap(count=count)
 
 
 @manager.command

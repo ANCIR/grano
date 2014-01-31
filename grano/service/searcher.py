@@ -10,6 +10,10 @@ log = logging.getLogger(__name__)
 
 
 class ESSearcher(object):
+    """ The searcher wraps query-building for elastic search 
+    queries based on request arguments. It provides a result
+    interface similar to a SQLAlchemy query, so it can be 
+    handled the same - especially by a pager. """
 
     def __init__(self, args):
         self.args = args

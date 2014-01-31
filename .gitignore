@@ -37,6 +37,7 @@ grano/static/vendor/*
 grano/static/style.*.css
 grano/static/app.*.js
 grano/static/gen/*
+grano/static/sitemap.xml
 grano/static/.webassets-cache/*
 
 grano/development.db
