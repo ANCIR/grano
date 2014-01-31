@@ -8,13 +8,13 @@ grano: facebook, for terrorists!
 .. toctree::
    :hidden:
 
-``grano`` web-based framework for the storage, analysis and presentation of social 
-network information. Many types of interactions between people, organisations 
-and institutions can be understood in terms of network structures. Such graphs
-provide an apt metaphor for the distribution of political, social and economic
-influence. ``grano`` is aimed at journalists, activists and researchers who
-want to explore and explain such structures. For example, consider the following
-contexts:
+``grano`` is a web-based framework for the storage, analysis and presentation
+of social network information. Many types of interactions between people,
+organisations and institutions can be understood in terms of network structures.
+Such graphs provide an apt metaphor for the distribution of political, social
+and economic influence. ``grano`` is aimed at journalists, activists and
+researchers who want to explore and explain such structures. For example,
+consider the following contexts:
 
 * Lobby registers disclose connections between lobbyists, lobbying firms, their
   clients and political actors.
