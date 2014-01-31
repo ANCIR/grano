@@ -21,6 +21,8 @@ The design goal for ``grano`` is to support the following basic features:
   them. When attempting to find an entity, historic versions of the name
   property are considered aliases and will also match.
 
+.. image:: _static/data_model.png
+
 To store data, ``grano`` maps the graph onto a relational database schema.
 While this may not be ideal in terms of performance, it means that the 
 underlying model is well understood and can be filtered, aggregated and
@@ -34,6 +36,8 @@ How ``grano`` is used
 that graphs are a metaphor that requires a domain-specific interface to be
 useful. For example, a database of political donors will require a very 
 different presentation from a graph of procurement relations.
+
+.. image:: _static/stack.png
 
 To build such a bespoke interface, two basic approaches can be considered:
 
