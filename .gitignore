@@ -43,3 +43,5 @@ grano/development.db
 
 *.DS_Store
 *.env
+
+docs/_build/*
