@@ -59,7 +59,7 @@ def flush_index():
 
 
 @manager.command
-def sitemap(count=20000):
+def sitemap(count=40000):
     """ Generate a static sitemap for SEO. """
     generate_sitemap(count=count)
 

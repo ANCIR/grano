@@ -1,5 +1,6 @@
 import logging
 import os
+import math
 
 from flask import render_template
 
@@ -10,7 +11,7 @@ from grano.model import Entity
 log = logging.getLogger(__name__)
 
 
-def generate_sitemap(count=20000):
+def generate_sitemap(count=40000):
     """ Generate a static sitemap.xml for the most central entities in the 
     database. """
 
@@ -25,7 +26,7 @@ def generate_sitemap(count=20000):
 
     upper = max([e[2] for e in entities])
     entities = sorted(entities, key=lambda e: e[2], reverse=True)[:count]
-    entities = [(i, d, '%.2f' % (float(s)/upper)) for (i,d,s) in entities]
+    entities = [(i, d, '%.2f' % max(0.3, ((float(s)**0.3)/upper))) for (i,d,s) in entities]
 
     xml = render_template('sitemap.xml', entities=entities)
     with open(os.path.join(app.static_folder, 'sitemap.xml'), 'w') as fh:
