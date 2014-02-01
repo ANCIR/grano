@@ -48,7 +48,9 @@ def export_entity(entity, writer):
     aliases = []
     schemata = ':'.join([s.name for s in entity.schemata])
     schemata = ":%s:" % schemata
-    for prop in entity.properties.filter_by(name='name'):
+    for prop in entity.properties:
+        if prop.name != 'name':
+            continue
         aliases.append(prop.value)
         if prop.active:
             canonical = prop.value

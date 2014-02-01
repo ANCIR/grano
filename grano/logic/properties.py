@@ -24,7 +24,8 @@ def set(obj, name, schema, value, active=True, source_url=None,
     prop = None
 
     if properties is None:
-        properties = obj.properties.filter_by(name=name)
+        # eager loading - change if it's not active any more
+        properties = [p for p in obj.properties if p.name == name]
 
     for cand in properties:
         if cand.source_url == source_url and cand.value == value:
