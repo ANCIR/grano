@@ -16,7 +16,7 @@ class Schema(db.Model, IntBase):
     hidden = db.Column(db.Boolean())
     obj = db.Column(db.Unicode())
 
-    attributes = db.relationship(Attribute, backref='schema', lazy='dynamic')
+    attributes = db.relationship(Attribute, backref='schema', lazy='joined')
     properties = db.relationship(Property, backref='schema', lazy='dynamic')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic')
 

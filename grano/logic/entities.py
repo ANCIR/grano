@@ -117,7 +117,7 @@ def to_index(entity):
     for prop in entity.properties:
         if prop.name == 'name':
             data['names'].append(prop.value)
-        if prop.active and prop.qualified_name not in data:
+        if prop.active and prop.name not in data:
             data[prop.name] = prop.value
             data['num_properties'] += 1
 

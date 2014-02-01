@@ -28,7 +28,11 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     properties = db.relationship(EntityProperty, backref='entity',
         order_by=EntityProperty.created_at.desc(),
-        lazy='dynamic')
+        lazy='joined')
+
+    @property
+    def names(self):
+        return [p for p in self.properties if p.name == 'name']
 
     @classmethod
     def by_name(cls, name, only_active=False):
