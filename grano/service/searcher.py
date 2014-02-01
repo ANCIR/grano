@@ -42,12 +42,13 @@ class ESSearcher(object):
     @property
     def filters(self):
         _filters = []
-        for q, v in self.args.items():
+        for q in self.args.keys():
             if not q.startswith('filter-'):
                 continue
-            _, field = q.split('filter-', 1)
-            _filters.append({
-                "term": { field: v }
+            for v in self.args.getlist(q):
+                _, field = q.split('filter-', 1)
+                _filters.append({
+                    "term": { field: v }
                 })
         return _filters
 
