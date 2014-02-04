@@ -17,8 +17,17 @@ def index_entities():
         body = entities.to_index(entity)
         es.index(index=es_index, doc_type='entity', id=body.pop('id'), body=body)
         #log.info('Indexing: %s', body.get('name'))
-        if i % 100 == 0:
+        if i > 0 and i % 1000 == 0:
             log.info("Indexed: %s entities", i)
+            es.indices.refresh(index=es_index)
+    es.indices.refresh(index=es_index)
+
+
+def index_single(entity_id):
+    """ Index a single entity. """
+    entity = Entity.by_id(entity_id)
+    body = entities.to_index(entity)
+    es.index(index=es_index, doc_type='entity', id=body.pop('id'), body=body)
     es.indices.refresh(index=es_index)
 
 

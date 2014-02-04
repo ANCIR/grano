@@ -7,7 +7,8 @@ from grano.core import db, assets
 from grano.views import app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
-from grano.service import index_entities, search_entities, flush_entities
+from grano.service import index_entities, index_single
+from grano.service import search_entities, flush_entities
 from grano.service import generate_sitemap
 
 
@@ -47,9 +48,12 @@ def alias_export(path):
 
 
 @manager.command
-def index():
+def index(entity_id=None):
     """ (Re-)create a full text search index. """
-    index_entities()
+    if entity_id is not None:
+        index_single(entity_id)
+    else:
+        index_entities()
 
 
 @manager.command
