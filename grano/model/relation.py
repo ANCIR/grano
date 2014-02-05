@@ -15,8 +15,7 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     	order_by=RelationProperty.created_at.desc(),
     	backref='relation', lazy='dynamic')
 
+    @property
+    def schemata(self):
+        return [self.schema]
 
-    def get_attribute(self, prop_name):
-        for attribute in self.schema.attributes:
-            if attribute.name == prop_name:
-                return attribute

@@ -64,18 +64,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         q = self.outbound.filter_by(schema=schema)
         return q
 
-    def get_attribute(self, prop_name):
-        for schema in self.schemata:
-            for attribute in schema.attributes:
-                if attribute.name == prop_name:
-                    return attribute
-
-    def has_schema(self, name):
-        for schema in self.schemata:
-            if schema.name == name:
-                return True
-        return False
-
     @property
     def degree(self):
         return self.inbound.count() + self.outbound.count()

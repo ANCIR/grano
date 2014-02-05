@@ -50,6 +50,18 @@ class PropertyBase(object):
     def has_property(self, name):
         return self[name] is not None
 
+    def get_attribute(self, prop_name):
+        for schema in self.schemata:
+            for attribute in schema.attributes:
+                if attribute.name == prop_name:
+                    return attribute
+
+    def has_schema(self, name):
+        for schema in self.schemata:
+            if schema.name == name:
+                return True
+        return False
+
     @classmethod
     def _filter_property(cls, q, name, value, only_active=True):
         # TODO: move to logic layer?
