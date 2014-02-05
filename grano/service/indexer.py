@@ -1,7 +1,5 @@
 import logging 
-
 from pprint import pprint
-import elasticsearch
 
 from grano.core import es, es_index
 from grano.model import Entity
