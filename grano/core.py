@@ -17,6 +17,9 @@ urllib3_log.setLevel(logging.WARNING)
 elasticsearch_log = logging.getLogger("elasticsearch")
 elasticsearch_log.setLevel(logging.WARNING)
 
+#sqlalchemy_log = logging.getLogger("sqlalchemy")
+#sqlalchemy_log.setLevel(logging.INFO)
+
 app = Flask(__name__)
 app.config.from_object(default_settings)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
