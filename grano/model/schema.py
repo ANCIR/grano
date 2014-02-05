@@ -52,35 +52,6 @@ class Schema(db.Model, IntBase):
         return q.first()
 
 
-    @classmethod
-    def from_dict(cls, data):
-        name = slugify_column(data.get('name', data.get('label')))
-        obj = cls.by_name(name)
-        if obj is None:
-            obj = cls()
-        obj.name = name
-        obj.label = data.get('label')
-        obj.label_in = data.get('label_in', obj.label)
-        obj.label_out = data.get('label_out', obj.label)
-
-        # TODO validate:
-        obj.obj = data.get('obj')
-        obj.hidden = data.get('hidden')
-        db.session.add(obj)
-        
-        # TODO check that the name is unique across 'obj'
-        names = []
-        for attribute in data.get('attributes', []):
-            attribute['schema'] = obj
-            attr = Attribute.from_dict(attribute)
-            obj.attributes.append(attr)
-            names.append(attr.name)
-        for attr in obj.attributes:
-            if attr.name not in names:
-                db.session.delete(attr)
-        return obj
-
-
     def to_dict(self, shallow=False):
         data = {
             'id': self.id,

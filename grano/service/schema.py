@@ -1,14 +1,20 @@
 import os
 import yaml
+from pprint import pprint
 
 from grano.core import db
 from grano.model import Schema
+from grano.logic.schemata import save_schema
+from grano.logic.validation import Invalid
 
 
 def import_schema(fh):
     data = yaml.load(fh.read())
-    Schema.from_dict(data)
-    db.session.commit()
+    try:
+        save_schema(data)
+        db.session.commit()
+    except Invalid, inv:
+        pprint(inv.asdict())
 
 
 def export_schema(path):
