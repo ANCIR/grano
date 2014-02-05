@@ -3,6 +3,7 @@ import logging
 from grano.core import db
 from grano.model import Schema, Entity, Relation
 from grano.logic import entities, relations
+from grano.logic.validation import Invalid
 
 
 log = logging.getLogger(__name__)
@@ -16,19 +17,10 @@ class ObjectLoader(object):
         self.properties = {}
         self.update_criteria = set()
 
-    def get_schema(self, name):
-        for schema in self.schemata:
-            for attribute in schema.attributes:
-                if attribute.name == name:
-                    return schema
-
     def unique(self, name, only_active=True):
         self.update_criteria.add((name, only_active))
 
     def set(self, name, value, source_url=None):
-        schema = self.get_schema(name)
-        if name is None:
-            raise ValueError('Invalud attribute name: %s' % name)
         source_url = source_url or self.source_url
         if source_url is None:
             log.warning('No source for property %s.', name)
@@ -36,8 +28,7 @@ class ObjectLoader(object):
             'name': name,
             'value': value if value is None else unicode(value),
             'source_url': source_url,
-            'active': True,
-            'schema': schema
+            'active': True
             }
 
 
@@ -56,8 +47,11 @@ class EntityLoader(ObjectLoader):
         return self._entity
 
     def save(self):
-        self._entity = entities.save(self.schemata, self.properties, self.update_criteria)
-        db.session.flush()
+        try:
+            self._entity = entities.save(self.schemata, self.properties, self.update_criteria)
+            db.session.flush()
+        except Invalid, inv:
+            log.warning("Validation error: %r", inv)
 
 
 class RelationLoader(ObjectLoader):
@@ -69,10 +63,13 @@ class RelationLoader(ObjectLoader):
         self.target = target
 
     def save(self):
-        self._relation = relations.save(self.schemata.pop(), self.properties, self.source.entity,
-            self.target.entity, self.update_criteria)
-        db.session.flush()
-
+        try:
+            self._relation = relations.save(self.schemata.pop(), self.properties, self.source.entity,
+                self.target.entity, self.update_criteria)
+            db.session.flush()
+        except Invalid, inv:
+            log.warning("Validation error: %r", inv)
+        
 
 class Loader(object):
     """ A loader is a factory object that can be used to make entities and 

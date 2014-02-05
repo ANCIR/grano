@@ -65,6 +65,29 @@ def validate_schema(data):
     return schema.deserialize(data)
 
 
-def validate_properties(data):
-    pass
+def validate_properties(data, schemata):
+    schema = colander.SchemaNode(colander.Mapping(), name='root')
+    for sche in schemata:
+        for attr in sche.attributes:
+            attrib = colander.SchemaNode(colander.Mapping(),
+                name=attr.name, missing=colander.null)
+            attrib.add(colander.SchemaNode(colander.String(),
+                validator=colander.Length(min=1),
+                default=None, missing=None, name='value'))
+            attrib.add(colander.SchemaNode(colander.Boolean(),
+                default=True, missing=True, name='active'))
+            attrib.add(colander.SchemaNode(colander.String(),
+                name='schema', preparer=lambda x: sche))
 
+            # TODO: check this is a URL?
+            attrib.add(colander.SchemaNode(colander.String(),
+                missing=None, name='source_url'))
+
+            schema.add(attrib)
+
+    data = schema.deserialize(data)
+    out = {}
+    for k, v in data.items():
+        if v != colander.null:
+            out[k] = v
+    return out
