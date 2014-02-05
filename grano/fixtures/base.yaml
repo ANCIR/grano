@@ -1,0 +1,10 @@
+name: base
+label: Common
+obj: entity
+hidden: yes
+attributes:
+  - name: name
+    label: Name
+    hidden: yes
+  - name: tagline
+    label: Short description

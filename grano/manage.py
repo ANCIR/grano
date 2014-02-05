@@ -21,12 +21,15 @@ manager.add_command("assets", ManageAssets(assets))
 def createdb():
     """ Create the database schema. """
     db.create_all()
+    with app.open_resource('fixtures/base.yaml') as fh:
+        import_schema(fh)
 
 
 @manager.command
 def schema_import(path):
     """ Load a schema specification from a YAML file. """
-    import_schema(path)
+    with open(path, 'r') as fh:
+        import_schema(fh)
 
 
 @manager.command
