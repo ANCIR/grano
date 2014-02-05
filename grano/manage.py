@@ -73,10 +73,10 @@ def search(text):
     """ Search for a query string. """
     res = search_entities({'q': text})
 
-    for hit in res.get('hits'):
+    for hit in res:
         log.info("%s: %s", hit.get('_id'), hit.get('_source').get('name'))
 
-    log.info("Total hits: %s", res.get('total'))
+    log.info("Total hits: %s", res.count())
 
 
 if __name__ == "__main__":
