@@ -1,7 +1,8 @@
 Services
 ========
 
-``grano`` includes a set of services that can be used to perform administrative tasks. 
+``grano`` includes a set of services that can be used to perform administrative tasks. Many 
+of these are activated via the command line script, ``grano/manage.py``.
 
 
 Sitemap generation
@@ -17,4 +18,5 @@ file such that replacing ``%s`` will yield a valid URI for each entity. Then, si
 
     python grano/manage.py sitemap
 
-The generated file will be located in ``grano/static/sitemap.xml``.
+The generated file will be located in ``grano/static/sitemap.xml``, which ``robots.txt`` 
+points towards.

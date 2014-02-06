@@ -9,5 +9,3 @@ attributes:
   - name: opencorporates_uri
     label: "OpenCorporates URI"
     hidden: yes
-  - name: tagline
-    label: Short description

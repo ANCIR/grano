@@ -58,6 +58,8 @@ Contents
 
    technical
    install
+   schema
+   services
    api
 
 
