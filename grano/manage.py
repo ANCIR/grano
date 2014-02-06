@@ -8,7 +8,7 @@ from grano.views import app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
 from grano.service import index_entities, index_single
-from grano.service import flush_entities
+from grano.service import flush_entities, rebuild as rebuild_
 from grano.logic.searcher import search_entities
 from grano.service import generate_sitemap
 from grano.plugins import list_plugins
@@ -59,6 +59,12 @@ def index(entity_id=None):
         index_single(entity_id)
     else:
         index_entities()
+
+
+@manager.command
+def rebuild():
+    """ Trigger change processing on all relations and entities. """
+    rebuild_()
 
 
 @manager.command

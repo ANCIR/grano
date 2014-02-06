@@ -3,3 +3,4 @@ from grano.service.aliases import import_aliases, export_aliases
 from grano.service.loader import Loader
 from grano.service.indexer import index_entities, index_single, flush_entities
 from grano.service.sitemap import generate_sitemap
+from grano.service.rebuild import rebuild
