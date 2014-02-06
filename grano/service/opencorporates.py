@@ -17,7 +17,6 @@ class OpenCorporatesCanonicalizer(EntityChangeProcessor):
     def __init__(self):
         self.api_endpoint = app.config.get('OPENCORPORATES_URL',
             'http://opencorporates.com/reconcile')
-        self.api_key = app.config.get('OPENCORPORATES_APIKEY')
         score_limit = app.config.get('OPENCORPORATES_SCORE_LIMIT', 90)
         self.score_limit = int(score_limit)
         self.schemata = app.config.get('OPENCORPORATES_SCHEMATA')
