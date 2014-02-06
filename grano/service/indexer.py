@@ -30,9 +30,12 @@ def index_entities():
 def index_single(entity_id):
     """ Index a single entity. """
     entity = Entity.by_id(entity_id)
+    if entity.same_as is not None:
+        return
+    log.debug("Indexing: %s", entity['name'].value)
     body = entities.to_index(entity)
     es.index(index=es_index, doc_type='entity', id=body.pop('id'), body=body)
-    es.indices.refresh(index=es_index)
+    #es.indices.refresh(index=es_index)
 
 
 def flush_entities():

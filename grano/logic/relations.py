@@ -1,6 +1,18 @@
 from grano.core import db
 from grano.model import Relation
 from grano.logic import properties as properties_logic
+from grano.plugins import notify_plugins
+
+
+log = logging.getLogger(__name__)
+
+
+def _relation_changed(relation_id):
+    """ Notify plugins about changes to a relation. """
+    # TODO: put behind a queue.
+    def _handle(obj):
+        obj.relation_changed(relation_id)
+    notify_plugins('grano.relation.change', _handle)
 
 
 def save(schema, properties, source, target, update_criteria):
@@ -17,11 +29,13 @@ def save(schema, properties, source, target, update_criteria):
     if obj is None:
         obj = Relation()
         db.session.add(obj)
+        db.session.flush()
     
     obj.source = source
     obj.target = target
     obj.schema = schema
     properties_logic.set_many(obj, properties)
+    _relation_changed(obj.id)
     return obj
 
 
