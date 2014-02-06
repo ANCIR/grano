@@ -8,7 +8,8 @@ from grano.views import app
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
 from grano.service import index_entities, index_single
-from grano.service import search_entities, flush_entities
+from grano.service import flush_entities
+from grano.logic.searcher import search_entities
 from grano.service import generate_sitemap
 
 
