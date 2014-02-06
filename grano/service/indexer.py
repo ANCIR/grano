@@ -4,6 +4,7 @@ from pprint import pprint
 from grano.core import es, es_index
 from grano.model import Entity
 from grano.logic import entities
+from grano.interface import EntityChangeProcessor
 
 
 log = logging.getLogger(__name__)
@@ -38,3 +39,9 @@ def flush_entities():
     """ Delete the entire index. """
     query = {'query': {"match_all": {}}}
     es.delete_by_query(index=es_index, doc_type='entity', q='*:*')
+
+
+class AutoIndexer(EntityChangeProcessor):
+
+    def entity_changed(self, entity_id):
+        index_single(entity_id)

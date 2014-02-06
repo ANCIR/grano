@@ -11,6 +11,7 @@ from grano.service import index_entities, index_single
 from grano.service import flush_entities
 from grano.logic.searcher import search_entities
 from grano.service import generate_sitemap
+from grano.plugins import list_plugins
 
 
 log = logging.getLogger('grano')
@@ -64,6 +65,13 @@ def index(entity_id=None):
 def flush_index():
     """ Delete the full text search index. """
     flush_entities()
+
+
+@manager.command
+def plugins():
+    """ List all available plugins. """
+    for namespace, plugins in list_plugins().items():
+        print "%s: %s" % (namespace, ' '.join(plugins)) 
 
 
 @manager.command

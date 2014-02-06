@@ -22,7 +22,10 @@ setup(
     zip_safe=False,
     install_requires=[
     ],
-    tests_require=[],
-    entry_points=\
-    """ """,
+    entry_points={
+        'grano.entity.change': [
+            'indexer = grano.service.indexer:AutoIndexer'
+        ],
+    },
+    tests_require=[]
 )
