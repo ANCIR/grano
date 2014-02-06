@@ -1,3 +1,5 @@
+import logging
+
 from grano.core import db
 from grano.model import Relation
 from grano.logic import properties as properties_logic
