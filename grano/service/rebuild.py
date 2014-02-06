@@ -1,7 +1,12 @@
+import logging
+
 # sanity checks and re-executing daemons
 from grano.model import Entity, Relation
 from grano.logic.entities import _entity_changed
 from grano.logic.relations import _relation_changed
+
+
+log = logging.getLogger(__name__)
 
 
 def rebuild():
