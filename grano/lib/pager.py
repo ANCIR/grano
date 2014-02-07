@@ -1,26 +1,21 @@
 import math
-
 from urllib import urlencode
 from flask import url_for, request
 
+from grano.lib.args import arg_int, get_limit
+
+
 class Pager(object):
 
-    def __init__(self, query, name, limit=25, pager_range=3, **kwargs):
+    def __init__(self, query, name, limit=25, pager_range=4, **kwargs):
         self.args = request.args
         self.name = name
         self.query = query
         self.kwargs = kwargs
         self.pager_range = pager_range
-
-        try:
-            self.page = int(request.args.get(name + '_page'))
-        except:
-            self.page = 1
-        try:
-            self.limit = min(int(request.args.get(name + '_limit')), 200)
-        except:
-            self.limit = limit
-
+        self.page = arg_int(name + '_page', default=1)
+        self.limit = get_limit(default=limit, field=name + '_limit')
+        
     @property
     def offset(self):
         return (self.page-1)*self.limit
