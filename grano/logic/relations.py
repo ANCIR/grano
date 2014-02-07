@@ -3,6 +3,7 @@ import logging
 from grano.core import db
 from grano.model import Relation
 from grano.logic import properties as properties_logic
+from grano.logic import schemata as schemata_logic
 from grano.plugins import notify_plugins
 
 
@@ -49,7 +50,7 @@ def to_index(relation):
         'id': relation.id,
         'source': relation.source_id,
         'target': relation.target_id,
-        'schema': relation.schema.to_dict(shallow=True),
+        'schema': schemata_logic.to_index(relation.schema),
     }
 
     for prop in relation.active_properties:
