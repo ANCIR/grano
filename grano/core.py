@@ -1,5 +1,5 @@
 import logging
-from flask import Flask
+from flask import Flask, url_for as _url_for
 from flask.ext.assets import Environment
 from flask.ext.sqlalchemy import SQLAlchemy
 from elasticsearch import Elasticsearch
@@ -29,3 +29,7 @@ db = SQLAlchemy(app)
 es = Elasticsearch()
 
 es_index = app.config.get('ES_INDEX', 'grano')
+
+
+def url_for(*a, **kw):
+    return _url_for(*a, _external=True, **kw)
