@@ -11,6 +11,7 @@ User-agent: *
 Sitemap: /static/sitemap.xml
 """
 
+
 @base_api.route('/robots.txt')
 def robots_txt():
     res = make_response(ROBOTS)
@@ -20,5 +21,6 @@ def robots_txt():
 
 @base_api.route('/favicon.ico')
 def favicon_ico():
-    ico_url = app.config.get('FAVICON_URL', 'http://assets.pudo.org/img/favicon.ico')
+    ico_url = app.config.get('FAVICON_URL',
+        'http://assets.pudo.org/img/favicon.ico')
     return redirect(ico_url)
