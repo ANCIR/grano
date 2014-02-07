@@ -13,15 +13,6 @@ class Attribute(db.Model, IntBase):
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
 
 
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'label': self.label,
-            'hidden': self.hidden,
-            'description': self.description
-        }
-
-
     @classmethod
     def by_name(cls, schema, name):
         q = db.session.query(cls)

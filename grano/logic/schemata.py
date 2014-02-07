@@ -1,9 +1,10 @@
 from grano.core import db
 from grano.model import Schema, Attribute
 from grano.logic.validation import validate_schema
+from grano.logic import attributes
 
 
-def save_schema(data):
+def save(data):
     """ Create a schema. """
 
     data = validate_schema(data)
@@ -24,7 +25,7 @@ def save_schema(data):
     names = []
     for attribute in data.get('attributes', []):
         attribute['schema'] = obj
-        attr = save_attribute(attribute)
+        attr = attributes.save(attribute)
         obj.attributes.append(attr)
         names.append(attr.name)
     for attr in obj.attributes:
@@ -33,16 +34,25 @@ def save_schema(data):
     return obj
 
 
-def save_attribute(data):
-    schema = data.get('schema')
-    name = data.get('name')
-    obj = Attribute.by_name(schema, name)
-    if obj is None:
-        obj = Attribute()
-    obj.name = name
-    obj.label = data.get('label')
-    obj.hidden = data.get('hidden')
-    obj.description = data.get('description')
-    obj.schema = schema
-    db.session.add(obj)
-    return obj
+def to_basic(schema):
+    return {
+        'name': schema.name,
+        'label': schema.label
+    }
+
+
+def to_index(schema):
+    data = to_basic(schema)
+    #data['attributes'] = [attributes.to_index(a) for a in schema.attributes]
+    return data
+
+
+def to_dict(schema):
+    data = to_basic(schema)
+    data['id'] = schema.id
+    data['obj'] = schema.obj
+    data['hidden'] = schema.hidden
+    data['label_in'] = schema.label_in
+    data['label_out'] = schema.label_out
+    data['attributes'] = [attributes.to_dict(a) for a in schema.attributes]
+    return data

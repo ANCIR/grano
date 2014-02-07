@@ -2,7 +2,7 @@ import logging
 
 from grano.core import db
 from grano.model import Entity, Schema
-from grano.logic import relations
+from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.plugins import notify_plugins
 
@@ -105,7 +105,7 @@ def to_index(entity):
     schemata = list(entity.schemata)
     data = {
         'id': entity.id,
-        'schemata': [s.to_dict(shallow=True) for s in schemata if s.name != 'base'],
+        'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
         'num_schemata': len(schemata),
         'num_properties': 0,
         'inbound': [],

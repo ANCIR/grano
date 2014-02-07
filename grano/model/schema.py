@@ -50,18 +50,3 @@ class Schema(db.Model, IntBase):
         q = q.filter_by(name=name)
         q = q.filter_by(obj=obj)
         return q.first()
-
-
-    def to_dict(self, shallow=False):
-        data = {
-            'id': self.id,
-            'name': self.name,
-            'label': self.label,
-            'label_in': self.label_in,
-            'label_out': self.label_out,
-            'hidden': self.hidden,
-            'obj': self.obj
-        }
-        if not shallow:
-            data['attributes'] = [a.to_dict() for a in self.attributes]
-        return data

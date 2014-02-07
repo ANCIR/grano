@@ -4,14 +4,14 @@ from pprint import pprint
 
 from grano.core import db
 from grano.model import Schema
-from grano.logic.schemata import save_schema
+from grano.logic.schemata import save, to_dict
 from grano.logic.validation import Invalid
 
 
 def import_schema(fh):
     data = yaml.load(fh.read())
     try:
-        save_schema(data)
+        save(data)
         db.session.commit()
     except Invalid, inv:
         pprint(inv.asdict())
@@ -25,4 +25,4 @@ def export_schema(path):
             continue
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
-            fh.write(yaml.dump(schema.to_dict()))
+            fh.write(yaml.dump(to_dict(schema)))
