@@ -105,7 +105,7 @@ def to_index(entity):
     schemata = list(entity.schemata)
     data = {
         'id': entity.id,
-        'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
+        'schemata': [schemata_logic.to_basic(s) for s in schemata if s.name != 'base'],
         'num_schemata': len(schemata),
         'num_properties': 0,
         'inbound': [],
@@ -152,5 +152,9 @@ def to_rest_index(entity):
 def to_rest(entity):
     """ Full serialization of the entity. """
     data = to_rest_index(entity)
-    # TODO: schema
+    data['created_at'] = entity.created_at
+    data['updated_at'] = entity.updated_at
+
+    ss = [schemata_logic.to_rest_index(s) for s in entity.schemata]
+    data['schemata'] = ss
     return data

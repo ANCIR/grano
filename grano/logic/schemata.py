@@ -1,4 +1,4 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model import Schema, Attribute
 from grano.logic.validation import validate_schema
 from grano.logic import attributes
@@ -41,9 +41,22 @@ def to_basic(schema):
     }
 
 
-def to_index(schema):
+def to_rest_index(schema):
     data = to_basic(schema)
-    #data['attributes'] = [attributes.to_index(a) for a in schema.attributes]
+    data['api_url'] = url_for('schemata_api.view', name=schema.name)
+    return data
+
+
+def to_rest(schema):
+    data = to_rest_index(schema)
+    data['id'] = schema.id
+    data['hidden'] = schema.hidden
+    if schema.label_in:
+        data['label_in'] = schema.label_in
+    if schema.label_out:
+        data['label_out'] = schema.label_out
+    as_ = [attributes.to_rest(a) for a in schema.attributes]
+    data['attributes'] = as_
     return data
 
 

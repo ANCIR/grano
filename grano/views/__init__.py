@@ -5,6 +5,8 @@ from grano.core import app
 from grano.lib.serialisation import jsonify
 from grano.views.base_api import base_api
 from grano.views.entities_api import entities_api
+from grano.views.relations_api import relations_api
+from grano.views.schemata_api import schemata_api
 
 
 @app.errorhandler(401)
@@ -38,3 +40,5 @@ def handle_invalid(exc):
 
 app.register_blueprint(base_api)
 app.register_blueprint(entities_api)
+app.register_blueprint(relations_api)
+app.register_blueprint(schemata_api)

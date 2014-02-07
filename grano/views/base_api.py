@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
-from grano.core import app
+from grano.core import app, url_for
 
 
 base_api = Blueprint('base_api', __name__)
@@ -33,9 +33,12 @@ def status():
     return jsonify({
         'service': 'grano',
         'status': 'ok',
+        'version': '0.1',
         'docs': 'http://grano.pudo.org/api.html',
-        'api_url': url_for('base_api.status', _external=True),
+        'api_url': url_for('base_api.status'),
         'services': {
-            'entities_index_url': url_for('entities_api.index', _external=True)
+            'entities_index_url': url_for('entities_api.index'),
+            'relations_index_url': url_for('relations_api.index'),
+            'schemata_index_url': url_for('schemata_api.index')
         }
     })

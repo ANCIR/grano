@@ -1,6 +1,6 @@
 import logging
 
-from grano.core import db
+from grano.core import db, url_for
 from grano.model import Relation
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
@@ -57,3 +57,24 @@ def to_index(relation):
         data[prop.name] = prop.value
 
     return data
+
+
+def to_rest(relation):
+    return to_rest_index(relation)
+
+
+def to_rest_index(relation):
+    props = {}
+    for prop in relation.active_properties:
+        name, prop = properties_logic.to_rest_index(prop)
+        props[name] = prop
+    return {
+        'id': relation.id,
+        'api_url': url_for('relations_api.view', id=relation.id),
+        'source_id': relation.source_id,
+        'source_url': url_for('entities_api.view', id=relation.source_id),
+        'target_id': relation.target_id,
+        'target_url': url_for('entities_api.view', id=relation.target_id),
+        'properties': props,
+        'schema': schemata_logic.to_rest_index(relation.schema),
+    }

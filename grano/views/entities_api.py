@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
+from grano.lib.args import object_or_404
 from grano.model import Entity
 from grano.logic import entities
 from grano.lib.pager import Pager
@@ -21,4 +22,5 @@ def index():
 
 @entities_api.route('/api/1/entities/<id>')
 def view(id):
-    return 'huhu'
+    entity = object_or_404(Entity.by_id(id))
+    return jsonify(entities.to_rest(entity))

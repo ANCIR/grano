@@ -27,6 +27,15 @@ def to_index(attribute):
     }
 
 
+def to_rest(attribute):
+    data = to_index(attribute)
+    data['id'] = attribute.id
+    data['hidden'] = attribute.hidden
+    if attribute.description:
+        data['description'] = attribute.description
+    return data
+
+
 def to_dict(attribute):
     data = to_index(attribute)
     data['id'] = attribute.id
