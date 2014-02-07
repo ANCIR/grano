@@ -4,6 +4,7 @@ from flask import request
 from grano.core import app
 from grano.lib.serialisation import jsonify
 from grano.views.base_api import base_api
+from grano.views.entities_api import entities_api
 
 
 @app.errorhandler(401)
@@ -36,3 +37,4 @@ def handle_invalid(exc):
 
 
 app.register_blueprint(base_api)
+app.register_blueprint(entities_api)

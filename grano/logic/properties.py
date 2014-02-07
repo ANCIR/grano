@@ -53,3 +53,12 @@ def set(obj, name, schema, value, active=True, source_url=None,
     prop.active = active
     prop.source_url = source_url
     return prop
+
+
+def to_rest_index(prop):
+    return prop.name, {
+        #'id': prop.id,
+        'value': prop.value,
+        #'active': prop.active,
+        'source_url': prop.source_url
+    }

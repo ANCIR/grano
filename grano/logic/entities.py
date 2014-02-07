@@ -1,6 +1,6 @@
 import logging
 
-from grano.core import db
+from grano.core import db, url_for
 from grano.model import Entity, Schema
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
@@ -135,3 +135,22 @@ def to_index(entity):
 
     return data
 
+
+def to_rest_index(entity):
+    """ Convert an entity to the REST API form. """
+    props = {}
+    for prop in entity.active_properties:
+        name, prop = properties_logic.to_rest_index(prop)
+        props[name] = prop
+    return {
+        'id': entity.id,
+        'api_url': url_for('entities_api.view', id=entity.id),
+        'properties': props
+    }
+
+
+def to_rest(entity):
+    """ Full serialization of the entity. """
+    data = to_rest_index(entity)
+    # TODO: schema
+    return data
