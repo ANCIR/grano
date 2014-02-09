@@ -157,4 +157,13 @@ def to_rest(entity):
 
     ss = [schemata_logic.to_rest_index(s) for s in entity.schemata]
     data['schemata'] = ss
+
+    data['inbound_relations'] = entity.inbound.count()
+    if data['inbound_relations'] > 0:
+        data['inbound_url'] = url_for('entities_api.inbound', id=entity.id)
+    
+    data['outbound_relations'] = entity.outbound.count()
+    if data['outbound_relations'] > 0:
+        data['outbound_url'] = url_for('entities_api.outbound', id=entity.id)
+    
     return data
