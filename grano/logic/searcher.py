@@ -15,12 +15,14 @@ class ESSearcher(object):
     interface similar to a SQLAlchemy query, so it can be 
     handled the same - especially by a pager. """
 
-    def __init__(self, args):
+    def __init__(self, args, sort_field=None):
         self.args = args
         self.results = None
         self._limit = 25
         self._offset = 0
         self._facets = []
+        self._filters = []
+        self._sort_field = sort_field
 
     def limit(self, limit):
         self.results = None
@@ -35,13 +37,18 @@ class ESSearcher(object):
     def add_facet(self, name, size=10):
         self._facets.append((name, size))
 
+    def add_filter(self, field, value):
+        self._filters.append({
+            "term": { field: value }
+        })
+
     @property
     def query_text(self):
         return self.args.get('q', '').strip()
 
     @property
     def filters(self):
-        _filters = []
+        _filters = list(self._filters)
         for q in self.args.keys():
             if not q.startswith('filter-'):
                 continue
@@ -51,7 +58,6 @@ class ESSearcher(object):
                     "term": { field: v }
                 })
         return _filters
-
 
     def _run(self):
         query = {'from': self._offset, 'size': self._limit}
@@ -79,7 +85,12 @@ class ESSearcher(object):
                 }
             }
 
-        self.results = es.search(index=es_index, doc_type='entity', body=query)
+        if self._sort_field:
+            field, order = self._sort_field
+            query['sort'] = [{field: {'order': order}}]
+
+        self.results = es.search(index=es_index, doc_type='entity',
+            body=query)
 
     def get_facet(self, name):
         if self.results is None:
@@ -108,5 +119,5 @@ class ESSearcher(object):
         return list(self)
 
 
-def search_entities(args):
-    return ESSearcher(args)
+def search_entities(args, sort_field=None):
+    return ESSearcher(args, sort_field=sort_field)

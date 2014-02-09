@@ -41,6 +41,12 @@ def to_basic(schema):
     }
 
 
+def to_index(schema):
+    data = to_basic(schema)
+    data['hidden'] = schema.hidden
+    return data
+
+
 def to_rest_index(schema):
     data = to_basic(schema)
     data['api_url'] = url_for('schemata_api.view', name=schema.name)

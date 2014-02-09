@@ -105,7 +105,7 @@ def to_index(entity):
     schemata = list(entity.schemata)
     data = {
         'id': entity.id,
-        'schemata': [schemata_logic.to_basic(s) for s in schemata if s.name != 'base'],
+        'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
         'num_schemata': len(schemata),
         'num_properties': 0,
         'inbound': [],
