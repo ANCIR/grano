@@ -1,6 +1,6 @@
 import logging
 
-from grano.core import db, url_for
+from grano.core import db, url_for, celery
 from grano.model import Relation
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
@@ -10,9 +10,10 @@ from grano.plugins import notify_plugins
 log = logging.getLogger(__name__)
 
 
+@celery.task
 def _relation_changed(relation_id):
     """ Notify plugins about changes to a relation. """
-    # TODO: put behind a queue.
+    log.warn("Processing change in relation: %s", relation_id)
     def _handle(obj):
         obj.relation_changed(relation_id)
     notify_plugins('grano.relation.change', _handle)
@@ -38,7 +39,7 @@ def save(schema, properties, source, target, update_criteria):
     obj.target = target
     obj.schema = schema
     properties_logic.set_many(obj, properties)
-    _relation_changed(obj.id)
+    _relation_changed.delay(obj.id)
     return obj
 
 

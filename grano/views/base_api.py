@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask import redirect, make_response, url_for
 
+from grano import __version__
 from grano.lib.serialisation import jsonify
-from grano.core import app, url_for
+from grano.core import app, url_for, app_name
+from grano.background import ping
 
 
 base_api = Blueprint('base_api', __name__)
@@ -42,3 +44,9 @@ def status():
             'schemata_index_url': url_for('schemata_api.index')
         }
     })
+
+
+@base_api.route('/api/1/ping')
+def queue_ping():
+    ret = ping.delay(message=request.args.get('message'))
+    return jsonify({'status': 'sent', 'task': ret.task_name, 'id': ret.id})

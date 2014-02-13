@@ -1,6 +1,6 @@
 import logging
 
-from grano.core import db, url_for
+from grano.core import db, url_for, celery
 from grano.model import Entity, Schema
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
@@ -10,9 +10,10 @@ from grano.plugins import notify_plugins
 log = logging.getLogger(__name__)
 
 
+@celery.task
 def _entity_changed(entity_id):
     """ Notify plugins about changes to an entity. """
-    # TODO: put behind a queue.
+    log.warn("Processing change in entity: %s", entity_id)
     def _handle(obj):
         obj.entity_changed(entity_id)
     notify_plugins('grano.entity.change', _handle)
@@ -35,7 +36,7 @@ def save(schemata, properties, update_criteria):
     
     obj.schemata = list(set(obj.schemata + schemata))
     properties_logic.set_many(obj, properties)
-    _entity_changed(obj.id)
+    _entity_changed.delay(obj.id)
     return obj
 
 
@@ -85,7 +86,7 @@ def apply_alias(canonical_name, alias_name):
     if canonical is None:
         properties_logic.set(alias, 'name', schema, canonical_name,
             active=True, source_url=None)
-        _entity_changed(alias.id)
+        _entity_changed.delay(alias.id)
         return log.info("Renamed: %s", alias_name)
 
     # Already done, thanks.
@@ -95,7 +96,7 @@ def apply_alias(canonical_name, alias_name):
     # Merge two existing entities, declare one as "same_as"
     if canonical is not None and alias is not None:
         _merge_entities(alias, canonical)
-        _entity_changed(canonical.id)
+        _entity_changed.delay(canonical.id)
         return log.info("Mapped: %s -> %s", alias.id, canonical.id)
 
 

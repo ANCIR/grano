@@ -5,7 +5,8 @@ ASSETS_DEBUG = False
 
 SECRET_KEY = 'test'
 SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/grano.db'
-ES_INDEX = 'grano'
+APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 
 # Generate a public URI for an entity, based on its ID.
 ENTITY_VIEW_PATTERN = 'http://grano.io/e/%s'
