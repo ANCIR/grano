@@ -31,9 +31,9 @@ def favicon_ico():
 @base_api.route('/api/1')
 def status():
     return jsonify({
-        'service': 'grano',
+        'service': app_name,
         'status': 'ok',
-        'version': '0.1',
+        'version': __version__,
         'docs': 'http://grano.pudo.org/api.html',
         'api_url': url_for('base_api.status'),
         'services': {
