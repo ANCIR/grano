@@ -7,7 +7,7 @@ from grano.core import app, url_for, app_name
 from grano.background import ping
 
 
-base_api = Blueprint('base_api', __name__)
+blueprint = Blueprint('base_api', __name__)
 
 ROBOTS = """
 User-agent: *
@@ -15,22 +15,22 @@ Sitemap: /static/sitemap.xml
 """
 
 
-@base_api.route('/robots.txt')
+@blueprint.route('/robots.txt')
 def robots_txt():
     res = make_response(ROBOTS)
     res.headers['Content-Type'] = 'text/plain'
     return res
 
 
-@base_api.route('/favicon.ico')
+@blueprint.route('/favicon.ico')
 def favicon_ico():
     ico_url = app.config.get('FAVICON_URL',
         'http://assets.pudo.org/img/favicon.ico')
     return redirect(ico_url)
 
 
-@base_api.route('/api')
-@base_api.route('/api/1')
+@blueprint.route('/api')
+@blueprint.route('/api/1')
 def status():
     return jsonify({
         'service': app_name,
@@ -41,12 +41,13 @@ def status():
         'services': {
             'entities_index_url': url_for('entities_api.index'),
             'relations_index_url': url_for('relations_api.index'),
-            'schemata_index_url': url_for('schemata_api.index')
+            'schemata_index_url': url_for('schemata_api.index'),
+            'sessions_status_url': url_for('sessions_api.status')
         }
     })
 
 
-@base_api.route('/api/1/ping')
+@blueprint.route('/api/1/ping')
 def queue_ping():
     ret = ping.delay(message=request.args.get('message'))
     return jsonify({'status': 'sent', 'task': ret.task_name, 'id': ret.id})

@@ -9,10 +9,10 @@ from grano.lib.pager import Pager
 from grano.core import app
 
 
-entities_api = Blueprint('entities_api', __name__)
+blueprint = Blueprint('entities_api', __name__)
 
 
-@entities_api.route('/api/1/entities')
+@blueprint.route('/api/1/entities')
 def index():
     query = Entity.all()
     pager = Pager(query)
@@ -20,13 +20,13 @@ def index():
     return jsonify(pager.to_dict(conv))
 
 
-@entities_api.route('/api/1/entities/<id>')
+@blueprint.route('/api/1/entities/<id>')
 def view(id):
     entity = object_or_404(Entity.by_id(id))
     return jsonify(entities.to_rest(entity))
 
 
-@entities_api.route('/api/1/entities/<id>/inbound')
+@blueprint.route('/api/1/entities/<id>/inbound')
 def inbound(id):
     entity = object_or_404(Entity.by_id(id))
     pager = Pager(entity.inbound)
@@ -34,7 +34,7 @@ def inbound(id):
     return jsonify(pager.to_dict(conv))
 
 
-@entities_api.route('/api/1/entities/<id>/outbound')
+@blueprint.route('/api/1/entities/<id>/outbound')
 def outbound(id):
     entity = object_or_404(Entity.by_id(id))
     pager = Pager(entity.outbound)

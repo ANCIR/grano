@@ -13,6 +13,11 @@ Jinja2==2.7.2
 SQLAlchemy==0.9.1
 python-slugify==0.0.7
 PyYAML==3.10
-colander==1.0b1
+colander==0.9.9
 stevedore==0.14.1
-dataset
+dataset==0.5
+python-slugify==0.0.7
+unicodecsv==0.9.4
+requests==2.2.0
+lxml==3.2.5
+elasticsearch==0.4.4

@@ -9,10 +9,10 @@ from grano.lib.pager import Pager
 from grano.core import app
 
 
-relations_api = Blueprint('relations_api', __name__)
+blueprint = Blueprint('relations_api', __name__)
 
 
-@relations_api.route('/api/1/relations')
+@blueprint.route('/api/1/relations')
 def index():
     query = Relation.all()
     pager = Pager(query)
@@ -20,7 +20,7 @@ def index():
     return jsonify(pager.to_dict(conv))
 
 
-@relations_api.route('/api/1/relations/<id>')
+@blueprint.route('/api/1/relations/<id>')
 def view(id):
     relation = object_or_404(Relation.by_id(id))
     return jsonify(relations.to_rest(relation))

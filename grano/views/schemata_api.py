@@ -9,10 +9,10 @@ from grano.lib.pager import Pager
 from grano.core import app
 
 
-schemata_api = Blueprint('schemata_api', __name__)
+blueprint = Blueprint('schemata_api', __name__)
 
 
-@schemata_api.route('/api/1/schemata')
+@blueprint.route('/api/1/schemata')
 def index():
     query = Schema.all()
     pager = Pager(query)
@@ -20,7 +20,7 @@ def index():
     return jsonify(pager.to_dict(conv))
 
 
-@schemata_api.route('/api/1/schemata/<name>')
+@blueprint.route('/api/1/schemata/<name>')
 def view(name):
     schema = object_or_404(Schema.by_name(name))
     return jsonify(schemata.to_rest(schema))

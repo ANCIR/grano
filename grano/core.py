@@ -1,9 +1,12 @@
 import logging
+
 from flask import Flask, url_for as _url_for
 from flask.ext.assets import Environment
+from flask.ext.oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 from elasticsearch import Elasticsearch
 from celery import Celery
+import certifi
 
 from grano import default_settings
 
@@ -34,6 +37,18 @@ celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
     broker=app.config['CELERY_BROKER_URL'])
 
 es_index = app.config.get('ES_INDEX', app_name)
+
+
+oauth = OAuth()
+github = oauth.remote_app('github',
+        base_url='https://github.com/login/oauth/',
+        authorize_url='https://github.com/login/oauth/authorize',
+        request_token_url=None,
+        access_token_url='https://github.com/login/oauth/access_token',
+        consumer_key=app.config.get('GITHUB_CLIENT_ID'),
+        consumer_secret=app.config.get('GITHUB_CLIENT_SECRET'))
+
+github._client.ca_certs = certifi.where()
 
 
 def url_for(*a, **kw):
