@@ -97,5 +97,8 @@ def search(text):
     log.info("Total hits: %s", res.count())
 
 
-if __name__ == "__main__":
+def run():
     manager.run()
+
+if __name__ == "__main__":
+    run()    

@@ -27,6 +27,9 @@ setup(
             'indexer = grano.service.indexer:AutoIndexer',
             'opencorporates = grano.service.opencorporates:OpenCorporatesCanonicalizer'
         ],
+        'console_scripts': [
+            'grano = grano.manage:run',
+        ]
     },
     tests_require=[]
 )
