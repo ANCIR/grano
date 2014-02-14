@@ -10,6 +10,8 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'), index=True)
     source_id = db.Column(db.Unicode, db.ForeignKey('entity.id'), index=True)
     target_id = db.Column(db.Unicode, db.ForeignKey('entity.id'), index=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
     properties = db.relationship(RelationProperty,
     	order_by=RelationProperty.created_at.desc(),

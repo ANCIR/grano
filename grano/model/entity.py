@@ -17,6 +17,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     PropertyClass = EntityProperty
 
     same_as = db.Column(db.Unicode, db.ForeignKey('entity.id'), nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
     schemata = db.relationship('Schema', secondary=entity_schema,
         backref=db.backref('entities', lazy='dynamic'))

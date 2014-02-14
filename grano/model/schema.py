@@ -19,7 +19,7 @@ class Schema(db.Model, IntBase):
     attributes = db.relationship(Attribute, backref='schema', lazy='joined')
     properties = db.relationship(Property, backref='schema', lazy='dynamic')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic')
-
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     def get_attribute(self, name):
         for attribute in self.attributes:

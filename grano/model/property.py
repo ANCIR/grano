@@ -6,6 +6,8 @@ class Property(db.Model, IntBase):
     __tablename__ = 'property'
 
     schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+
     name = db.Column(db.Unicode(), index=True)
     value = db.Column(db.Unicode())
     source_url = db.Column(db.Unicode())
