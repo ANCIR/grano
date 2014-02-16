@@ -1,4 +1,4 @@
-from grano.core import app, db
+from grano.core import app, db, url_for
 from grano.model import Project
 
 
@@ -35,11 +35,12 @@ def save(slug, author, label=None, settings=None):
 def to_rest_index(project):
     return {
         'slug': project.slug,
-        'label': project.label
+        'label': project.label,
+        'api_url': url_for('projects_api.view', slug=project.slug)
     }
 
 
 def to_rest(project):
-    data = to_rest_index()
+    data = to_rest_index(project)
     data['settings'] = project.settings
     return data

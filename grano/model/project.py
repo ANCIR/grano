@@ -1,5 +1,5 @@
 from grano.core import db
-from grano.model.util import make_token, JSONEncodedDict
+from grano.model.util import make_token, MutableDict, JSONEncodedDict
 from grano.model.common import IntBase
 
 
@@ -8,7 +8,7 @@ class Project(db.Model, IntBase):
 
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
-    settings = JSONEncodedDict()
+    settings = db.Column(MutableDict.as_mutable(JSONEncodedDict))
 
     author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 

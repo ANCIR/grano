@@ -22,6 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('slug', sa.Unicode(), nullable=True),
     sa.Column('label', sa.Unicode(), nullable=True),
+    sa.Column('settings', sa.Unicode(), nullable=True),
     sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['account.id'], ),
     sa.PrimaryKeyConstraint('id')

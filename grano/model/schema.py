@@ -31,7 +31,7 @@ class Schema(db.Model, IntBase):
     def cached(cls, project, type, name):
         obj = type.__tablename__
         if not (project, obj, name) in cls.SCHEMATA:
-            schema = Schema.by_obj_name(obj, name)
+            schema = Schema.by_obj_name(project, obj, name)
             if schema is None:
                 raise ValueError("Unknown schema: %s" % name)
             cls.SCHEMATA[(project, obj, name)] = schema

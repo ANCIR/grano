@@ -39,6 +39,7 @@ def status():
         'docs': 'http://grano.pudo.org/api.html',
         'api_url': url_for('base_api.status'),
         'services': {
+            'projects_index_url': url_for('projects_api.index'),
             'entities_index_url': url_for('entities_api.index'),
             'relations_index_url': url_for('relations_api.index'),
             'schemata_index_url': url_for('schemata_api.index'),
