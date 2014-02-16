@@ -6,14 +6,14 @@ from flask.ext.assets import ManageAssets
 from grano.core import db, assets
 from grano.views import app
 from grano.model import Project
-from grano.service import import_schema, export_schema
-from grano.service import import_aliases, export_aliases
-from grano.service import index_entities, index_single
-from grano.service import flush_entities, rebuild as rebuild_
+from grano.logic import import_schema, export_schema
+from grano.logic import import_aliases, export_aliases
+from grano.logic import index_entities, index_single
+from grano.logic import flush_entities, rebuild as rebuild_
 from grano.logic.searcher import search_entities
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as ensure_project
-from grano.service import generate_sitemap
+from grano.logic import generate_sitemap
 from grano.plugins import list_plugins
 
 

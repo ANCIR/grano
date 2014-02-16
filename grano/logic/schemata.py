@@ -1,3 +1,5 @@
+import os
+
 from grano.core import db, url_for
 from grano.model import Schema, Attribute
 from grano.logic.validation import validate_schema
@@ -34,6 +36,26 @@ def save(project, data):
         if attr.name not in names:
             db.session.delete(attr)
     return obj
+
+
+def import_schema(project, fh):
+    data = yaml.load(fh.read())
+    try:
+        save(project, data)
+        db.session.commit()
+    except Invalid, inv:
+        pprint(inv.asdict())
+
+
+def export_schema(project, path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    for schema in Schema.all().filter_by(project=project):
+        if schema.name == 'base':
+            continue
+        fn = os.path.join(path, schema.name + '.yaml')
+        with open(fn, 'w') as fh:
+            fh.write(yaml.dump(to_dict(schema)))
 
 
 def to_basic(schema):

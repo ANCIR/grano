@@ -24,7 +24,7 @@ def save(slug, author, label=None, settings=None):
     project.author = author
     db.session.add(project)
     
-    from grano.service.schema import import_schema
+    from grano.logic.schemata import import_schema
     with app.open_resource('fixtures/base.yaml') as fh:
         import_schema(project, fh)
 
