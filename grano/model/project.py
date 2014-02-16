@@ -10,7 +10,7 @@ class Project(db.Model, IntBase):
     label = db.Column(db.Unicode)
     settings = JSONEncodedDict()
 
-    owner_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
     relations = db.relationship('Relation', backref='project', lazy='dynamic')
     entities = db.relationship('Entity', backref='project', lazy='dynamic')

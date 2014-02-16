@@ -19,6 +19,13 @@ def update(account, data):
     return account
 
 
+def console_account(login='_system'):
+    account = Account.by_login(login)
+    if account is None:
+        account = create({'login': login, 'id': None, 'email': None})
+    return account
+
+
 def to_rest(account):
     return {
         'id': account.id,

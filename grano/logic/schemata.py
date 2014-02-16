@@ -1,19 +1,21 @@
 from grano.core import db, url_for
 from grano.model import Schema, Attribute
 from grano.logic.validation import validate_schema
+from grano.logic import projects as projects_logic
 from grano.logic import attributes
 
 
-def save(data):
+def save(project, data):
     """ Create a schema. """
 
     data = validate_schema(data)
     
     name = data.get('name')
-    obj = Schema.by_name(name)
+    obj = Schema.by_name(project, name)
     if obj is None:
         obj = Schema()
     obj.name = name
+    obj.project = project
     obj.label = data.get('label')
     obj.label_in = data.get('label_in') or obj.label
     obj.label_out = data.get('label_out') or obj.label
@@ -49,6 +51,7 @@ def to_index(schema):
 
 def to_rest_index(schema):
     data = to_basic(schema)
+    data['project'] = projects_logic.to_rest_index(schema.project)
     data['api_url'] = url_for('schemata_api.view', name=schema.name)
     return data
 
@@ -70,6 +73,7 @@ def to_dict(schema):
     data = to_basic(schema)
     data['id'] = schema.id
     data['obj'] = schema.obj
+    data['project'] = schema.project.slug
     data['hidden'] = schema.hidden
     data['label_in'] = schema.label_in
     data['label_out'] = schema.label_out

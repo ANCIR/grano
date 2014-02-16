@@ -3,7 +3,7 @@ from grano.model import Entity
 from grano.logic.validation import validate_properties
 
 
-def set_many(obj, properties):
+def set_many(obj, author, properties):
     """ Set a list of properties supplied as a dictionary containing the 
     arguments necessary for calling set(). """
     
@@ -12,11 +12,11 @@ def set_many(obj, properties):
     current_properties = list(obj.properties)
     for name, prop in properties.items():
         relevant = [p for p in current_properties if p.name == name]
-        set(obj, name, prop.get('schema'), prop.get('value'),
+        set(obj, author, name, prop.get('schema'), prop.get('value'),
             prop.get('active'), prop.get('source_url'), relevant)
 
 
-def set(obj, name, schema, value, active=True, source_url=None,
+def set(obj, author, name, schema, value, active=True, source_url=None,
     properties=None):
     """ Set a property on the given object (entity or relation). This will
     either create a new property object or re-activate an existing object
@@ -48,6 +48,7 @@ def set(obj, name, schema, value, active=True, source_url=None,
 
     prop._set_obj(obj)
     prop.name = name
+    prop.author = author
     prop.schema = schema
     prop.value = value
     prop.active = active

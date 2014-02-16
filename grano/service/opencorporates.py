@@ -58,7 +58,7 @@ class OpenCorporatesCanonicalizer(EntityChangeProcessor):
         if best_match.get('score') >= self.score_limit:
             log.info('OpenCorporates Lookup: %s -> %s',
                 best_match['name'], best_match['canonical'])
-            schema = Schema.cached(Entity, 'base')
+            schema = Schema.cached(entity.project, Entity, 'base')
             properties.set(entity, 'name', schema, best_match['canonical'],
                 source_url=best_match['uri'])
             properties.set(entity, 'opencorporates_uri', schema, best_match['uri'],

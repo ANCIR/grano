@@ -8,19 +8,19 @@ from grano.logic.schemata import save, to_dict
 from grano.logic.validation import Invalid
 
 
-def import_schema(fh):
+def import_schema(project, fh):
     data = yaml.load(fh.read())
     try:
-        save(data)
+        save(project, data)
         db.session.commit()
     except Invalid, inv:
         pprint(inv.asdict())
 
 
-def export_schema(path):
+def export_schema(project, path):
     if not os.path.exists(path):
         os.makedirs(path)
-    for schema in Schema.all():
+    for schema in Schema.all().filter_by(project=project):
         if schema.name == 'base':
             continue
         fn = os.path.join(path, schema.name + '.yaml')

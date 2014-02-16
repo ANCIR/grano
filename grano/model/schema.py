@@ -28,25 +28,27 @@ class Schema(db.Model, IntBase):
 
 
     @classmethod
-    def cached(cls, type, name):
+    def cached(cls, project, type, name):
         obj = type.__tablename__
-        if not (obj, name) in cls.SCHEMATA:
+        if not (project, obj, name) in cls.SCHEMATA:
             schema = Schema.by_obj_name(obj, name)
             if schema is None:
                 raise ValueError("Unknown schema: %s" % name)
-            cls.SCHEMATA[(obj, name)] = schema
-        return cls.SCHEMATA[(obj, name)]
+            cls.SCHEMATA[(project, obj, name)] = schema
+        return cls.SCHEMATA[(project, obj, name)]
 
 
     @classmethod
-    def by_name(cls, name):
+    def by_name(cls, project, name):
         q = db.session.query(cls).filter_by(name=name)
+        q = q.filter_by(project=project)
         return q.first()
 
 
     @classmethod
-    def by_obj_name(cls, obj, name):
+    def by_obj_name(cls, project, obj, name):
         q = db.session.query(cls)
+        q = q.filter_by(project=project)
         q = q.filter_by(name=name)
         q = q.filter_by(obj=obj)
         return q.first()

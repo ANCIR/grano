@@ -4,6 +4,7 @@ from grano.core import db, url_for, celery
 from grano.model import Entity, Schema
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
+from grano.logic import projects as projects_logic
 from grano.plugins import notify_plugins
 
 
@@ -19,11 +20,12 @@ def _entity_changed(entity_id):
     notify_plugins('grano.entity.change', _handle)
 
 
-def save(schemata, properties, update_criteria):
+def save(project, author, schemata, properties, update_criteria):
     """ Save or update an entity. """
     obj = None
     if len(update_criteria):
         q = db.session.query(Entity)
+        q = q.filter(Entity.project_id==project.id)
         for name, only_active in update_criteria:
             value = properties.get(name).get('value')
             q = Entity._filter_property(q, name, value, only_active=only_active)
@@ -34,8 +36,10 @@ def save(schemata, properties, update_criteria):
         db.session.add(obj)
         db.session.flush()
     
+    obj.project = project
+    obj.author = author
     obj.schemata = list(set(obj.schemata + schemata))
-    properties_logic.set_many(obj, properties)
+    properties_logic.set_many(obj, author, properties)
     _entity_changed.delay(obj.id)
     return obj
 
@@ -63,7 +67,7 @@ def _merge_entities(source, target):
     db.session.flush()
 
 
-def apply_alias(canonical_name, alias_name):
+def apply_alias(project, author, canonical_name, alias_name):
     """ Given two names, find out if there are existing entities for one or 
     both of them. If so, merge them into a single entity - or, if only the 
     entity associated with the alias exists - re-name the entity. """
@@ -74,9 +78,9 @@ def apply_alias(canonical_name, alias_name):
     if canonical_name == alias_name or not len(canonical_name):
         return log.info("No alias: %s", canonical_name)
 
-    canonical = Entity.by_name(canonical_name)
-    alias = Entity.by_name(alias_name)
-    schema = Schema.cached(Entity, 'base')
+    canonical = Entity.by_name(project, canonical_name)
+    alias = Entity.by_name(project, alias_name)
+    schema = Schema.cached(project, Entity, 'base')
 
     # Don't artificially increase entity counts.
     if canonical is None and alias is None:
@@ -84,7 +88,7 @@ def apply_alias(canonical_name, alias_name):
 
     # Rename an alias to its new, canonical name.
     if canonical is None:
-        properties_logic.set(alias, 'name', schema, canonical_name,
+        properties_logic.set(alias, author, 'name', schema, canonical_name,
             active=True, source_url=None)
         _entity_changed.delay(alias.id)
         return log.info("Renamed: %s", alias_name)
@@ -106,6 +110,7 @@ def to_index(entity):
     schemata = list(entity.schemata)
     data = {
         'id': entity.id,
+        'project': projects_logic.to_rest_index(entity.project),
         'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
         'num_schemata': len(schemata),
         'num_properties': 0,
@@ -145,6 +150,7 @@ def to_rest_index(entity):
         props[name] = prop
     return {
         'id': entity.id,
+        'project': projects_logic.to_rest_index(entity.project),
         'api_url': url_for('entities_api.view', id=entity.id),
         'properties': props
     }

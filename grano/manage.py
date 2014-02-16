@@ -5,11 +5,14 @@ from flask.ext.assets import ManageAssets
 
 from grano.core import db, assets
 from grano.views import app
+from grano.model import Project
 from grano.service import import_schema, export_schema
 from grano.service import import_aliases, export_aliases
 from grano.service import index_entities, index_single
 from grano.service import flush_entities, rebuild as rebuild_
 from grano.logic.searcher import search_entities
+from grano.logic.accounts import console_account
+from grano.logic.projects import save as ensure_project
 from grano.service import generate_sitemap
 from grano.plugins import list_plugins
 
@@ -23,33 +26,38 @@ manager.add_command("assets", ManageAssets(assets))
 def createdb():
     """ Create the database schema. """
     db.create_all()
-    with app.open_resource('fixtures/base.yaml') as fh:
-        import_schema(fh)
 
 
 @manager.command
-def schema_import(path):
+def schema_import(project, path):
     """ Load a schema specification from a YAML file. """
+    pobj = ensure_project(project, console_account())
     with open(path, 'r') as fh:
-        import_schema(fh)
+        import_schema(pobj, fh)
 
 
 @manager.command
-def schema_export(path):
+def schema_export(project, path):
     """ Export the current schema to a YAML file. """
-    export_schema(path)
+    pobj = Project.by_slug(project)
+    assert pobj is not None, 'Project not available: %s' % project
+    export_schema(pobj, path)
 
 
 @manager.command
-def alias_import(path):
+def alias_import(project, path):
     """ Load a set of entity aliases from a CSV file. """
-    import_aliases(path)
+    pobj = Project.by_slug(project)
+    assert pobj is not None, 'Project not available: %s' % project
+    import_aliases(pobj, console_account(), path)
 
 
 @manager.command
-def alias_export(path):
+def alias_export(project, path):
     """ Export all known entity aliases to a CSV file. """
-    export_aliases(path)
+    pobj = Project.by_slug(project)
+    assert pobj is not None, 'Project not available: %s' % project
+    export_aliases(pobj, path)
 
 
 @manager.command
