@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='grano',
-    version='0.2',
-    description="A entity tracking software for news organisations",
-    long_description='',
+    version='0.2p1',
+    description="An entity and social network tracking software for news applications",
+    long_description=open('README.rst').read(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -14,7 +14,7 @@ setup(
     keywords='sql graph sna networks journalism ddj entities',
     author='Friedrich Lindenberg',
     author_email='friedrich@pudo.org',
-    url='http://pudo.org',
+    url='http://grano.pudo.org',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=[],
