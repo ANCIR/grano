@@ -2,6 +2,7 @@ from flask import request
 
 from grano.lib.exc import Forbidden
 
+
 def logged_in():
     return request.account is not None
 
@@ -13,19 +14,13 @@ def project_create():
 def project_edit(project):
     if not logged_in():
         return False
-    if project.public_edit:
-        return True
-    if project.owner_id == request.account.id:
+    if project.author_id == request.account.id:
         return True
     return False
 
 
 def project_manage(project):
-    if not logged_in():
-        return False
-    if project.owner_id == request.account.id:
-        return True
-    return False
+    return project_edit(project)
 
 
 def require(pred):
