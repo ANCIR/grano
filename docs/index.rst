@@ -60,7 +60,8 @@ Contents
    install
    schema
    services
-   api
+   rest_api
+   bulk_api
 
 
 Related projects

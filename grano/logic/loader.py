@@ -20,10 +20,29 @@ class ObjectLoader(object):
 
 
     def unique(self, name, only_active=True):
+        """ Define a unique field for this entity or relation. Each unique 
+        key will be used to decide whether a record already exists and can 
+        be updated, or whether a new one must be created.
+
+        :param name: The property name of the unique field.
+        :param only_active: If set to ``False``, the check will include all 
+            historic values of the property as well as the current value. 
+        """
         self.update_criteria.add((name, only_active))
 
 
     def set(self, name, value, source_url=None):
+        """ Set the value of a given property, optionally by attributing a 
+        source URL. 
+
+        :param name: The property name. This must be defined as part of one
+            of the schemata that the entity or relation is associated with. 
+        :param value: The value to be set for this property. If it is
+            ``None``, the property will not be set, but existing values of 
+            will be marked as inactive.
+        :param source_url: A URL which will be set as the origin of this 
+            information.
+        """
         source_url = source_url or self.source_url
         if source_url is None:
             log.warning('No source for property %s.', name)
@@ -36,6 +55,8 @@ class ObjectLoader(object):
 
 
 class EntityLoader(ObjectLoader):
+    """ A factory object for entities, used to set the schemata and 
+    properties for an entity. """
     
     def __init__(self, loader, schemata, source_url=None):
         self._setup(loader, Entity, set(schemata + ['base']))
@@ -52,6 +73,8 @@ class EntityLoader(ObjectLoader):
 
 
     def save(self):
+        """ Save the entity to the database. Do this only once, after all
+        properties have been set. """
         try:
             self._entity = entities.save(self.loader.project, self.loader.account, 
                 self.schemata, self.properties, self.update_criteria)
@@ -61,6 +84,8 @@ class EntityLoader(ObjectLoader):
 
 
 class RelationLoader(ObjectLoader):
+    """ A factory object for relations, used to construct a relation by setting
+    its schema, source entity, target entity and a set of properties. """
     
     def __init__(self, loader, schema, source, target, source_url=None):
         self._setup(loader, Relation, [schema])
@@ -70,6 +95,8 @@ class RelationLoader(ObjectLoader):
 
 
     def save(self):
+        """ Save the relation to the database. Do this only once, after all
+        properties have been set. """
         try:
             self._relation = relations.save(self.loader.project, self.loader.account, 
                 self.schemata.pop(), self.properties, self.source.entity,
@@ -95,6 +122,15 @@ class Loader(object):
 
 
     def make_entity(self, schemata, source_url=None):
+        """ Create an entity loader, i.e. a construction helper for entities.
+
+        :param schemata: A list of schema names for all the schemata that the entity 
+            should be associated with.
+        :param source_url: A URL which will be made the default source for all 
+            properties defined on this entity.
+
+        :returns: :py:class:`EntityLoader <grano.logic.loader.EntityLoader>`
+        """
         entity = EntityLoader(self, schemata,
             source_url=source_url or self.source_url)
         self.entities.append(entity)
@@ -102,6 +138,20 @@ class Loader(object):
 
 
     def make_relation(self, schema, source, target, source_url=None):
+        """ Create a relation loader, i.e. a construction helper for relations.
+
+        :param schema: A schema name for the relation.
+        :param source: An :py:class:`EntityLoader <grano.logic.loader.EntityLoader>` 
+            which has been used to construct the source entity. 
+        :param target: A second :py:class:`EntityLoader <grano.logic.loader.EntityLoader>` 
+            which has been used to construct the target entity. Cannot be identical to
+            the source.
+        :param source_url: A URL which will be made the default source for all 
+            properties defined on this entity.
+
+        :returns: :py:class:`RelationLoader <grano.logic.loader.RelationLoader>`
+        """
+
         relation = RelationLoader(self, schema, source, target,
             source_url=source_url or self.source_url)
         self.relations.append(relation)
@@ -109,4 +159,6 @@ class Loader(object):
 
 
     def persist(self):
+        """ Save the created entiites and relations, i.e. commit the database
+        transaction. """
         db.session.commit()
