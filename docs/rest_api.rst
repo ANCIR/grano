@@ -8,6 +8,7 @@ such as projects, schemata, entities, and relations.
 
 Before using this API, it is advisable to read the :ref:`techintro`.
 
+
 Authentication
 --------------
 
@@ -61,4 +62,18 @@ Any pager can be modified using the following query parameters:
   been provided explicitly.
 * ``offset`` instructs the pager to skip the given number of initial records before
   beginning to return resources.
+
+
+Domain resources
+----------------
+
+Grano exposes a set of public (REST) resources via its API. They are listed at the
+root of the API::
+
+    GET /api/1 
+
+This root endpoint will also list the current version of ``grano``, as well as a 
+link to the most recent verson of this documentation. 
+
+
 
