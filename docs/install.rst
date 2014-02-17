@@ -15,7 +15,9 @@ project):
 * `UglifyJS <https://github.com/mishoo/UglifyJS/>`_ for JS minification.
 
 When you set up grano, first check out the application from GitHub, create a virtual
-environment and install the Python dependencies::
+environment and install the Python dependencies:
+
+.. code-block:: bash
 
     git clone https://github.com/pudo/grano.git
     cd grano
@@ -33,16 +35,24 @@ Next, you'll need to configure grano. Create a copy of the file
 Open the file and set up the various account configurations.
     
 Once the new configuration is set up, you need to an environment variables pointing
-grano to the configuration file you've created::
+grano to the configuration file you've created:
+
+.. code-block:: bash
 
     export GRANO_SETTINGS=`pwd`/settings.py
 
-Once this is done, you can create the database and import schema specifications::
+Once this is done, you can create the database and import schema specifications:
 
-    python grano/manage.py createdb
+.. code-block:: bash
+
+    alembic upgrade head
     python grano/manage.py schema_import <YOUR_MODEL.yaml>
     
-Finally, you can run grano::
+Finally, you can run grano:
+
+.. code-block:: bash
 
     python grano/manage.py runserver 
 
+**Hint:** instead of typing out the commmand ``python grano/manage.py``, you can also 
+use the command-line script ``grano``, which points to the same code.

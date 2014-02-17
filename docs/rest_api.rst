@@ -128,6 +128,8 @@ Retrieves a single project from the API, including all its settings.
 Schemata
 ++++++++
 
+For details about the data format, see :ref:`schema`.
+
 ::
 
     GET /api/1/schemata

@@ -31,6 +31,8 @@ For the moment, the loader itself does not support creating schemata or loading 
     grano schema_import my-project my_entity_schema.yaml
     grano schema_import my-project my_relation_schema.yaml
 
+For more details, see :ref:`schema`.
+
 Note that all data loaded via the loader API will be created by the ``_system`` user. To allow further accounts to manage and modify the data, you may have to grant them permissions explicitly.
 
 

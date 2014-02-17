@@ -1,10 +1,12 @@
+.. _schema:
+
 Schemata
 ========
 
 To keep ``granos`` data model adaptable to specific use cases, the 
-platform allows users to define so-scalled schemata. They apply
-either to entities or to relations (never both). While each relation
-can only be associated with one schema, entities can combine several
+platform allows users to define so-scalled schemata for each project.
+They apply either to entities or to relations (never both). While each
+relation can only be associated with one schema, entities can combine several
 schemata (e.g. they can be a company, but also a lobby register
 entry).
 
@@ -59,13 +61,13 @@ and ``label_out``).
 On the command line, each schema is expected to be stored in its own 
 YAML file, which can be imported like this::
 
-    python grano/manage.py schema_import my_schema.yaml
+    python grano/manage.py schema_import my-project my_schema.yaml
 
 The reverse command, ``schema_export`` expects a directory name as its
 sole argument. In the directory, one YAML file will be generated for 
 each schema that is currently defined in ``grano``::
 
-    python grano/manage.py schema_export my_schemata/
+    python grano/manage.py schema_export my-project my_schemata/
 
 
 Base schema

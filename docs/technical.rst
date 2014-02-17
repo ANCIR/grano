@@ -13,7 +13,7 @@ The design goal for ``grano`` is to support the following basic features:
   individual attributes of an element. Properties are formalized using a 
   *schema*, which specifies the set of property names that are available.
   Relations can only be associated with one schema, entities can combine
-  multiple schemata.
+  multiple schemata (see :ref:`schema`).
 
 * Each property also stores information on who set it, when and what URL 
   they gave as a source for this fact. Previous values of the same
@@ -56,4 +56,3 @@ browser (i.e. a single-page app), would prevent search engines from indexing
 content. This might be acceptable for internal deployments, but makes
 the approach not viable for public offerings which would benefit heavily
 from organic traffic.
-
