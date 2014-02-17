@@ -8,6 +8,9 @@ such as projects, schemata, entities, and relations.
 
 Before using this API, it is advisable to read the :ref:`techintro`.
 
+.. contents::
+    :backlinks: none
+    :local:
 
 Authentication
 --------------
@@ -21,10 +24,37 @@ logged in.
 
 The API key must be submitted with each request, and it can either be given as the
 ``api_key`` query parameter, or as the value of the ``Authorization``
-request header. When an API key is given, nomenklatura still performs authorization 
+request header. When an API key is given, ``grano`` still performs authorization 
 checks and return an HTTP 401 error when the credentials are invalid, or an HTTP
 403 error, when the user tries to modify objects which he is not authorized to 
 write.
+
+
+Sessions API
+++++++++++++
+
+In order to determine if the (browser-based) user has a valid session, ``grano`` 
+provides an API which returns details of the current user. The API is available
+at::
+
+    GET /api/1/sessions
+
+This will contain a flag to indicate a user is logged in, the serialized account
+data if an account is available, and the user's API key. 
+
+An OAuth-based login can be triggered by pointing the user agent at this endpoint::
+
+    GET /api/1/sessions/login
+
+If the query argument ``next_url`` is provided, the user is forwarded to the 
+given URL upon completion (successful or not) of the OAuth request.
+
+Inversely, the current session can be erased by visiting this endpoint::
+
+    GET /api/1/sessions/logout
+
+The query argument ``next_url`` is available and has the same semantics as during
+login.
 
 
 Cross-origin requests
@@ -36,8 +66,10 @@ web site on a different domain. Cross-origin request sharing (CORS) is not curre
 supported.
 
 
-Pagers
-------
+.. _pager:
+
+Pagination
+----------
 
 All collections of HTTP resources such as datasets or entities provide a similar 
 interface that supports pagination by means of limit and offset. A paginated 
@@ -76,4 +108,72 @@ This root endpoint will also list the current version of ``grano``, as well as a
 link to the most recent verson of this documentation. 
 
 
+Projects
+++++++++
+
+::
+
+    GET /api/1/projects
+
+Retrieves a collection of all projects that are currently available on grano.
+Standard :ref:`pager` arguments are available.
+
+::
+
+    GET /api/1/projects/<slug>
+
+Retrieves a single project from the API, including all its settings.
+
+
+Schemata
+++++++++
+
+::
+
+    GET /api/1/schemata
+
+Retrieves a collection of all schemata that are currently available on grano.
+Standard :ref:`pager` arguments are available.
+
+::
+
+    GET /api/1/schemata/<name>
+
+Retrieves a single schema from the API, including all attributes.
+
+
+Entities
+++++++++
+
+::
+
+    GET /api/1/entities
+
+Retrieves a collection of all entities that are currently available on grano.
+Standard :ref:`pager` arguments are available.
+
+::
+
+    GET /api/1/entities/<id>
+
+Retrieves a single entity from the API, including all its properties and references
+to the schemata that apply.
+
+
+Relations
++++++++++
+
+::
+
+    GET /api/1/relations
+
+Retrieves a collection of all relations that are currently available on grano.
+Standard :ref:`pager` arguments are available.
+
+::
+
+    GET /api/1/relations/<id>
+
+Retrieves a single relation from the API, including all its properties and references
+to the schema as well as the source and target entities.
 
