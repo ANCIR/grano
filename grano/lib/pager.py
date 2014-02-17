@@ -14,7 +14,7 @@ class Pager(object):
         self.query = query
         self.kwargs = kwargs
         self.pager_range = pager_range
-        self.page = arg_int(self.arg_name('page'), default=1)
+        self.offset = arg_int(self.arg_name('offset'), default=0)
         self.limit = get_limit(default=limit, field=self.arg_name('limit'))
         
     def arg_name(self, arg):
@@ -23,8 +23,8 @@ class Pager(object):
         return self.name + '_' + arg
 
     @property
-    def offset(self):
-        return (self.page-1)*self.limit
+    def page(self):
+        return (self.offset/self.limit) + 1
 
     @property
     def pages(self):
@@ -56,7 +56,7 @@ class Pager(object):
     def query_args(self):
         args = []
         for key in self.args:
-            if key == self.arg_name('page'):
+            if key == self.arg_name('offset'):
                 continue
             for value in self.args.getlist(key):
                 args.append((key, value.encode('utf-8')))
@@ -91,7 +91,7 @@ class Pager(object):
         return self.url(query_args)
 
     def page_url(self, page):
-        return self.add_url_state(self.arg_name('page'), page)
+        return self.add_url_state(self.arg_name('offset'), (page-1)*self.limit)
 
     def url(self, query):
         url = url_for(request.endpoint, **dict(self.kwargs))
