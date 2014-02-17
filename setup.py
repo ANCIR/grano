@@ -24,8 +24,7 @@ setup(
     ],
     entry_points={
         'grano.entity.change': [
-            'indexer = grano.service.indexer:AutoIndexer',
-            'opencorporates = grano.service.opencorporates:OpenCorporatesCanonicalizer'
+            'indexer = grano.service.indexer:AutoIndexer'
         ],
         'console_scripts': [
             'grano = grano.manage:run',
