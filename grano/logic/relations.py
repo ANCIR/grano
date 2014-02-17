@@ -66,23 +66,30 @@ def to_index(relation):
     return data
 
 
+def to_rest_base(relation):
+    from grano.logic import entities as entities_logic
+    return {
+        'id': relation.id,
+        'properties': {},
+        'project': projects_logic.to_rest_index(relation.project),
+        'api_url': url_for('relations_api.view', id=relation.id),
+        'schema': schemata_logic.to_rest_index(relation.schema),
+        'source': entities_logic.to_rest_index(relation.source),
+        'target': entities_logic.to_rest_index(relation.target)
+    }
+
+
 def to_rest(relation):
-    return to_rest_index(relation)
+    data = to_rest_base(relation)
+    for prop in relation.active_properties:
+        name, prop = properties_logic.to_rest(prop)
+        data['properties'][name] = prop
+    return data
 
 
 def to_rest_index(relation):
-    props = {}
+    data = to_rest_base(relation)
     for prop in relation.active_properties:
         name, prop = properties_logic.to_rest_index(prop)
-        props[name] = prop
-    return {
-        'id': relation.id,
-        'project': projects_logic.to_rest_index(relation.project),
-        'api_url': url_for('relations_api.view', id=relation.id),
-        'source_id': relation.source_id,
-        'source_url': url_for('entities_api.view', id=relation.source_id),
-        'target_id': relation.target_id,
-        'target_url': url_for('entities_api.view', id=relation.target_id),
-        'properties': props,
-        'schema': schemata_logic.to_rest_index(relation.schema),
-    }
+        data['properties'][name] = prop
+    return data

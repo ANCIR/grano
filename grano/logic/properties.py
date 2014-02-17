@@ -63,3 +63,9 @@ def to_rest_index(prop):
         #'active': prop.active,
         'source_url': prop.source_url
     }
+
+def to_rest(prop):
+    name, data = to_rest_index(prop)
+    data['id'] = prop.id
+    data['active'] = prop.active
+    return name, data

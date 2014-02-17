@@ -142,28 +142,37 @@ def to_index(entity):
     return data
 
 
-def to_rest_index(entity):
-    """ Convert an entity to the REST API form. """
-    props = {}
-    for prop in entity.active_properties:
-        name, prop = properties_logic.to_rest_index(prop)
-        props[name] = prop
+def to_rest_base(entity):
     return {
         'id': entity.id,
         'project': projects_logic.to_rest_index(entity.project),
-        'api_url': url_for('entities_api.view', id=entity.id),
-        'properties': props
+        'api_url': url_for('entities_api.view', id=entity.id)
     }
+
+
+def to_rest_index(entity):
+    """ Convert an entity to the REST API form. """
+    data = to_rest_base(entity)
+    data['properties'] = {}
+    for prop in entity.active_properties:
+        name, prop = properties_logic.to_rest_index(prop)
+        data['properties'][name] = prop
+    return data
 
 
 def to_rest(entity):
     """ Full serialization of the entity. """
-    data = to_rest_index(entity)
+    data = to_rest_base(entity)
     data['created_at'] = entity.created_at
     data['updated_at'] = entity.updated_at
 
     ss = [schemata_logic.to_rest_index(s) for s in entity.schemata]
     data['schemata'] = ss
+
+    data['properties'] = {}
+    for prop in entity.active_properties:
+        name, prop = properties_logic.to_rest(prop)
+        data['properties'][name] = prop
 
     data['inbound_relations'] = entity.inbound.count()
     if data['inbound_relations'] > 0:
