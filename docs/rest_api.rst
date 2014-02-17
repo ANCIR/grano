@@ -1,6 +1,6 @@
 
-REST API documentation
-======================
+Web-based API
+=============
 
 ``grano`` exposes most of it's functionality via a web-based programming interface.
 The interface communicates mostly using JSON data, and exposes a set of resources, 
