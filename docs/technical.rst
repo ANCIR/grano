@@ -1,3 +1,5 @@
+.. _techintro:
+
 Technical Introduction
 ======================
 
