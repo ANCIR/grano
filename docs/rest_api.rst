@@ -30,8 +30,8 @@ checks and return an HTTP 401 error when the credentials are invalid, or an HTTP
 write.
 
 
-Sessions API
-++++++++++++
+Sessions
+++++++++
 
 In order to determine if the (browser-based) user has a valid session, ``grano`` 
 provides an API which returns details of the current user. The API is available
