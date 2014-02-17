@@ -6,7 +6,10 @@ from grano.core import db
 from grano.model import Schema, Attribute
 
 
-database_name = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
+FORBIDDEN = ['project', 'source', 'target', 'id', 'created_at', 'updated_at', 'author', 'author_id']
+database_forbidden = colander.Function(lambda v: v not in FORBIDDEN, message="Reserved name")
+database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
+database_name = colander.All(database_format, database_forbidden)
 
 
 def check_attributes(form, value):
