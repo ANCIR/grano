@@ -32,11 +32,12 @@ def get_offset(default=0, field='offset'):
     return max(0, arg_int(field, default=default))
 
 
-def request_data():
+def request_data(overlay={}):
     """ Decode a JSON-formatted POST body. """
     data = request.json
     if data is None:
         raise BadRequest()
+    data.update(overlay)
     return data
 
 

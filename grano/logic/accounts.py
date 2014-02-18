@@ -26,11 +26,15 @@ def console_account(login='_system'):
     return account
 
 
-def to_rest(account):
+def to_rest_index(account):
     return {
         'id': account.id,
-        'github_id': account.github_id,
         'login': account.login,
-        'created_at': account.created_at, 
-        'updated_at': account.updated_at,
         }
+
+def to_rest(account):
+    data = to_rest_index(account)
+    data['github_id'] = account.github_id
+    data['created_at'] = account.created_at 
+    data['updated_at'] = account.updated_at
+    return data

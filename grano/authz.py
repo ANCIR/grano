@@ -23,6 +23,10 @@ def project_manage(project):
     return project_edit(project)
 
 
+def project_delete(project):
+    return project_manage(project)
+
+
 def require(pred):
     if not pred:
         raise Forbidden("Sorry, you're not permitted to do this!")

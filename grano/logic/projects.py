@@ -4,6 +4,7 @@ from grano.core import app, db, url_for
 from grano.lib.exc import NotImplemented
 from grano.logic.validation import database_name
 from grano.logic.references import AccountRef
+from grano.logic import accounts
 from grano.model import Project
 
 
@@ -26,11 +27,11 @@ def save(data, project=None):
     if project is None:
         project = Project()
         project.slug = data.get('slug')
+        project.author = data.get('author')
 
     project.settings = data.get('settings')
     project.label = data.get('label')
-    project.author = data.get('author')
-
+    
     db.session.add(project)
     
     # TODO: make this nicer - separate files? 
@@ -57,5 +58,6 @@ def to_rest_index(project):
 def to_rest(project):
     data = to_rest_index(project)
     data['settings'] = project.settings
+    data['author'] = accounts.to_rest_index(project.author)
     data['schemata_index_url'] = url_for('schemata_api.index', slug=project.slug)
     return data

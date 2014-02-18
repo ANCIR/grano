@@ -2,11 +2,13 @@ from flask import Blueprint, render_template
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
-from grano.lib.args import object_or_404
+from grano.lib.args import object_or_404, request_data
 from grano.model import Project
 from grano.logic import projects
 from grano.lib.pager import Pager
-from grano.core import app
+from grano.lib.exc import Gone
+from grano.core import app, db
+from grano import authz
 
 
 blueprint = Blueprint('projects_api', __name__)
@@ -20,7 +22,38 @@ def index():
     return jsonify(pager.to_dict(conv))
 
 
+@blueprint.route('/api/1/projects', methods=['POST', 'PUT'])
+def create():
+    authz.require(authz.project_create())
+    project = projects.save(request_data({'author': request.account}))
+    db.session.commit()
+    return jsonify(projects.to_rest(project), status=201)
+
+
 @blueprint.route('/api/1/projects/<slug>', methods=['GET'])
 def view(slug):
     project = object_or_404(Project.by_slug(slug))
     return jsonify(projects.to_rest(project))
+
+
+@blueprint.route('/api/1/projects/<slug>', methods=['POST', 'PUT'])
+def update(slug):
+    project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_manage(project))
+    try:
+        data = request_data({'author': request.account})
+        project = projects.save(data, project=project)
+    except Exception, e:
+        print e
+        raise
+    db.session.commit()
+    return jsonify(projects.to_rest(project))
+
+
+@blueprint.route('/api/1/projects/<slug>', methods=['DELETE'])
+def delete(slug):
+    project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_delete(project))
+    projects.delete(project)
+    db.session.commit()
+    raise Gone()
