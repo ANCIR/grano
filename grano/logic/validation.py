@@ -13,39 +13,10 @@ database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
 database_name = colander.All(database_format, database_forbidden)
 
 
-class AttributeValidator(colander.MappingSchema):
-    name = colander.SchemaNode(colander.String(),
-        validator=database_name)
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3))
-    description = colander.SchemaNode(colander.String(),
-        missing='', default='')
-    hidden = colander.SchemaNode(colander.Boolean(),
-        missing=False)
-
-
-class Attributes(colander.SequenceSchema):
-    attribute = AttributeValidator()
-
-
-class SchemaValidator(colander.MappingSchema):
-    project = colander.SchemaNode(ProjectRef())
-    name = colander.SchemaNode(colander.String(),
-        validator=database_name)
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3))
-    label_in = colander.SchemaNode(colander.String(),
-        missing=None, validator=colander.Length(min=3))
-    label_out = colander.SchemaNode(colander.String(),
-        missing=None, validator=colander.Length(min=3))
-    hidden = colander.SchemaNode(colander.Boolean(),
-        missing=False)
-    obj = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(['entity', 'relation']))
-    attributes = Attributes()
-
-
 def validate_properties(data, schemata):
+    """ Compile a validator for the given set of properties, based on
+    the available schemata. """
+    
     schema = colander.SchemaNode(colander.Mapping(), name='root')
     for sche in schemata:
         for attr in sche.attributes:

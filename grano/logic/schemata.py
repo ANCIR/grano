@@ -1,49 +1,88 @@
 import os
 import yaml
+import colander
 from pprint import pprint
 
 from grano.core import db, url_for
 from grano.model import Schema, Attribute
-from grano.logic.validation import Invalid, SchemaValidator
+from grano.logic.validation import Invalid, database_name
+from grano.logic.references import ProjectRef
 from grano.logic import projects as projects_logic
 from grano.logic import attributes
 
 
-def save(data):
+
+class AttributeValidator(colander.MappingSchema):
+    name = colander.SchemaNode(colander.String(),
+        validator=database_name)
+    label = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3))
+    description = colander.SchemaNode(colander.String(),
+        missing='', default='')
+    hidden = colander.SchemaNode(colander.Boolean(),
+        missing=False)
+
+
+class Attributes(colander.SequenceSchema):
+    attribute = AttributeValidator()
+
+
+class SchemaValidator(colander.MappingSchema):
+    project = colander.SchemaNode(ProjectRef())
+    name = colander.SchemaNode(colander.String(),
+        validator=database_name)
+    label = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3))
+    label_in = colander.SchemaNode(colander.String(),
+        missing=None, validator=colander.Length(min=3))
+    label_out = colander.SchemaNode(colander.String(),
+        missing=None, validator=colander.Length(min=3))
+    hidden = colander.SchemaNode(colander.Boolean(),
+        missing=False)
+    obj = colander.SchemaNode(colander.String(),
+        validator=colander.OneOf(['entity', 'relation']))
+    attributes = Attributes()
+
+
+def save(data, schema=None):
     """ Create a schema. """
 
-    data = validate_schema(data)
-    obj = Schema.by_name(data.get('project'), data.get('name'))
-    if obj is None:
-        obj = Schema()
+    schema_val = SchemaValidator(validator=check_attributes)
+    data = schema_val.deserialize(data)
 
-    obj.name = data.get('name')
-    obj.project = data.get('project')
-    obj.label = data.get('label')
-    obj.label_in = data.get('label_in') or obj.label
-    obj.label_out = data.get('label_out') or obj.label
+    if schema is None:
+        schema = Schema()
+        schema.name = data.get('name')
+        schema.project = data.get('project')
 
-    obj.obj = data.get('obj')
-    obj.hidden = data.get('hidden')
-    db.session.add(obj)
+    schema.label = data.get('label')
+    schema.label_in = data.get('label_in') or schema.label
+    schema.label_out = data.get('label_out') or schema.label
+
+    schema.obj = data.get('obj')
+    schema.hidden = data.get('hidden')
+    db.session.add(schema)
     
     names = []
     for attribute in data.get('attributes', []):
-        attribute['schema'] = obj
+        attribute['schema'] = schema
         attr = attributes.save(attribute)
-        obj.attributes.append(attr)
+        schema.attributes.append(attr)
         names.append(attr.name)
-    for attr in obj.attributes:
+
+    for attr in schema.attributes:
         if attr.name not in names:
             db.session.delete(attr)
-    return obj
+
+    return schema
 
 
 def import_schema(project, fh):
     data = yaml.load(fh.read())
     try:
+        schema = Schema.by_name(project, data.get('name'))
         data['project'] = project
-        save(data)
+        save(data, schema=schema)
         db.session.commit()
     except Invalid, inv:
         pprint(inv.asdict())
@@ -58,11 +97,6 @@ def export_schema(project, path):
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
             fh.write(yaml.dump(to_dict(schema)))
-
-
-def validate_schema(data):
-    schema = SchemaValidator(validator=check_attributes)
-    return schema.deserialize(data)
 
 
 def check_attributes(form, value):
@@ -101,7 +135,7 @@ def to_index(schema):
 def to_rest_index(schema):
     data = to_basic(schema)
     data['project'] = projects_logic.to_rest_index(schema.project)
-    data['api_url'] = url_for('schemata_api.view', name=schema.name)
+    data['api_url'] = url_for('schemata_api.view', slug=schema.project.slug, name=schema.name)
     return data
 
 
