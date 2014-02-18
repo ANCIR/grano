@@ -7,7 +7,6 @@ from grano.model.property import Property
 
 class Schema(db.Model, IntBase):
     __tablename__ = 'schema'
-    SCHEMATA = {}
 
     name = db.Column(db.Unicode())
     label = db.Column(db.Unicode())
@@ -25,18 +24,6 @@ class Schema(db.Model, IntBase):
         for attribute in self.attributes:
             if attribute.name == name:
                 return attribute
-
-
-    @classmethod
-    def cached(cls, project, type, name):
-        obj = type.__tablename__
-        if not (project, obj, name) in cls.SCHEMATA:
-            schema = Schema.by_obj_name(project, obj, name)
-            if schema is None:
-                raise ValueError("Unknown schema: %s" % name)
-            cls.SCHEMATA[(project, obj, name)] = schema
-        return cls.SCHEMATA[(project, obj, name)]
-
 
     @classmethod
     def by_name(cls, project, name):

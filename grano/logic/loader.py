@@ -1,7 +1,7 @@
 import logging
 
 from grano.core import db
-from grano.model import Schema, Entity, Relation, Project
+from grano.model import Entity, Relation, Project
 from grano.logic import entities, relations, projects, accounts
 from grano.logic.validation import Invalid
 
@@ -14,7 +14,7 @@ class ObjectLoader(object):
 
     def _setup(self, loader, type, schemata):
         self.loader = loader
-        self.schemata = [Schema.cached(loader.project, type, s) for s in schemata]
+        self.schemata = schemata
         self.properties = {}
         self.update_criteria = set()
 
@@ -59,7 +59,7 @@ class EntityLoader(ObjectLoader):
     properties for an entity. """
     
     def __init__(self, loader, schemata, source_url=None):
-        self._setup(loader, Entity, set(schemata + ['base']))
+        self._setup(loader, Entity, schemata + ['base'])
         self.unique('name', only_active=False)
         self.source_url = source_url
         self._entity = None
