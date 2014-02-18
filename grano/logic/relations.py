@@ -20,32 +20,24 @@ def _relation_changed(relation_id):
     notify_plugins('grano.relation.change', _handle)
 
 
-def save(project, author, schema, properties, source, target, update_criteria):
+def save(data, relation=None):
     """ Save or update a relation with the given properties. """
 
-    q = db.session.query(Relation)
-    q = q.filter(Relation.source_id==source.id)
-    q = q.filter(Relation.target_id==target.id)
-    q = q.filter(Relation.project_id==project.id)
-    for name, only_active in update_criteria:
-        value = properties.get(name).get('value')
-        q = Relation._filter_property(q, name, value, only_active=only_active)
-    obj = q.first()
+    if relation is None:
+        relation = Relation()
+        relation.project = data.get('project')
+        relation.author = data.get('author')
+        db.session.add(relation)
 
-    if obj is None:
-        obj = Relation()
-        db.session.add(obj)
-        db.session.flush()
+    relation.source = data.get('source')
+    relation.target = data.get('target')
+    relation.schema = data.get('schema')
+    properties_logic.set_many(relation, data.get('author'),
+        data.get('properties'))
+    db.session.flush()
     
-    # TODO: check they are not identical, but part of the same project
-    obj.source = source
-    obj.target = target
-    obj.project = project
-    obj.author = author
-    obj.schema = schema
-    properties_logic.set_many(obj, author, properties)
-    _relation_changed.delay(obj.id)
-    return obj
+    _relation_changed.delay(relation.id)
+    return relation
 
 
 def to_index(relation):

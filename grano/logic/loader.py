@@ -75,10 +75,25 @@ class EntityLoader(ObjectLoader):
     def save(self):
         """ Save the entity to the database. Do this only once, after all
         properties have been set. """
+
+        # fetch existing:
+        q = Entity.all()
+        q = q.filter(Entity.project==self.loader.project)
+        for name, only_active in self.update_criteria:
+            value = self.properties.get(name).get('value')
+            q = Entity._filter_property(q, name, value,
+                only_active=only_active)
+        entity = q.first()
+
         try:
-            self._entity = entities.save(self.loader.project, self.loader.account, 
-                self.schemata, self.properties, self.update_criteria)
-            db.session.flush()
+            data = {
+                'project': self.loader.project,
+                'author': self.loader.account,
+                'schemata': self.schemata,
+                'properties': self.properties
+            }
+            self._entity = entities.save(data, entity=entity)
+
         except Invalid, inv:
             log.warning("Validation error: %r", inv)
 
@@ -97,11 +112,29 @@ class RelationLoader(ObjectLoader):
     def save(self):
         """ Save the relation to the database. Do this only once, after all
         properties have been set. """
+
+        # fetch existing:
+        q = Relation.all()
+        q = q.filter(Relation.project==self.loader.project)
+        q = q.filter(Relation.source==self.source.entity)
+        q = q.filter(Relation.target==self.target.entity)
+
+        for name, only_active in self.update_criteria:
+            value = self.properties.get(name).get('value')
+            q = Entity._filter_property(q, name, value,
+                only_active=only_active)
+        relation = q.first()
+
         try:
-            self._relation = relations.save(self.loader.project, self.loader.account, 
-                self.schemata.pop(), self.properties, self.source.entity,
-                self.target.entity, self.update_criteria)
-            db.session.flush()
+            data = {
+                'project': self.loader.project,
+                'author': self.loader.account,
+                'schema': self.schemata.pop(),
+                'properties': self.properties,
+                'source': self.source.entity,
+                'target': self.target.enttiy
+            }
+            self._relation = relations.save(data, relation=relation)
         except Invalid, inv:
             log.warning("Validation error: %r", inv)
         
