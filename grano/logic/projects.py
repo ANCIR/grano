@@ -1,29 +1,38 @@
+import colander
+
 from grano.core import app, db, url_for
+from grano.logic.validation import database_name
+from grano.logic.references import AccountRef
 from grano.model import Project
 
 
-def save(slug, author, label=None, settings=None):
+class ProjectValidator(colander.MappingSchema):
+    slug = colander.SchemaNode(colander.String(),
+        validator=database_name)
+    label = colander.SchemaNode(colander.String(),
+        validator=colander.Length(min=3))
+    author = colander.SchemaNode(AccountRef())
+    settings = colander.SchemaNode(colander.Mapping(),
+        missing={})
+
+
+def save(data, project=None):
     """ Create or update a project with a given slug. """
 
-    # TODO: sanitize the slug
-    project = Project.by_slug(slug)
+    validator = ProjectValidator()
+    data = validator.deserialize(validator)
+
     if project is None:
         project = Project()
-        project.slug = slug
-        project.settings = {}
+        project.slug = data.get('slug')
 
-    if settings is not None:
-        project.settings.update(settings)
+    project.settings = data.get('settings')
+    project.label = data.get('label')
+    project.author = data.get('author')
 
-    if label is not None:
-        project.label = label
-
-    if project.label is None:
-        project.label = slug
-
-    project.author = author
     db.session.add(project)
     
+    # TODO: make this nicer - separate files? 
     from grano.logic.schemata import import_schema
     with app.open_resource('fixtures/base.yaml') as fh:
         import_schema(project, fh)

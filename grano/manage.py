@@ -12,7 +12,7 @@ from grano.logic import index_entities, index_single
 from grano.logic import flush_entities, rebuild as rebuild_
 from grano.logic.searcher import search_entities
 from grano.logic.accounts import console_account
-from grano.logic.projects import save as ensure_project
+from grano.logic.projects import save as save_project
 from grano.logic import generate_sitemap
 from grano.plugins import list_plugins
 
@@ -31,7 +31,13 @@ def createdb():
 @manager.command
 def schema_import(project, path):
     """ Load a schema specification from a YAML file. """
-    pobj = ensure_project(project, console_account())
+    pobj = Project.by_slug(project)
+    if pobj is None:
+        pobj = save_project({
+            'slug': project,
+            'label': project,
+            'author': console_account()
+            })
     with open(path, 'r') as fh:
         import_schema(pobj, fh)
 

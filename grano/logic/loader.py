@@ -115,8 +115,15 @@ class Loader(object):
             project_settings=None):
         self.source_url = source_url
         self.account = accounts.console_account()
-        self.project = projects.save(project_slug, self.account, label=project_label,
-            settings=project_settings)
+        
+        project = Project.by_slug(project_slug)
+        self.project = projects.save({
+            'slug': project_slug,
+            'author': self.account,
+            'label': project_label,
+            'settings': project_settings
+            }, project=project)
+        
         self.entities = []
         self.relations = []
 
