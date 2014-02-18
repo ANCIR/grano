@@ -124,6 +124,22 @@ Standard :ref:`pager` arguments are available.
 
 Retrieves a single project from the API, including all its settings.
 
+::
+
+    POST /api/1/projects
+
+Operation to create a new dataset. The ``slug`` and ``label`` properties are
+required. ``slug`` must be a valid url name, i.e. it may not contain non-alphanumeric
+characters, except the underscore. Optionally, arbitrary metadata can be 
+configured in the ``settings`` property, which is a dictionary.
+
+::
+
+    POST /api/1/projects/<slug>
+
+Update an existing dataset. Most of the fields returned by the ``GET`` operation 
+are mutable, except for ``slug`` and the automatically generated fields.
+
 
 Schemata
 ++++++++
@@ -144,6 +160,22 @@ available.
 
 Retrieves a single schema from the API, including all attributes.
 
+::
+
+    POST /api/1/projects/<slug>/schemata
+
+Operation to create a new schema. The ``name`` and ``label`` properties are
+required. ``slug`` must be a valid url name, i.e. it may not contain non-alphanumeric
+characters, except the underscore. For the complete syntax, see :ref:`schema`.
+
+::
+
+    POST /api/1/projects/<slug>/schemata/<name>
+
+Update an existing schema. Most of the fields returned by the ``GET`` operation 
+are mutable, except for ``name``, ``project`` and the automatically generated
+fields.
+
 
 Entities
 ++++++++
@@ -161,6 +193,24 @@ Standard :ref:`pager` arguments are available.
 
 Retrieves a single entity from the API, including all its properties and references
 to the schemata that apply.
+
+::
+
+    POST /api/1/entities
+
+Operation to create a new entity. The ``project``, ``schemata`` and ``properties``
+fields are required. ``project`` must be a reference to a valid project (ie. its ``slug``),
+while ``schemata`` is a list of schemata, identified by their ``name``. ``properties`` is 
+expected to be a dictionary, where each key is a property name defined by one of the 
+``schemata``, and the value is another dict, settings a ``value`` and, possibly, a 
+``source_url``.
+
+::
+
+    POST /api/1/entities/<id>
+
+Update an existing entity. Most of the fields returned by the ``GET`` operation 
+are mutable, except for the ``project``, and automatically generated fields.
 
 
 Relations
@@ -180,3 +230,21 @@ Standard :ref:`pager` arguments are available.
 Retrieves a single relation from the API, including all its properties and references
 to the schema as well as the source and target entities.
 
+::
+
+    POST /api/1/relations
+
+Operation to create a new relation. The ``project``, ``source``, ``target``, ``schema``
+and ``properties`` fields are required. ``project`` must be a reference to a valid
+project (ie. its ``slug``). ``source`` and ``target`` are expected to be entity IDs,
+while ``schema`` is a schema, identified by its ``name``. ``properties`` is 
+expected to be a dictionary, where each key is a property name defined by the 
+``schema``, and the value is another dict, settings a ``value`` and, possibly, a 
+``source_url``.
+
+::
+
+    POST /api/1/relations/<id>
+
+Update an existing relation. Most of the fields returned by the ``GET`` operation 
+are mutable, except for the ``project``, ``schema`` and automatically generated fields.

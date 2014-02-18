@@ -28,7 +28,8 @@ def index(slug):
 def create(slug):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))
-    schema = schemata.save(request_data())
+    data = request_data({'project': project})
+    schema = schemata.save(data)
     db.session.commit()
     return jsonify(schemata.to_rest(schema), status=201)
 
@@ -45,7 +46,8 @@ def update(slug, name):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))
     schema = object_or_404(Schema.by_name(project, name))
-    project = schemata.save(request_data(), schema=schema)
+    data = request_data({'project': project})
+    project = schemata.save(data, schema=schema)
     db.session.commit()
     return jsonify(schemata.to_rest(schema))
 
