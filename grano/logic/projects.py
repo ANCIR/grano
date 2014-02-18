@@ -52,4 +52,5 @@ def to_rest_index(project):
 def to_rest(project):
     data = to_rest_index(project)
     data['settings'] = project.settings
+    data['schemata_index_url'] = url_for('schemata_api.index', slug=project.slug)
     return data

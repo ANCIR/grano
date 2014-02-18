@@ -42,7 +42,6 @@ def status():
             'projects_index_url': url_for('projects_api.index'),
             'entities_index_url': url_for('entities_api.index'),
             'relations_index_url': url_for('relations_api.index'),
-            'schemata_index_url': url_for('schemata_api.index'),
             'sessions_status_url': url_for('sessions_api.status')
         }
     })
