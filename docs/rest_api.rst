@@ -185,7 +185,14 @@ Entities
     GET /api/1/entities
 
 Retrieves a collection of all entities that are currently available on grano.
-Standard :ref:`pager` arguments are available.
+Standard :ref:`pager` arguments are available. As a means to filter the results 
+returned by this endpoint, the following arguments can be given as query
+parameters:
+
+* ``project`` will filter for entities belonging to a specific project, based 
+  on the ``slug`` provided.
+* ``property-<name>`` will filter for entities which have a property ``<name>``
+  and the given value. This will consider active properties only.
 
 ::
 
@@ -221,7 +228,16 @@ Relations
     GET /api/1/relations
 
 Retrieves a collection of all relations that are currently available on grano.
-Standard :ref:`pager` arguments are available.
+Standard :ref:`pager` arguments are available. As a means to filter the results 
+returned by this endpoint, the following arguments can be given as query
+parameters:
+
+* ``project`` will filter for relations belonging to a specific project, based 
+  on the ``slug`` provided.
+* ``source`` and ``target`` can be given as an entity ``id`` to filter for a 
+  specific origin or destination of the relation, respectively.
+* ``property-<name>`` will filter for relations which have a property ``<name>``
+  and the given value. This will consider active properties only.
 
 ::
 
