@@ -9,7 +9,6 @@ log = logging.getLogger(__name__)
 
 
 ## Import commands
-
 def import_aliases(project, author, path):
     """ Import aliases from a CSV file. This will not create new entities, but
     re-name existing entities or merge two entities if one's name is given as 
@@ -32,7 +31,6 @@ def import_aliases(project, author, path):
 
 
 ## Export commands
-
 def export_aliases(project, path):
     """ Dump a list of all entity names to a CSV file. The table will contain the 
     active name of each entity, and one of the other existing names as an alias. """
