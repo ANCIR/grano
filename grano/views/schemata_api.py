@@ -51,7 +51,7 @@ def update(slug, name):
 
 
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['DELETE'])
-def delete(slug):
+def delete(slug, name):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))
     schema = object_or_404(Schema.by_name(project, name))
