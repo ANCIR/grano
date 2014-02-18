@@ -12,7 +12,7 @@ from grano.core import app
 blueprint = Blueprint('schemata_api', __name__)
 
 
-@blueprint.route('/api/1/projects/<slug>/schemata')
+@blueprint.route('/api/1/projects/<slug>/schemata', methods=['GET'])
 def index(slug):
     project = object_or_404(Project.by_slug(slug))
     query = Schema.all()
@@ -22,7 +22,7 @@ def index(slug):
     return jsonify(pager.to_dict(conv))
 
 
-@blueprint.route('/api/1/projects/<slug>/schemata/<name>')
+@blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['GET'])
 def view(slug, name):
     project = object_or_404(Project.by_slug(slug))
     schema = object_or_404(Schema.by_name(project, name))

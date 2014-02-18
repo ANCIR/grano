@@ -15,22 +15,22 @@ Sitemap: /static/sitemap.xml
 """
 
 
-@blueprint.route('/robots.txt')
+@blueprint.route('/robots.txt', methods=['GET'])
 def robots_txt():
     res = make_response(ROBOTS)
     res.headers['Content-Type'] = 'text/plain'
     return res
 
 
-@blueprint.route('/favicon.ico')
+@blueprint.route('/favicon.ico', methods=['GET'])
 def favicon_ico():
     ico_url = app.config.get('FAVICON_URL',
         'http://assets.pudo.org/img/favicon.ico')
     return redirect(ico_url)
 
 
-@blueprint.route('/api')
-@blueprint.route('/api/1')
+@blueprint.route('/api', methods=['GET'])
+@blueprint.route('/api/1', methods=['GET'])
 def status():
     return jsonify({
         'service': app_name,
@@ -47,7 +47,7 @@ def status():
     })
 
 
-@blueprint.route('/api/1/ping')
+@blueprint.route('/api/1/ping', methods=['GET'])
 def queue_ping():
     ret = ping.delay(message=request.args.get('message'))
     return jsonify({'status': 'sent', 'task': ret.task_name, 'id': ret.id})

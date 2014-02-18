@@ -12,7 +12,7 @@ from grano.core import app
 blueprint = Blueprint('projects_api', __name__)
 
 
-@blueprint.route('/api/1/projects')
+@blueprint.route('/api/1/projects', methods=['GET'])
 def index():
     query = Project.all()
     pager = Pager(query)
@@ -20,7 +20,7 @@ def index():
     return jsonify(pager.to_dict(conv))
 
 
-@blueprint.route('/api/1/projects/<slug>')
+@blueprint.route('/api/1/projects/<slug>', methods=['GET'])
 def view(slug):
     project = object_or_404(Project.by_slug(slug))
     return jsonify(projects.to_rest(project))

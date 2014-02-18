@@ -14,7 +14,7 @@ from grano.logic import accounts
 blueprint = Blueprint('sessions_api', __name__)
 
 
-@blueprint.route('/api/1/sessions')
+@blueprint.route('/api/1/sessions', methods=['GET'])
 def status():
     return jsonify({
         'logged_in': authz.logged_in(),
@@ -38,7 +38,7 @@ def status():
 #    return jsonify(permissions)
 
 
-@blueprint.route('/api/1/sessions/login')
+@blueprint.route('/api/1/sessions/login', methods=['GET'])
 def login():
     callback=url_for('sessions_api.authorized')
     if not request.args.get('next_url'):
@@ -47,14 +47,14 @@ def login():
     return github.authorize(callback=callback)
 
 
-@blueprint.route('/api/1/sessions/logout')
+@blueprint.route('/api/1/sessions/logout', methods=['GET'])
 def logout():
     authz.require(authz.logged_in())
     session.clear()
     return redirect(request.args.get('next_url', '/'))
 
 
-@blueprint.route('/api/1/sessions/callback')
+@blueprint.route('/api/1/sessions/callback', methods=['GET'])
 @github.authorized_handler
 def authorized(resp):
     next_url = session.get('next_url', '/')
