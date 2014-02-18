@@ -1,5 +1,6 @@
 import colander
 
+from grano.lib.exc import BadRequest
 from grano.model import Project, Entity, Account
 from grano.model import Schema
 
@@ -17,6 +18,14 @@ class Ref(object):
 
     def cstruct_children(self, node, cstruct):
         return []
+
+    def get(self, cstruct):
+        if cstruct is None:
+            raise BadRequest()
+        project = self.decode(None, cstruct)
+        if project is None:
+            raise BadRequest()
+        return project
 
 
 class ProjectRef(Ref):
