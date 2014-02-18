@@ -132,7 +132,7 @@ class RelationLoader(ObjectLoader):
                 'schema': self.schemata.pop(),
                 'properties': self.properties,
                 'source': self.source.entity,
-                'target': self.target.enttiy
+                'target': self.target.entity
             }
             self._relation = relations.save(data, relation=relation)
         except Invalid, inv:
