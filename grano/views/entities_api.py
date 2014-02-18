@@ -9,6 +9,7 @@ from grano.logic.references import ProjectRef
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
+from grano.views.util import filter_query
 from grano import authz
 
 
@@ -17,7 +18,7 @@ blueprint = Blueprint('entities_api', __name__)
 
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
-    query = Entity.all()
+    query = filter_query(Entity, Entity.all(), request.args)
     pager = Pager(query)
     conv = lambda es: [entities.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
@@ -38,22 +39,6 @@ def create():
 def view(id):
     entity = object_or_404(Entity.by_id(id))
     return jsonify(entities.to_rest(entity))
-
-
-@blueprint.route('/api/1/entities/<id>/inbound', methods=['GET'])
-def inbound(id):
-    entity = object_or_404(Entity.by_id(id))
-    pager = Pager(entity.inbound)
-    conv = lambda es: [relations.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
-
-
-@blueprint.route('/api/1/entities/<id>/outbound', methods=['GET'])
-def outbound(id):
-    entity = object_or_404(Entity.by_id(id))
-    pager = Pager(entity.outbound)
-    conv = lambda es: [relations.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['POST', 'PUT'])

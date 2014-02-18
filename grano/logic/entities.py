@@ -209,10 +209,10 @@ def to_rest(entity):
 
     data['inbound_relations'] = entity.inbound.count()
     if data['inbound_relations'] > 0:
-        data['inbound_url'] = url_for('entities_api.inbound', id=entity.id)
+        data['inbound_url'] = url_for('relations_api.index', target=entity.id)
     
     data['outbound_relations'] = entity.outbound.count()
     if data['outbound_relations'] > 0:
-        data['outbound_url'] = url_for('entities_api.outbound', id=entity.id)
+        data['outbound_url'] = url_for('relations_api.index', source=entity.id)
     
     return data

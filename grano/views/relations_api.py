@@ -9,6 +9,7 @@ from grano.logic.references import ProjectRef
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
+from grano.views.util import filter_query
 from grano import authz
 
 
@@ -17,7 +18,14 @@ blueprint = Blueprint('relations_api', __name__)
 
 @blueprint.route('/api/1/relations', methods=['GET'])
 def index():
-    query = Relation.all()
+    query = filter_query(Relation, Relation.all(), request.args)
+
+    if request.args.get('source'):
+        query = query.filter(Relation.source_id==request.args.getlist('source')[0])
+
+    if request.args.get('target'):
+        query = query.filter(Relation.target_id==request.args.getlist('target')[0])
+    
     pager = Pager(query)
     conv = lambda es: [relations.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
