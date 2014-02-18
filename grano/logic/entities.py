@@ -1,14 +1,46 @@
 import logging
+import colander
 
 from grano.core import db, url_for, celery
 from grano.model import Entity, Schema
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.logic import projects as projects_logic
+from grano.logic.validation import validate_properties
+from grano.logic.references import ProjectRef, AccountRef, SchemaRef
 from grano.plugins import notify_plugins
 
 
 log = logging.getLogger(__name__)
+
+
+class EntityBaseValidator(colander.MappingSchema):
+    author = colander.SchemaNode(AccountRef())
+    project = colander.SchemaNode(ProjectRef())
+    
+
+def validate(data):
+    """ Due to some fairly weird interdependencies between the different elements
+    of the model, validation of entities has to happen in three steps. """
+
+    # a bit hacky
+    data['schemata'] = data.get('schemata', []) + ['base']
+
+    validator = EntityBaseValidator()
+    sane = validator.deserialize(data)
+    
+    schemata_validator = colander.SchemaNode(colander.Mapping())
+    schemata_node = colander.SchemaNode(SchemaRef(sane.get('project')))
+    schemata_validator.add(colander.SchemaNode(colander.Sequence(),
+        schemata_node, name='schemata'))
+
+    sane.update(schemata_validator.deserialize(data))
+
+    sane['properties'] = validate_properties(
+        data.get('properties', []),
+        sane.get('schemata'),
+        name='properties')
+    return sane
 
 
 @celery.task
@@ -22,6 +54,8 @@ def _entity_changed(entity_id):
 
 def save(data, entity=None):
     """ Save or update an entity. """
+
+    data = validate(data)
     
     if entity is None:
         entity = Entity()
@@ -29,7 +63,7 @@ def save(data, entity=None):
         entity.author = data.get('author')
         db.session.add(entity)
 
-    entity.schemata = data.get('schemata')
+    entity.schemata = list(set(data.get('schemata')))
     properties_logic.set_many(entity, data.get('author'),
         data.get('properties'))
     db.session.flush()
@@ -74,7 +108,7 @@ def apply_alias(project, author, canonical_name, alias_name):
 
     canonical = Entity.by_name(project, canonical_name)
     alias = Entity.by_name(project, alias_name)
-    schema = Schema.cached(project, Entity, 'base')
+    schema = Schema.by_name(project, 'base')
 
     # Don't artificially increase entity counts.
     if canonical is None and alias is None:
