@@ -1,6 +1,7 @@
 import colander
 
 from grano.model import Project, Entity, Account
+from grano.model import Schema
 
 
 class Ref(object):
@@ -25,18 +26,26 @@ class ProjectRef(Ref):
             return cstruct
         if isinstance(cstruct, basestring):
             return Project.by_slug(cstruct)
-        #elif isinstance(cstruct, int):
-        #    project = Project.by_id(cstruct.get('id'))
         if isinstance(cstruct, dict):
             if cstruct.get('slug'):
                 return Project.by_slug(cstruct.get('slug'))
-            #elif cstruct.get('id'):
-            #    project = Project.by_id(cstruct.get('id'))
         return None
 
 
 class EntityRef(Ref):
-    pass
+
+    def __init__(self, project):
+        self.project = project
+
+    def decode(self, node, cstruct):
+        if isinstance(cstruct, Entity):
+            return cstruct
+        if isinstance(cstruct, basestring):
+            return Entity.by_id(self.project, cstruct)
+        if isinstance(cstruct, dict):
+            if cstruct.get('id'):
+                return Entity.by_id(self.project, cstruct.get('id'))
+        return None
 
 
 class AccountRef(Ref):
@@ -53,5 +62,17 @@ class AccountRef(Ref):
 
 
 class SchemaRef(Ref):
-    pass
 
+    def __init__(self, project):
+        self.project = project
+
+    def decode(self, node, cstruct):
+        if isinstance(cstruct, Schema):
+            return cstruct
+        if isinstance(cstruct, basestring):
+            return Schema.by_name(self.project, cstruct)
+        if isinstance(cstruct, dict):
+            if cstruct.get('name'):
+                return Schema.by_name(self.project,
+                    cstruct.get('name'))
+        return None

@@ -13,11 +13,11 @@ database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
 database_name = colander.All(database_format, database_forbidden)
 
 
-def validate_properties(data, schemata):
+def validate_properties(data, schemata, name='root'):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
     
-    schema = colander.SchemaNode(colander.Mapping(), name='root')
+    schema = colander.SchemaNode(colander.Mapping(), name=name)
     for sche in schemata:
         for attr in sche.attributes:
             attrib = colander.SchemaNode(colander.Mapping(),
