@@ -27,6 +27,7 @@ def index():
 def create():
     data = request_data({'author': request.account})
     project = ProjectRef().get(data.get('project'))
+    data['project'] = project
     authz.require(authz.project_edit(project))
     entity = entities.save(data)
     db.session.commit()

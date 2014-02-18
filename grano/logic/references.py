@@ -48,12 +48,17 @@ class EntityRef(Ref):
 
     def decode(self, node, cstruct):
         if isinstance(cstruct, Entity):
-            return cstruct
+            if cstruct.project == self.project:
+                return cstruct
         if isinstance(cstruct, basestring):
-            return Entity.by_id(self.project, cstruct)
+            entity = Entity.by_id(cstruct)
+            if entity.project == self.project:
+                return entity
         if isinstance(cstruct, dict):
             if cstruct.get('id'):
-                return Entity.by_id(self.project, cstruct.get('id'))
+                entity = Entity.by_id(cstruct.get('id'))
+                if entity.project == self.project:
+                    return entity
         return None
 
 
