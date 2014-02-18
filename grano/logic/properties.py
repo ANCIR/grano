@@ -1,14 +1,11 @@
 from grano.core import db
 from grano.model import Entity
-from grano.logic.validation import validate_properties
 
 
 def set_many(obj, author, properties):
     """ Set a list of properties supplied as a dictionary containing the 
     arguments necessary for calling set(). """
     
-    properties = validate_properties(properties, obj.schemata)
-
     current_properties = list(obj.properties)
     for name, prop in properties.items():
         relevant = [p for p in current_properties if p.name == name]
