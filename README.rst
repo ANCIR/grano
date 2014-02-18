@@ -11,3 +11,6 @@ Documentation for grano is available at `grano.pudo.org <http://grano.pudo.org>`
 * `Technical introduction <http://grano.pudo.org/technical.html>`_
 * `Web (REST) API <http://grano.pudo.org/rest_api.html>`_
 
+``grano`` is also available on cheeseshop, and can be installed with::
+
+    pip install grano
