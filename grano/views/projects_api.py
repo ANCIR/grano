@@ -40,12 +40,8 @@ def view(slug):
 def update(slug):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))
-    try:
-        data = request_data({'author': request.account})
-        project = projects.save(data, project=project)
-    except Exception, e:
-        print e
-        raise
+    data = request_data({'author': request.account})
+    project = projects.save(data, project=project)
     db.session.commit()
     return jsonify(projects.to_rest(project))
 
