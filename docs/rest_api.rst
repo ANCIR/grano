@@ -132,14 +132,15 @@ For details about the data format, see :ref:`schema`.
 
 ::
 
-    GET /api/1/schemata
+    GET /api/1/projects/<slug>/schemata
 
-Retrieves a collection of all schemata that are currently available on grano.
-Standard :ref:`pager` arguments are available.
+Retrieves a collection of all schemata that are available in the context of 
+the project identified by ``slug``. Standard :ref:`pager` arguments are
+available.
 
 ::
 
-    GET /api/1/schemata/<name>
+    GET /api/1/projects/<slug>/schemata/<name>
 
 Retrieves a single schema from the API, including all attributes.
 
