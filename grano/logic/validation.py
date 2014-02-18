@@ -2,6 +2,7 @@ import re
 import colander
 from colander import Invalid
 
+from grano.logic.references import ProjectRef
 from grano.core import db
 from grano.model import Schema, Attribute
 
@@ -10,26 +11,6 @@ FORBIDDEN = ['project', 'source', 'target', 'id', 'created_at', 'updated_at', 'a
 database_forbidden = colander.Function(lambda v: v not in FORBIDDEN, message="Reserved name")
 database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
 database_name = colander.All(database_format, database_forbidden)
-
-
-def check_attributes(form, value):
-    """ Form validator to check that the all attribute names used 
-    by this schema are unused. """
-
-    if value.get('obj') == 'relation':
-        return
-
-    for attr in value.get('attributes', []):
-        q = db.session.query(Attribute)
-        q = q.filter(Attribute.name==attr.get('name'))
-        q = q.join(Schema)
-        q = q.filter(Schema.obj==value.get('obj'))
-        q = q.filter(Schema.name!=value.get('name'))
-        attrib = q.first()
-        if attrib is not None:
-            raise Invalid(form,
-                "Attribute '%s' already declared in schema '%s'" \
-                 % (attr.get('name'), attrib.schema.name))
 
 
 class AttributeValidator(colander.MappingSchema):
@@ -48,6 +29,7 @@ class Attributes(colander.SequenceSchema):
 
 
 class SchemaValidator(colander.MappingSchema):
+    project = colander.SchemaNode(ProjectRef())
     name = colander.SchemaNode(colander.String(),
         validator=database_name)
     label = colander.SchemaNode(colander.String(),
@@ -61,11 +43,6 @@ class SchemaValidator(colander.MappingSchema):
     obj = colander.SchemaNode(colander.String(),
         validator=colander.OneOf(['entity', 'relation']))
     attributes = Attributes()
-
-
-def validate_schema(data):
-    schema = SchemaValidator(validator=check_attributes)
-    return schema.deserialize(data)
 
 
 def validate_properties(data, schemata):

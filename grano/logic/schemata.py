@@ -4,22 +4,21 @@ from pprint import pprint
 
 from grano.core import db, url_for
 from grano.model import Schema, Attribute
-from grano.logic.validation import validate_schema, Invalid
+from grano.logic.validation import Invalid, SchemaValidator
 from grano.logic import projects as projects_logic
 from grano.logic import attributes
 
 
-def save(project, data):
+def save(data):
     """ Create a schema. """
 
     data = validate_schema(data)
-    
-    name = data.get('name')
-    obj = Schema.by_name(project, name)
+    obj = Schema.by_name(data.get('project'), data.get('name'))
     if obj is None:
         obj = Schema()
-    obj.name = name
-    obj.project = project
+
+    obj.name = data.get('name')
+    obj.project = data.get('project')
     obj.label = data.get('label')
     obj.label_in = data.get('label_in') or obj.label
     obj.label_out = data.get('label_out') or obj.label
@@ -43,7 +42,8 @@ def save(project, data):
 def import_schema(project, fh):
     data = yaml.load(fh.read())
     try:
-        save(project, data)
+        data['project'] = project
+        save(data)
         db.session.commit()
     except Invalid, inv:
         pprint(inv.asdict())
@@ -58,6 +58,31 @@ def export_schema(project, path):
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
             fh.write(yaml.dump(to_dict(schema)))
+
+
+def validate_schema(data):
+    schema = SchemaValidator(validator=check_attributes)
+    return schema.deserialize(data)
+
+
+def check_attributes(form, value):
+    """ Form validator to check that the all attribute names used 
+    by this schema are unused. """
+
+    if value.get('obj') == 'relation':
+        return
+
+    for attr in value.get('attributes', []):
+        q = db.session.query(Attribute)
+        q = q.filter(Attribute.name==attr.get('name'))
+        q = q.join(Schema)
+        q = q.filter(Schema.obj==value.get('obj'))
+        q = q.filter(Schema.name!=value.get('name'))
+        attrib = q.first()
+        if attrib is not None:
+            raise Invalid(form,
+                "Attribute '%s' already declared in schema '%s'" \
+                 % (attr.get('name'), attrib.schema.name))
 
 
 def to_basic(schema):
