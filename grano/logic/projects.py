@@ -20,7 +20,7 @@ def save(data, project=None):
     """ Create or update a project with a given slug. """
 
     validator = ProjectValidator()
-    data = validator.deserialize(validator)
+    data = validator.deserialize(data)
 
     if project is None:
         project = Project()
