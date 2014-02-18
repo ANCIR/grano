@@ -2,6 +2,7 @@ import logging
 import colander
 
 from grano.core import db, url_for, celery
+from grano.lib.exc import NotImplemented
 from grano.model import Relation
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
@@ -74,6 +75,10 @@ def save(data, relation=None):
     
     _relation_changed.delay(relation.id)
     return relation
+
+
+def delete(relation):
+    raise NotImplemented()
 
 
 def to_index(relation):

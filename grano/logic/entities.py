@@ -3,6 +3,7 @@ import colander
 
 from grano.core import db, url_for, celery
 from grano.model import Entity, Schema
+from grano.lib.exc import NotImplemented
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.logic import projects as projects_logic
@@ -70,6 +71,10 @@ def save(data, entity=None):
 
     _entity_changed.delay(entity.id)    
     return entity
+
+
+def delete(entity):
+    raise NotImplemented()
 
 
 def _merge_entities(source, target):

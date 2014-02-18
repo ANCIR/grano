@@ -4,6 +4,7 @@ import colander
 from pprint import pprint
 
 from grano.core import db, url_for
+from grano.lib.exc import NotImplemented
 from grano.model import Schema, Attribute
 from grano.logic.validation import Invalid, database_name
 from grano.logic.references import ProjectRef
@@ -75,6 +76,10 @@ def save(data, schema=None):
             db.session.delete(attr)
 
     return schema
+
+
+def delete(schema):
+    raise NotImplemented()
 
 
 def import_schema(project, fh):

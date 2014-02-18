@@ -2,4 +2,4 @@
 from werkzeug.exceptions import HTTPException, NotFound, Gone
 from werkzeug.exceptions import BadRequest, Unauthorized, Forbidden
 from werkzeug.exceptions import InternalServerError as InternalError
-
+from werkzeug.exceptions import NotImplemented

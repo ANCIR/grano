@@ -1,6 +1,7 @@
 import colander
 
 from grano.core import app, db, url_for
+from grano.lib.exc import NotImplemented
 from grano.logic.validation import database_name
 from grano.logic.references import AccountRef
 from grano.model import Project
@@ -39,6 +40,10 @@ def save(data, project=None):
 
     db.session.flush()
     return project
+
+
+def delete(project):
+    raise NotImplemented()
 
 
 def to_rest_index(project):
