@@ -1,14 +1,48 @@
 import logging
+import colander
 
 from grano.core import db, url_for, celery
 from grano.model import Relation
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
 from grano.logic import projects as projects_logic
+from grano.logic.validation import validate_properties
+from grano.logic.references import ProjectRef, AccountRef
+from grano.logic.references import SchemaRef, EntityRef
 from grano.plugins import notify_plugins
 
 
 log = logging.getLogger(__name__)
+
+
+class RelationBaseValidator(colander.MappingSchema):
+    author = colander.SchemaNode(AccountRef())
+    project = colander.SchemaNode(ProjectRef())
+
+
+def validate(data):
+    """ Due to some fairly weird interdependencies between the different elements
+    of the model, validation of relations has to happen in three steps. """
+
+    validator = RelationBaseValidator()
+    sane = validator.deserialize(data)
+    project = sane.get('project')
+
+    schema_validator = colander.SchemaNode(colander.Mapping())
+    schema_validator.add(colander.SchemaNode(SchemaRef(project),
+        name='schema'))
+    schema_validator.add(colander.SchemaNode(EntityRef(project),
+        name='source'))
+    schema_validator.add(colander.SchemaNode(EntityRef(project),
+        name='target'))
+
+    sane.update(schema_validator.deserialize(data))
+
+    sane['properties'] = validate_properties(
+        data.get('properties', []),
+        [sane.get('schema')],
+        name='properties')
+    return sane
 
 
 @celery.task
@@ -22,6 +56,8 @@ def _relation_changed(relation_id):
 
 def save(data, relation=None):
     """ Save or update a relation with the given properties. """
+
+    data = validate(data)
 
     if relation is None:
         relation = Relation()
