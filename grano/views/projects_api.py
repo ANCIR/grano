@@ -36,6 +36,16 @@ def view(slug):
     return jsonify(projects.to_rest(project))
 
 
+@blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])
+def graph(id):
+    project = object_or_404(Project.by_slug(slug))
+    extractor = GraphExtractor(projet_id=project.id)
+    if extractor.format == 'gexf':
+        return Response(extractor.to_gexf(),
+                mimetype='text/xml')
+    return jsonify(extractor.to_dict())
+
+
 @blueprint.route('/api/1/projects/<slug>', methods=['POST', 'PUT'])
 def update(slug):
     project = object_or_404(Project.by_slug(slug))

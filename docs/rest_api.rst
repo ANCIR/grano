@@ -126,6 +126,20 @@ Retrieves a single project from the API, including all its settings.
 
 ::
 
+    GET /api/1/projects/<slug>/graph
+
+This endpoint will return a graph representation of the whole project, i.e. a single
+document that contains all relations and entities in the project in an abbreviated 
+form, unless any filters have been applied.
+
+The following query paramters are available:
+
+* ``format`` can be either ``json`` or ``gexf``. The ``json`` representation is a
+  custom format for easy integration into visualizations, while ``gexf`` is a 
+  widely-used exchange format.
+
+::
+
     POST /api/1/projects
 
 Operation to create a new dataset. The ``slug`` and ``label`` properties are
@@ -200,6 +214,22 @@ parameters:
 
 Retrieves a single entity from the API, including all its properties and references
 to the schemata that apply.
+
+::
+
+    GET /api/1/entities/<id>/graph
+
+This endpoint will return a graph representation of the entity, including its relations
+and neighbouts. If requested, this will trigger a recursive process and return a larger
+subgraph of the entire project.
+
+The following query paramters are available:
+
+* ``depth`` can be a number from 1 to 3 and will set the depth of the recursion, i.e.
+  how many degrees of separation the graph should contain.
+* ``format`` can be either ``json`` or ``gexf``. The ``json`` representation is a
+  custom format for easy integration into visualizations, while ``gexf`` is a 
+  widely-used exchange format.
 
 ::
 

@@ -38,7 +38,7 @@ class GraphExtractor(object):
     def depth(self):
         if self.root_id is None:
             return 1
-        depth = arg_int('depth', 2)
+        depth = arg_int('depth', 1)
         return max(1, min(depth, 3))
 
 
