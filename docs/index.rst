@@ -9,34 +9,45 @@ grano: facebook, for terrorists!
    :hidden:
 
 ``grano`` is a web-based framework for the storage, analysis and presentation
-of social network information. Many types of interactions between people,
-organisations and institutions can be understood in terms of network structures.
+of social network information. The tool provides building blocks for custom, 
+data-driven investigative solutions.
 
-Such graphs provide an apt metaphor for the distribution of political, social
-and economic influence. ``grano`` is aimed at journalists, activists and
-researchers who want to explore and explain such structures. For example,
-consider the following contexts:
+Many types of interactions between people, organisations and institutions can
+be understood in terms of network structures. This makes for an apt metaphor
+for the distribution of political, social and economic influence. ``grano`` is
+aimed at journalists, activists and researchers who want to explore and explain
+such structures.
 
-* Lobby registers disclose connections between lobbyists, lobbying firms, their
-  clients and political actors.
-* Spending and procurement information can be understood as a graph of public
-  bodies and private suppliers.
-* Newspaper articles often establish narrative bridges between various actors,
-  a short summary can often be given as a graph.
+
+What is grano used for?
+-----------------------
+
+The focus of ``grano`` is its reusabilty for a wide variety of scenarios. Currently,
+the following services are based on the tool:
+
+.. image:: _static/openinterests.png
+
+* `OpenInterests.eu <http://openinterests.eu>`_ explores who has financial and 
+  political interests in the institutions of the EU. The site combines
+  information from various official databases into a unique catalogue.
+
+* `nomenklatura <http://opennames.org>`_ is a data cleaning service that helps
+  to de-duplicate and link entity names in raw data. The next version of this 
+  service will be a part of ``grano``.
 
 
 A toolkit for understanding networks
 ------------------------------------
 
-``grano`` is not intended as a stand-alone solution to analyze all of these types 
-of structures. Rather, the software can be seen as a building block that can 
-help to build bespoke interfaces that ideally match the domain that needs to 
-be explored. To support the analysis of such structures, ``grano`` provides a set
-of services:
+``grano`` is not intended as a stand-alone solution. Rather, the software can be
+seen as a toolkit that can help to build bespoke interfaces that ideally match the
+domain that needs to be explored. To support the analysis of such structures,
+``grano`` provides a set of services:
 
 * A basic network data store with custom configurable schemata for any use 
   case.
-* Full source tracking for all properties of entities and relations in the 
+* A rich :ref:`webapi` which can be used to query and manipulate the data.
+* Full lineage tracking for all properties of entities and relations in the 
   graph.
 * Canonicalization and aliasing of entities in the network ("BP" is also known
   as "British Petroleum").
@@ -44,8 +55,6 @@ of services:
 
 In the future, the following additional services will be available:
 
-* A RESTful web API to read and write graph information, and export options for
-  more specific network file formats.
 * A web-based property editor for graph entities and relations.
 * Computation of graph metrics and aggregate reports based on entity properties.
 
