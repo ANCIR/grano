@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, Response
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
@@ -6,6 +6,7 @@ from grano.lib.args import object_or_404, request_data
 from grano.model import Entity
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
+from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
@@ -39,6 +40,16 @@ def create():
 def view(id):
     entity = object_or_404(Entity.by_id(id))
     return jsonify(entities.to_rest(entity))
+
+
+@blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
+def graph(id):
+    entity = object_or_404(Entity.by_id(id))
+    extractor = GraphExtractor(root_id=entity.id)
+    if extractor.format == 'gexf':
+        return Response(extractor.to_gexf(),
+                mimetype='text/xml')
+    return jsonify(extractor.to_dict())
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['POST', 'PUT'])
