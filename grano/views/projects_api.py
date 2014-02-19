@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, Response
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
@@ -6,6 +6,7 @@ from grano.lib.args import object_or_404, request_data
 from grano.model import Project
 from grano.logic import projects
 from grano.lib.pager import Pager
+from grano.logic.graph import GraphExtractor
 from grano.lib.exc import Gone
 from grano.core import app, db
 from grano import authz
@@ -37,9 +38,9 @@ def view(slug):
 
 
 @blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])
-def graph(id):
+def graph(slug):
     project = object_or_404(Project.by_slug(slug))
-    extractor = GraphExtractor(projet_id=project.id)
+    extractor = GraphExtractor(project_id=project.id)
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')
