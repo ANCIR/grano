@@ -46,7 +46,7 @@ Several aspects of ``grano-client`` can be configured, including the host name o
 
 1. Read the ``~/.grano.ini`` file in the user's home directory. The file is a simple .ini configuration as detailed below.
 2. Check the contents of the following environment variables: ``GRANO_HOST``, ``GRANO_APIKEY``.
-3. Evaluate the keyword arguments passed into the constructor of ``grano.Project``.
+3. Evaluate the keyword arguments passed into the constructor of ``granoclient.Grano``.
 
 A simple configuration file for ``grano-client`` might look like this:
 
