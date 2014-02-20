@@ -18,7 +18,8 @@ from sqlalchemy.sql import table, column
 
 def upgrade():
     account = table('account',
-        column('login', sa.String)
+        column('login', sa.String),
+        column('api_key', sa.String)
     )
     op.execute(account.insert().values({'login': '_system', 'api_key': uuid.uuid4().hex}))
 
