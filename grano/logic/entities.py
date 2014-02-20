@@ -25,7 +25,7 @@ def validate(data):
     of the model, validation of entities has to happen in three steps. """
 
     # a bit hacky
-    data['schemata'] = set(data.get('schemata', []) + ['base'])
+    data['schemata'] = data.get('schemata', []) + ['base']
 
     validator = EntityBaseValidator()
     sane = validator.deserialize(data)
@@ -36,6 +36,7 @@ def validate(data):
         schemata_node, name='schemata'))
 
     sane.update(schemata_validator.deserialize(data))
+    sane['schemata'] = list(set(sane['schemata']))
 
     sane['properties'] = validate_properties(
         data.get('properties', []),

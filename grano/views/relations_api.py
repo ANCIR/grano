@@ -3,7 +3,7 @@ from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Relation
+from grano.model import Relation, Schema
 from grano.logic import relations
 from grano.logic.references import ProjectRef
 from grano.lib.pager import Pager
@@ -26,6 +26,11 @@ def index():
     if request.args.get('target'):
         query = query.filter(Relation.target_id==request.args.getlist('target')[0])
     
+    if request.args.get('schema'):
+        schemata = request.args.get('schema').split(',')
+        query = query.join(Schema)
+        query = query.filter(Schema.name.in_(schemata))
+
     pager = Pager(query)
     conv = lambda es: [relations.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))

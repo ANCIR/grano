@@ -208,6 +208,13 @@ parameters:
   on the ``slug`` provided.
 * ``property-<name>`` will filter for entities which have a property ``<name>``
   and the given value. This will consider active properties only.
+* ``property-aliases-<name>`` will filter entities which have a property 
+  ``<name>`` and one of the historic (i.e. inactive and active) values matches
+  the given value.
+* ``schema`` can be used to filter for entities which have a certain schema, 
+  indicated by its ``name``. Alternatives can be separated by commata, while 
+  multiple values for the query parameters mean that all schemata must be 
+  present.
 
 ::
 
@@ -269,6 +276,8 @@ parameters:
   specific origin or destination of the relation, respectively.
 * ``property-<name>`` will filter for relations which have a property ``<name>``
   and the given value. This will consider active properties only.
+* ``schema`` can be used to filter for relations with a certain schema, indicated
+  by its ``name``. Alternatives can be separated by commata.
 
 ::
 

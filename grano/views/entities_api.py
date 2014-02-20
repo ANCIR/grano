@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, Response
 from flask import redirect, make_response, url_for
+from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity
+from grano.model import Entity, Schema
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
@@ -20,6 +21,12 @@ blueprint = Blueprint('entities_api', __name__)
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
     query = filter_query(Entity, Entity.all(), request.args)
+
+    for schema in request.args.getlist('schema'):
+        alias = aliased(Schema)
+        query = query.join(alias, Entity.schemata)
+        query = query.filter(alias.name.in_(schema.split(',')))
+
     pager = Pager(query)
     conv = lambda es: [entities.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
