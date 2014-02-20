@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 class ObjectLoader(object):
     # Abstract parent
 
-    def _setup(self, loader, type, schemata):
+    def _setup(self, loader, schemata):
         self.loader = loader
         self.schemata = schemata
         self.properties = {}
@@ -59,7 +59,7 @@ class EntityLoader(ObjectLoader):
     properties for an entity. """
     
     def __init__(self, loader, schemata, source_url=None):
-        self._setup(loader, Entity, schemata + ['base'])
+        self._setup(loader, schemata + ['base'])
         self.unique('name', only_active=False)
         self.source_url = source_url
         self._entity = None
@@ -103,7 +103,7 @@ class RelationLoader(ObjectLoader):
     its schema, source entity, target entity and a set of properties. """
     
     def __init__(self, loader, schema, source, target, source_url=None):
-        self._setup(loader, Relation, [schema])
+        self._setup(loader, [schema])
         self.source_url = source_url
         self.source = source 
         self.target = target
@@ -159,8 +159,8 @@ class Loader(object):
             'settings': project_settings
             }, project=project)
         
-        self.entities = []
-        self.relations = []
+        #self.entities = []
+        #self.relations = []
 
 
     def make_entity(self, schemata, source_url=None):
@@ -175,7 +175,7 @@ class Loader(object):
         """
         entity = EntityLoader(self, schemata,
             source_url=source_url or self.source_url)
-        self.entities.append(entity)
+        #self.entities.append(entity)
         return entity
 
 
@@ -196,7 +196,7 @@ class Loader(object):
 
         relation = RelationLoader(self, schema, source, target,
             source_url=source_url or self.source_url)
-        self.relations.append(relation)
+        #self.relations.append(relation)
         return relation
 
 
