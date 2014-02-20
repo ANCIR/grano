@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='grano',
-    version='0.3',
+    version='0.3.1',
     description="An entity and social network tracking software for news applications",
     long_description=open('README.rst').read(),
     classifiers=[

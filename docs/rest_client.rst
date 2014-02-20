@@ -23,7 +23,7 @@ Python web client library
     data = {'schemata': ['base'], 'properties': {'name': {'value': 'Bob'}}}
     bob = project.entites.create(data)
 
-    rel = {'schmea': 'my-schema', 'source': alice, 'target': bob, 'properties': {}}
+    rel = {'schema': 'my-schema', 'source': alice, 'target': bob, 'properties': {}}
     project.relations.create(rel)
 
     query = project.entities.query.filter('properties-name', 'Alice')
