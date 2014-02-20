@@ -35,6 +35,7 @@ db = SQLAlchemy(app)
 es = Elasticsearch()
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
     broker=app.config['CELERY_BROKER_URL'])
+celery.config_from_object(app.config)
 
 es_index = app.config.get('ES_INDEX', app_name)
 
