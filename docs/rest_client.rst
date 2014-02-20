@@ -17,9 +17,19 @@ Python web client library
     project.label = 'New title'
     project.save()
 
-    for entity project.entities:
+    data = {'schemata': ['base'], 'properties': {'name': {'value': 'Alice'}}}
+    alice = project.entites.create(data)
+
+    data = {'schemata': ['base'], 'properties': {'name': {'value': 'Bob'}}}
+    bob = project.entites.create(data)
+
+    rel = {'schmea': 'my-schema', 'source': alice, 'target': bob, 'properties': {}}
+    project.relations.create(rel)
+
+    query = project.entities.query.filter('properties-name', 'Alice')
+    for entity in query:
         print entity.properties.get('name').get('value')
-    
+
 
 Installation
 ------------
