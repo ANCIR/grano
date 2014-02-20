@@ -84,10 +84,13 @@ def delete(schema):
 
 def import_schema(project, fh):
     data = yaml.load(fh.read())
+    if isinstance(data, dict):
+        data = [data]
     try:
-        schema = Schema.by_name(project, data.get('name'))
-        data['project'] = project
-        save(data, schema=schema)
+        for cur in data:
+            schema = Schema.by_name(project, cur.get('name'))
+            cur['project'] = project
+            save(cur, schema=schema)
         db.session.commit()
     except Invalid, inv:
         pprint(inv.asdict())
@@ -101,7 +104,11 @@ def export_schema(project, path):
             continue
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
-            fh.write(yaml.dump(to_dict(schema)))
+            dumped = yaml.safe_dump(to_dict(schema),
+                canonical=False,
+                default_flow_style=False,
+                indent=4)
+            fh.write(dumped)
 
 
 def check_attributes(form, value):
