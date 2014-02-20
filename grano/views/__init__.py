@@ -35,7 +35,7 @@ def handle_invalid(exc):
     body = {
         'status': 400,
         'name': 'Invalid Data',
-        'description': unicode(exc),
+        'message': unicode(exc),
         'errors': exc.asdict()
     }
     return jsonify(body, status=400)

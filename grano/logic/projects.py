@@ -8,21 +8,27 @@ from grano.logic import accounts
 from grano.model import Project
 
 
-class ProjectValidator(colander.MappingSchema):
-    slug = colander.SchemaNode(colander.String(),
-        validator=database_name)
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3))
-    author = colander.SchemaNode(AccountRef())
-    settings = colander.SchemaNode(colander.Mapping(),
-        missing={})
+def validate(data, project):
+    same_project = lambda s: Project.by_slug(s) == project
+    same_project = colander.Function(same_project, message="Project exists")
+
+    class ProjectValidator(colander.MappingSchema):
+        slug = colander.SchemaNode(colander.String(),
+            validator=colander.All(database_name, same_project))
+        label = colander.SchemaNode(colander.String(),
+            validator=colander.Length(min=3))
+        author = colander.SchemaNode(AccountRef())
+        settings = colander.SchemaNode(colander.Mapping(),
+            missing={})
+
+    validator = ProjectValidator()
+    return validator.deserialize(data)
 
 
 def save(data, project=None):
     """ Create or update a project with a given slug. """
 
-    validator = ProjectValidator()
-    data = validator.deserialize(data)
+    data = validate(data, project)
 
     if project is None:
         project = Project()

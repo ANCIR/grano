@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, Response
+from flask import Blueprint, render_template, Response, request
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
