@@ -26,7 +26,7 @@ Python web client library
     rel = {'schema': 'my-schema', 'source': alice, 'target': bob, 'properties': {}}
     project.relations.create(rel)
 
-    query = project.entities.query.filter('properties-name', 'Alice')
+    query = project.entities.query().filter('properties-name', 'Alice')
     for entity in query:
         print entity.properties.get('name').get('value')
 
