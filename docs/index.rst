@@ -70,6 +70,7 @@ Contents
    schema
    services
    rest_api
+   rest_client
    bulk_api
 
 

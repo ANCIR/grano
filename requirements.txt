@@ -23,3 +23,4 @@ elasticsearch==0.4.4
 celery==3.1.9
 certifi==1.0.0
 networkx==1.8.1
+grano-client
