@@ -18,10 +18,10 @@ Python web client library
     project.save()
 
     data = {'schemata': ['base'], 'properties': {'name': {'value': 'Alice'}}}
-    alice = project.entites.create(data)
+    alice = project.entities.create(data)
 
     data = {'schemata': ['base'], 'properties': {'name': {'value': 'Bob'}}}
-    bob = project.entites.create(data)
+    bob = project.entities.create(data)
 
     rel = {'schema': 'my-schema', 'source': alice, 'target': bob, 'properties': {}}
     project.relations.create(rel)
