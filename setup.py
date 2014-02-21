@@ -14,7 +14,7 @@ setup(
     keywords='sql graph sna networks journalism ddj entities',
     author='Friedrich Lindenberg',
     author_email='friedrich@pudo.org',
-    url='http://grano.pudo.org',
+    url='http://docs.grano.cc',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=[],
@@ -24,7 +24,7 @@ setup(
     ],
     entry_points={
         'grano.entity.change': [
-            'indexer = grano.logic.indexer:AutoIndexer'
+    #        'indexer = grano.logic.indexer:AutoIndexer'
         ],
         'console_scripts': [
             'grano = grano.manage:run',

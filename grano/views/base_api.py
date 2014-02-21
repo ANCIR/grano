@@ -36,7 +36,7 @@ def status():
         'service': app_name,
         'status': 'ok',
         'version': __version__,
-        'docs': 'http://grano.pudo.org/rest_api.html',
+        'docs': 'http://docs.grano.cc/rest_api.html',
         'api_url': url_for('base_api.status'),
         'services': {
             'projects_index_url': url_for('projects_api.index'),

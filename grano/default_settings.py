@@ -23,7 +23,7 @@ GITHUB_CLIENT_SECRET = '1701d3bd20bbb29012592fd3a9c64b827e0682d6'
 
 # Generate a public URI for an entity, based on its ID.
 
-ENTITY_VIEW_PATTERN = 'http://grano.io/e/%s'
+ENTITY_VIEW_PATTERN = 'http://beta.grano.cc/entities/%s'
 
 
 # Asynchronous task processing: For some tasks, grano will run 

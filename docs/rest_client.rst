@@ -63,7 +63,7 @@ A simple configuration file for ``grano-client`` might look like this:
 .. code-block:: ini
 
     [client]
-    host = http://api.grano.io
+    host = http://beta.grano.cc
 
     # see user profile in grano:
     api_key = xxxxxxxxxxxxxxx
