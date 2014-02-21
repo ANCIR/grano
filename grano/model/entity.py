@@ -37,8 +37,9 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         return [p for p in self.properties if p.name == 'name']
 
     @classmethod
-    def by_name(cls, name, only_active=False):
+    def by_name(cls, project, name, only_active=False):
         q = db.session.query(cls)
+        a = q.filter(cls.project==project)
         q = cls._filter_property(q, 'name', name, only_active=only_active)
         return q.first()
 
