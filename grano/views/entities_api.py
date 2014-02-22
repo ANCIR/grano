@@ -4,7 +4,7 @@ from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, Schema
+from grano.model import Entity, Schema, EntityProperty, Project
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
@@ -58,6 +58,29 @@ def search():
     data = pager.to_dict(results_converter=conv)
     data['facets'] = searcher.facets()
     return jsonify(data)
+
+
+@blueprint.route('/api/1/entities/_suggest', methods=['GET'])
+def suggest():
+    q = db.session.query(EntityProperty)
+    q = q.filter(EntityProperty.name=='name')
+    q = q.filter(EntityProperty.active==True)
+    q = q.filter(EntityProperty.entity_id!=None)
+    q = q.filter(EntityProperty.value.ilike(request.args.get('q', '') + '%'))
+    q = q.join(Entity)
+    q = q.join(Project)
+    if 'project' in request.args:
+        q = q.filter(Project.slug==request.args.get('project'))
+    pager = Pager(q)
+    def convert(props):
+        data = []
+        for prop in props:
+            data.append({
+                'name': prop.value,
+                'api_url': url_for('entities_api.view', id=prop.entity_id)
+            })
+        return data
+    return jsonify(pager.to_dict(results_converter=convert))
 
 
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
