@@ -8,6 +8,7 @@ from grano.model import Entity, Schema
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
+from grano.logic.searcher import ESSearcher
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
@@ -47,6 +48,16 @@ def create():
 def view(id):
     entity = object_or_404(Entity.by_id(id))
     return jsonify(entities.to_rest(entity))
+
+
+@blueprint.route('/api/1/entities/_search', methods=['GET'])
+def search():
+    searcher = ESSearcher(request.args)
+    pager = Pager(searcher)
+    conv = lambda c: [x for x in c]
+    data = pager.to_dict(results_converter=conv)
+    data['facets'] = searcher.facets()
+    return jsonify(data)
 
 
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])

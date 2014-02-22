@@ -3,6 +3,7 @@ import logging
 from pprint import pprint
 import elasticsearch
 
+from grano.lib.args import arg_int
 from grano.core import es, es_index
 
 
@@ -20,7 +21,8 @@ class ESSearcher(object):
         self.results = None
         self._limit = 25
         self._offset = 0
-        self._facets = []
+        self._facet_size = arg_int('facet-size', 50)
+        self._facets = [(k, self._facet_size) for k in args.getlist('facet')]
         self._filters = []
         self._sort_field = sort_field
 
@@ -34,7 +36,9 @@ class ESSearcher(object):
         self._offset = offset
         return self
 
-    def add_facet(self, name, size=10):
+    def add_facet(self, name, size=None):
+        if size is None:
+            size = self._facet_size
         self._facets.append((name, size))
 
     def add_filter(self, field, value):
@@ -85,12 +89,31 @@ class ESSearcher(object):
                 }
             }
 
+        #query["fields"] = ['name']
+        query["partial_fields"] = {
+            "partial1" : {
+                "include" : "*",
+                "exclude" : ["inbound.*", "outbound.*", "relations.*"]
+            }
+        }
+
+
         if self._sort_field:
-            field, order = self._sort_field
+            field, order = self.get_sort()
             query['sort'] = [{field: {'order': order}}]
 
+        print query
         self.results = es.search(index=es_index, doc_type='entity',
             body=query)
+
+    def get_sort(self):
+        sort = self._sort_field
+        if sort is not None:
+            sort, direction = sort
+        sort = self.args.get('sort', sort)
+        direction = self.args.get('direction', 'asc')
+        return sort, direction
+
 
     def get_facet(self, name):
         if self.results is None:
@@ -99,12 +122,25 @@ class ESSearcher(object):
         facet = self.results.get('facets', {}).get(name, {})
         return facet.get('terms', [])
 
+    def facets(self):
+        if self.results is None:
+            self._run()
+
+        data = {}
+        for facet, size in self._facets:
+            data[facet] = self.get_facet(facet)
+
+        return data
+
     def __iter__(self):
         if self.results is None:
             self._run()
 
         for hit in self.results.get('hits').get('hits'):
-            yield hit
+            #print hit.keys()
+            data = hit.get('fields')
+            data['id'] = hit.get('_id')
+            yield data
 
     def __len__(self):
         if self.results is None:
