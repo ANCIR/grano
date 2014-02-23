@@ -30,7 +30,7 @@ def set(obj, author, name, schema, value, active=True, source_url=None,
         properties = [p for p in obj.properties if p.name == name]
 
     for cand in properties:
-        if cand.source_url == source_url and cand.value == value:
+        if cand.value == value:
             prop = cand
         elif cand.active and active:
             cand.active = False
