@@ -9,6 +9,7 @@ from grano.lib.pager import Pager
 from grano.logic.graph import GraphExtractor
 from grano.lib.exc import Gone
 from grano.core import app, db
+from grano.views.cache import validate_cache
 from grano import authz
 
 
@@ -34,6 +35,7 @@ def create():
 @blueprint.route('/api/1/projects/<slug>', methods=['GET'])
 def view(slug):
     project = object_or_404(Project.by_slug(slug))
+    validate_cache(last_modified=project.updated_at)
     return jsonify(projects.to_rest(project))
 
 
@@ -41,6 +43,7 @@ def view(slug):
 def graph(slug):
     project = object_or_404(Project.by_slug(slug))
     extractor = GraphExtractor(project_id=project.id)
+    validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')

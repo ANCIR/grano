@@ -1,14 +1,17 @@
+from datetime import datetime
+
 from flask import Blueprint, render_template, request
 from flask import redirect, make_response, url_for
 
 from grano import __version__
 from grano.lib.serialisation import jsonify
 from grano.core import app, url_for, app_name
+from grano.views.cache import validate_cache, disable_cache
 from grano.background import ping
 
 
 blueprint = Blueprint('base_api', __name__)
-
+startup_time = datetime.utcnow()
 ROBOTS = """
 User-agent: *
 Sitemap: /static/sitemap.xml
@@ -17,6 +20,7 @@ Sitemap: /static/sitemap.xml
 
 @blueprint.route('/robots.txt', methods=['GET'])
 def robots_txt():
+    validate_cache(last_modified=startup_time)
     res = make_response(ROBOTS)
     res.headers['Content-Type'] = 'text/plain'
     return res
@@ -24,6 +28,7 @@ def robots_txt():
 
 @blueprint.route('/favicon.ico', methods=['GET'])
 def favicon_ico():
+    validate_cache(last_modified=startup_time)
     ico_url = app.config.get('FAVICON_URL',
         'http://assets.pudo.org/img/favicon.ico')
     return redirect(ico_url)
@@ -32,6 +37,7 @@ def favicon_ico():
 @blueprint.route('/api', methods=['GET'])
 @blueprint.route('/api/1', methods=['GET'])
 def status():
+    validate_cache(last_modified=startup_time)
     return jsonify({
         'service': app_name,
         'status': 'ok',
@@ -49,5 +55,6 @@ def status():
 
 @blueprint.route('/api/1/ping', methods=['GET'])
 def queue_ping():
+    disable_cache()
     ret = ping.delay(message=request.args.get('message'))
     return jsonify({'status': 'sent', 'task': ret.task_name, 'id': ret.id})

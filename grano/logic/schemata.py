@@ -2,6 +2,7 @@ import os
 import yaml
 import colander
 from pprint import pprint
+from datetime import datetime
 
 from grano.core import db, url_for
 from grano.lib.exc import NotImplemented
@@ -62,6 +63,7 @@ def save(data, schema=None):
 
     schema.obj = data.get('obj')
     schema.hidden = data.get('hidden')
+    schema.project.updated_at = datetime.utcnow()
     db.session.add(schema)
     
     names = []

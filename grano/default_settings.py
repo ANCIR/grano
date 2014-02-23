@@ -6,7 +6,8 @@ ASSETS_DEBUG = False
 # For production, it's essential that this is set:
 
 SECRET_KEY = 'test'
-
+CACHE = True
+CACHE_AGE = 84600
 
 # Configure the database
 

@@ -1,4 +1,5 @@
 from StringIO import StringIO
+from hashlib import sha1
 
 from flask import request
 from sqlalchemy import func, select, and_, not_
@@ -113,6 +114,15 @@ class GraphExtractor(object):
                         ids.add(row.get(field))
         self.seen = self._seen.union(ids)
         return ids
+
+
+    def to_hash(self):
+        hasch = sha1()
+        for row in self._rows:
+            hasch.update(row.get('source.id'))
+            hasch.update(row.get('target.id'))
+            hasch.update(row.get('relation.id'))
+        return hasch.hexdigest()
 
 
     def to_networkx(self):

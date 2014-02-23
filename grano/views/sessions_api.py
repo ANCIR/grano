@@ -6,6 +6,7 @@ from flask import request
 from grano import authz
 from grano.lib.exc import BadRequest
 from grano.lib.serialisation import jsonify
+from grano.views.cache import validate_cache
 from grano.core import db, github, url_for
 from grano.model import Account
 from grano.logic import accounts
@@ -16,6 +17,8 @@ blueprint = Blueprint('sessions_api', __name__)
 
 @blueprint.route('/api/1/sessions', methods=['GET'])
 def status():
+    if request.account is not None:
+        validate_cache(last_modified=request.account.updated_at)
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': request.account.api_key if authz.logged_in() else None,
@@ -58,7 +61,7 @@ def logout():
 @github.authorized_handler
 def authorized(resp):
     next_url = session.get('next_url', '/')
-    if not 'access_token' in resp:
+    if resp is None or not 'access_token' in resp:
         return redirect(next_url)
     access_token = resp['access_token']
     session['access_token'] = access_token, ''

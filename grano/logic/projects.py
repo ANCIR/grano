@@ -1,4 +1,5 @@
 import colander
+from datetime import datetime
 
 from grano.core import app, db, url_for
 from grano.lib.exc import NotImplemented
@@ -37,6 +38,7 @@ def save(data, project=None):
 
     project.settings = data.get('settings')
     project.label = data.get('label')
+    project.updated_at = datetime.utcnow()
     
     db.session.add(project)
     

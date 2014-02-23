@@ -8,6 +8,7 @@ from grano.logic import schemata
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
+from grano.views.cache import validate_cache
 from grano import authz
 
 
@@ -17,6 +18,7 @@ blueprint = Blueprint('schemata_api', __name__)
 @blueprint.route('/api/1/projects/<slug>/schemata', methods=['GET'])
 def index(slug):
     project = object_or_404(Project.by_slug(slug))
+    validate_cache(last_modified=project.updated_at)
     query = Schema.all()
     query = query.filter_by(project=project)
     pager = Pager(query)
@@ -37,6 +39,7 @@ def create(slug):
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['GET'])
 def view(slug, name):
     project = object_or_404(Project.by_slug(slug))
+    validate_cache(last_modified=project.updated_at)
     schema = object_or_404(Schema.by_name(project, name))
     return jsonify(schemata.to_rest(schema))
 
