@@ -15,6 +15,9 @@ startup_time = datetime.utcnow()
 ROBOTS = """
 User-agent: *
 Sitemap: /static/sitemap.xml
+Disallow: /harming/humans
+Disallow: /ignoring/human/orders
+Disallow: /harm/to/self
 """
 
 
