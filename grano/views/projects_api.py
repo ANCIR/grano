@@ -20,7 +20,7 @@ blueprint = Blueprint('projects_api', __name__)
 def index():
     query = Project.all()
     pager = Pager(query)
-    conv = lambda es: [projects.to_rest_index(e) for e in es]
+    conv = lambda es: [projects.to_rest_index_stats(e) for e in es]
     return jsonify(pager.to_dict(conv))
 
 

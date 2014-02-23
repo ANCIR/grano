@@ -63,6 +63,13 @@ def to_rest_index(project):
     }
 
 
+def to_rest_index_stats(project):
+    data = to_rest_index(project)
+    data['entities_count'] = project.entities.count()
+    data['relations_count'] = project.relations.count()
+    return data
+
+
 def to_rest(project):
     data = to_rest_index(project)
     data['settings'] = project.settings

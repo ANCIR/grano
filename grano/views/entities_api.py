@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response, url_for
+from flask import redirect, make_response
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
@@ -10,9 +10,10 @@ from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.logic.searcher import ESSearcher
 from grano.lib.pager import Pager
-from grano.lib.exc import Gone
-from grano.core import app, db
+from grano.lib.exc import Gone, BadRequest
+from grano.core import app, db, url_for
 from grano.views.util import filter_query
+from grano.views.cache import validate_cache
 from grano import authz
 
 
@@ -62,24 +63,30 @@ def search():
 
 @blueprint.route('/api/1/entities/_suggest', methods=['GET'])
 def suggest():
+    if not 'q' in request.args or not len(request.args.get('q').strip()):
+        raise BadRequest("Missing the query ('q' parameter).")
+
     q = db.session.query(EntityProperty)
     q = q.filter(EntityProperty.name=='name')
     q = q.filter(EntityProperty.active==True)
     q = q.filter(EntityProperty.entity_id!=None)
-    q = q.filter(EntityProperty.value.ilike(request.args.get('q', '') + '%'))
-    q = q.join(Entity)
-    q = q.join(Project)
+    q = q.filter(EntityProperty.value.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
+        q = q.join(Entity)
+        q = q.join(Project)
         q = q.filter(Project.slug==request.args.get('project'))
     pager = Pager(q)
+
+    data = []
     def convert(props):
-        data = []
         for prop in props:
             data.append({
                 'name': prop.value,
                 'api_url': url_for('entities_api.view', id=prop.entity_id)
             })
         return data
+
+    validate_cache(keys='#'.join([d['name'] for d in data]))
     return jsonify(pager.to_dict(results_converter=convert))
 
 
@@ -87,6 +94,7 @@ def suggest():
 def graph(id):
     entity = object_or_404(Entity.by_id(id))
     extractor = GraphExtractor(root_id=entity.id)
+    validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')
