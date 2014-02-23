@@ -71,8 +71,10 @@ def to_rest_index_stats(project):
 
 
 def to_rest(project):
-    data = to_rest_index(project)
+    data = to_rest_index_stats(project)
     data['settings'] = project.settings
     data['author'] = accounts.to_rest_index(project.author)
     data['schemata_index_url'] = url_for('schemata_api.index', slug=project.slug)
+    data['entities_index_url'] = url_for('entities_api.index', project=project.slug)
+    data['relations_index_url'] = url_for('relations_api.index', project=project.slug)
     return data
