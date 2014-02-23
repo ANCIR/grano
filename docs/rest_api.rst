@@ -218,6 +218,17 @@ parameters:
 
 ::
 
+    GET /api/1/entities/_suggest
+
+Auto-suggest API for entity names. Given a prefix, the API will return a set 
+of existing entities whose name starts with the given string, including their
+name and API URL. Standard :ref:`pager` arguments are available.
+
+* ``q`` the prefix to be searched, ideally longer than one character. 
+* ``project`` a project ``slug`` to pre-filter the search to only one project.
+
+::
+
     GET /api/1/entities/<id>
 
 Retrieves a single entity from the API, including all its properties and references
@@ -238,6 +249,7 @@ The following query paramters are available:
 * ``format`` can be either ``json`` or ``gexf``. The ``json`` representation is a
   custom format for easy integration into visualizations, while ``gexf`` is a 
   widely-used exchange format.
+
 
 ::
 
