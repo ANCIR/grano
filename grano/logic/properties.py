@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from grano.core import db
 from grano.model import Entity
 
@@ -44,12 +46,15 @@ def set(obj, author, name, schema, value, active=True, source_url=None,
         db.session.add(prop)
 
     prop._set_obj(obj)
+    obj.updated_at = datetime.utcnow()
+
     prop.name = name
     prop.author = author
     prop.schema = schema
     prop.value = value
     prop.active = active
     prop.source_url = source_url
+    prop.updated_at = datetime.utcnow()
     return prop
 
 
