@@ -90,19 +90,18 @@ class ESSearcher(object):
             }
 
         #query["fields"] = ['name']
-        query["partial_fields"] = {
-            "partial1" : {
-                "include" : "*",
-                "exclude" : ["inbound.*", "outbound.*", "relations.*"]
-            }
-        }
+        #query["partial_fields"] = {
+        #    "partial1" : {
+        #        "include" : "*",
+        #        "exclude" : ["inbound.*", "outbound.*", "relations.*"]
+        #    }
+        #}
 
 
         if self._sort_field:
             field, order = self.get_sort()
             query['sort'] = [{field: {'order': order}}]
 
-        print query
         self.results = es.search(index=es_index, doc_type='entity',
             body=query)
 
@@ -137,8 +136,8 @@ class ESSearcher(object):
             self._run()
 
         for hit in self.results.get('hits').get('hits'):
-            #print hit.keys()
-            data = hit.get('fields')
+            data = hit.get('_source')
+            #data = hit.get('fields')
             data['id'] = hit.get('_id')
             yield data
 

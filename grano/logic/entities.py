@@ -148,21 +148,21 @@ def to_index(entity):
         'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
         'num_schemata': len(schemata),
         'num_properties': 0,
-        'inbound': [],
-        'outbound': [],
-        'relations': [],
+    #    'inbound': [],
+    #    'outbound': [],
+    #    'relations': [],
         'names': []
         }
 
-    for rel in entity.inbound:
-        rel_data = relations.to_index(rel)
-        data['inbound'].append(rel_data)
-        data['relations'].append(rel_data)
+    #for rel in entity.inbound:
+    #    rel_data = relations.to_index(rel)
+    #    data['inbound'].append(rel_data)
+    #    data['relations'].append(rel_data)
 
-    for rel in entity.outbound:
-        rel_data = relations.to_index(rel)
-        data['outbound'].append(rel_data)
-        data['relations'].append(rel_data)
+    #for rel in entity.outbound:
+    #    rel_data = relations.to_index(rel)
+    #    data['outbound'].append(rel_data)
+    #    data['relations'].append(rel_data)
 
     data['num_relations'] = entity.degree
 
