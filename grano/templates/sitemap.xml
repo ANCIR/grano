@@ -6,7 +6,7 @@
       <loc>{{i}}</loc>
       <lastmod>{{d}}</lastmod>
       <changefreq>monthly</changefreq>
-      <priority>{{s}}</priority>
+      <priority>0.9</priority>
     </url>
     {% endfor %}
 </urlset> 
