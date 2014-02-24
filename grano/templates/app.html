@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" ng-app="grano">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>grano</title>
+  <meta name="description" content="A web-based framework for the storage, analysis and presentation of social network information.">
+
+  {% assets filters="less,cssmin,cssrewrite", output="gen/grano.style.css",
+      "vendor/bootstrap/less/bootstrap.less",
+      "style/style.less" %}
+    <link type="text/css" href="{{ ASSET_URL }}" rel="stylesheet">
+  {% endassets %}
+
+  <link rel="shortcut icon" href="http://assets.pudo.org/img/favicon.ico" type="image/x-icon" />
+</head>
+<body ng-controller="AppCtrl">
+  <div id="page">
+    <nav class="navbar navbar-default" role="navigation" id="menu">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">grano</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
+        <ul class="nav navbar-nav">
+          <li ng-show="session.logged_in">
+            <a><i class="fa fa-cogs"></i> Profile</a>
+          </li>
+          <li ng-hide="session.logged_in">
+            <a href="/api/1/sessions/login"><i class="fa fa-github"></i> Sign In</a>
+          </li>
+          <li ng-show="session.logged_in">
+            <a href="/api/1/sessions/logout"><i class="fa fa-sign-out"></i> Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div id="airlock" class="container">
+      <div class="row" ng-view></div>
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      I'm a banana!
+    </div>
+  </footer>
+
+  {% for path, tmpl in angular_templates %}
+    <script id="{{path}}" type="text/ng-template">{{tmpl|safe}}</script>
+  {% endfor %}
+
+  {% assets filters="uglifyjs", output="gen/grano.app.js",
+        "vendor/jquery/dist/jquery.js",
+        "vendor/bootstrap/js/collapse.js",
+
+        "vendor/angular/angular.js",
+
+        "js/app.js",
+        "js/services/session.js"
+         %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+</body>
+</html>
