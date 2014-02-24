@@ -35,10 +35,10 @@
             <a><i class="fa fa-cogs"></i> Profile</a>
           </li>
           <li ng-hide="session.logged_in">
-            <a href="/api/1/sessions/login"><i class="fa fa-github"></i> Sign In</a>
+            <a href="/api/1/sessions/login?next_url={{ui_root}}"><i class="fa fa-github"></i> Sign In</a>
           </li>
           <li ng-show="session.logged_in">
-            <a href="/api/1/sessions/logout"><i class="fa fa-sign-out"></i> Sign Out</a>
+            <a href="/api/1/sessions/logout?next_url={{ui_root}}"><i class="fa fa-sign-out"></i> Sign Out</a>
           </li>
         </ul>
       </div>
@@ -63,9 +63,11 @@
         "vendor/bootstrap/js/collapse.js",
 
         "vendor/angular/angular.js",
+        "vendor/angular-route/angular-route.js",
 
         "js/app.js",
-        "js/services/session.js"
+        "js/services/session.js",
+        "js/controllers/app.js"
          %}
       <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}

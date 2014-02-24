@@ -10,6 +10,7 @@ from grano.views.cache import validate_cache, disable_cache
 from grano.background import ping
 
 
+UI_PREFIX = app.config.get('UI_PREFIX', '/')
 blueprint = Blueprint('ui', __name__)
 
 def angular_templates():
@@ -25,7 +26,7 @@ def angular_templates():
                        fh.read().decode('utf-8'))
 
 
-@blueprint.route(app.config.get('UI_PREFIX', '/'))
+@blueprint.route(ui_root)
 def index(**kw):
-    return render_template('app.html',
+    return render_template('app.html', ui_root=UI_PREFIX,
         angular_templates=angular_templates())
