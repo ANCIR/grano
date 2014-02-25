@@ -33,7 +33,7 @@
       <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
         <ul class="nav navbar-nav">
           <li ng-show="session.logged_in">
-            <a ng-click="showAccount()"><i class="fa fa-cogs"></i> Profile {% raw %}({{session.account.display_name}}){% endraw %}</a>
+            <a ng-click="showAccount()"><i class="fa fa-cogs"></i> Profile</a>
           </li>
           <li ng-hide="session.logged_in">
             <a href="/api/1/sessions/login/github?next_url={{ui_root}}"><i class="fa fa-github"></i> Sign in via GitHub</a>
