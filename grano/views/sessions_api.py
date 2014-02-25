@@ -7,7 +7,8 @@ from grano import authz
 from grano.lib.exc import BadRequest
 from grano.lib.serialisation import jsonify
 from grano.views.cache import validate_cache
-from grano.core import db, github, url_for
+from grano.core import db, url_for, app
+from grano.providers import github, twitter, facebook
 from grano.model import Account
 from grano.logic import accounts
 
@@ -26,30 +27,6 @@ def status():
     })
 
 
-# TODO: move to project controller
-#@blueprint.route('/sessions/authz')
-#def get_authz():
-#    permissions = {}
-#    dataset_name = request.args.get('dataset')
-#    if dataset_name is not None:
-#        dataset = Dataset.find(dataset_name)
-#        permissions[dataset_name] = {
-#            'view': True,
-#            'edit': authz.dataset_edit(dataset),
-#            'manage': authz.dataset_manage(dataset)
-#        }
-#    return jsonify(permissions)
-
-
-@blueprint.route('/api/1/sessions/login', methods=['GET'])
-def login():
-    callback=url_for('sessions_api.authorized')
-    if not request.args.get('next_url'):
-        raise BadRequest("No 'next_url' is specified.")
-    session['next_url'] = request.args.get('next_url')
-    return github.authorize(callback=callback)
-
-
 @blueprint.route('/api/1/sessions/logout', methods=['GET'])
 def logout():
     authz.require(authz.logged_in())
@@ -57,20 +34,71 @@ def logout():
     return redirect(request.args.get('next_url', '/'))
 
 
-@blueprint.route('/api/1/sessions/callback', methods=['GET'])
-@github.authorized_handler
-def authorized(resp):
-    next_url = session.get('next_url', '/')
-    if resp is None or not 'access_token' in resp:
-        return redirect(next_url)
-    access_token = resp['access_token']
-    session['access_token'] = access_token, ''
-    res = requests.get('https://api.github.com/user?access_token=%s' % access_token,
-            verify=False)
-    data = res.json()
-    account = Account.by_github_id(data.get('id'))
-    if account is None:
-        account = accounts.create(data)
+if app.config.get('GITHUB_CLIENT_ID'):
+
+    @blueprint.route('/api/1/sessions/login/github', methods=['GET'])
+    def github_login():
+        callback=url_for('sessions_api.github_authorized')
+        if not request.args.get('next_url'):
+            raise BadRequest("No 'next_url' is specified.")
+        session['next_url'] = request.args.get('next_url')
+        return github.authorize(callback=callback)
+
+
+    @blueprint.route('/api/1/sessions/callback/github', methods=['GET'])
+    @github.authorized_handler
+    def github_authorized(resp):
+        session.clear()
+        next_url = session.get('next_url', '/')
+        if resp is None or not 'access_token' in resp:
+            return redirect(next_url)
+        access_token = resp['access_token']
+        session['access_token'] = access_token, ''
+        res = requests.get('https://api.github.com/user?access_token=%s' % access_token,
+                verify=False)
+        data = res.json()
+        account = Account.by_github_id(data.get('id'))
+        data_ = {
+            'full_name': data.get('name'),
+            'login': data.get('login'),
+            'email': data.get('email'),
+            'github_id': data.get('id')
+        }
+        account = accounts.create(data_, account=account)
         db.session.commit()
-    session['id'] = account.id
-    return redirect(next_url)
+        session['id'] = account.id
+        return redirect(next_url)
+
+
+if app.config.get('TWITTER_API_KEY'):
+
+    @blueprint.route('/api/1/sessions/login/twitter', methods=['GET'])
+    def twitter_login():
+        callback=url_for('sessions_api.twitter_authorized')
+        if not request.args.get('next_url'):
+            raise BadRequest("No 'next_url' is specified.")
+        session['next_url'] = request.args.get('next_url')
+        return twitter.authorize(callback=callback)
+
+
+    @blueprint.route('/api/1/sessions/callback/twitter', methods=['GET'])
+    @twitter.authorized_handler
+    def twitter_authorized(resp):
+        session.clear()
+        next_url = session.get('next_url', '/')
+        if resp is None or not 'oauth_token' in resp:
+            return redirect(next_url)
+        
+        session['twitter_token'] = (resp['oauth_token'],
+            resp['oauth_token_secret'])
+        res = twitter.get('users/show.json?user_id=%s' % resp.get('user_id'))
+        account = Account.by_twitter_id(res.data.get('id'))
+        data_ = {
+            'full_name': res.data.get('name'),
+            'login': res.data.get('screen_name'),
+            'twitter_id': res.data.get('id')
+        }
+        account = accounts.create(data_, account=account)
+        db.session.commit()
+        session['id'] = account.id
+        return redirect(next_url)
