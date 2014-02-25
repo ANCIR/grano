@@ -229,6 +229,21 @@ name and API URL. Standard :ref:`pager` arguments are available.
 
 ::
 
+    GET /api/1/entities/_search
+
+Full-text search API for entitues. Given a query, the API will return a set 
+of ElasticSearch results (i.e. not complete entity serializations). Standard
+:ref:`pager` arguments are available.
+
+* ``q`` the term to be searched.
+* ``filter-<name>`` filter field ``<name>`` for the given value.
+* ``facet`` add the value of the argument as a facet field. This argument 
+  can be supplied multiple times to have more than one facet.
+* ``facet-size`` can be used to specify the number of results to be returned
+  for each ``facet``.
+
+::
+
     GET /api/1/entities/<id>
 
 Retrieves a single entity from the API, including all its properties and references
