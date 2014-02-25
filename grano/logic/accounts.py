@@ -37,4 +37,5 @@ def to_rest(account):
     data['facebook_id'] = account.facebook_id
     data['created_at'] = account.created_at 
     data['updated_at'] = account.updated_at
+    data['email'] = account.email
     return data

@@ -39,3 +39,8 @@ facebook = oauth.remote_app('facebook',
     consumer_key=app.config.get('FACEBOOK_APP_ID'),
     consumer_secret=app.config.get('FACEBOOK_APP_SECRET'),
     request_token_params={'scope': 'email'})
+
+
+@facebook.tokengetter
+def get_facebook_token(token=None):
+    return session.get('facebook_token')
