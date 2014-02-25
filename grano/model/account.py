@@ -20,6 +20,13 @@ class Account(db.Model, IntBase):
     relations = db.relationship('Relation', backref='author', lazy='dynamic')
     entities = db.relationship('Entity', backref='author', lazy='dynamic')
     
+    @property
+    def display_name(self):
+        if self.full_name is not None and len(self.full_name.strip()):
+            return self.full_name
+        if self.login is not None and len(self.login.strip()):
+            return self.login
+        return self.email
 
     @classmethod
     def by_api_key(cls, api_key):
