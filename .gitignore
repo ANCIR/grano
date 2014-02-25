@@ -47,4 +47,6 @@ grano/development.db
 *.env
 *.gexf
 
+settings.py
+
 docs/_build/*

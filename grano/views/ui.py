@@ -26,7 +26,7 @@ def angular_templates():
                        fh.read().decode('utf-8'))
 
 
-@blueprint.route(ui_root)
+@blueprint.route(UI_PREFIX)
 def index(**kw):
     return render_template('app.html', ui_root=UI_PREFIX,
         angular_templates=angular_templates())
