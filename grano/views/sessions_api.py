@@ -18,8 +18,6 @@ blueprint = Blueprint('sessions_api', __name__)
 
 @blueprint.route('/api/1/sessions', methods=['GET'])
 def status():
-    if request.account is not None:
-        validate_cache(last_modified=request.account.updated_at)
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': request.account.api_key if authz.logged_in() else None,
@@ -37,16 +35,17 @@ def provider_not_enabled(name):
 
 @blueprint.route('/api/1/sessions/logout', methods=['GET'])
 def logout():
-    authz.require(authz.logged_in())
+    #authz.require(authz.logged_in())
     session.clear()
     return redirect(request.args.get('next_url', '/'))
 
 
 @blueprint.route('/api/1/sessions/login/github', methods=['GET'])
 def github_login():
-    if app.config.get('GITHUB_CLIENT_ID'):
+    if not app.config.get('GITHUB_CLIENT_ID'):
         return provider_not_enabled('github')
     callback=url_for('sessions_api.github_authorized')
+    session.clear()
     if not request.args.get('next_url'):
         raise BadRequest("No 'next_url' is specified.")
     session['next_url'] = request.args.get('next_url')
@@ -56,7 +55,6 @@ def github_login():
 @blueprint.route('/api/1/sessions/callback/github', methods=['GET'])
 @github.authorized_handler
 def github_authorized(resp):
-    session.clear()
     next_url = session.get('next_url', '/')
     if resp is None or not 'access_token' in resp:
         return redirect(next_url)
@@ -80,9 +78,10 @@ def github_authorized(resp):
 
 @blueprint.route('/api/1/sessions/login/twitter', methods=['GET'])
 def twitter_login():
-    if app.config.get('TWITTER_API_KEY'):
+    if not app.config.get('TWITTER_API_KEY'):
         return provider_not_enabled('twitter')
     callback=url_for('sessions_api.twitter_authorized')
+    session.clear()
     if not request.args.get('next_url'):
         raise BadRequest("No 'next_url' is specified.")
     session['next_url'] = request.args.get('next_url')
@@ -92,7 +91,6 @@ def twitter_login():
 @blueprint.route('/api/1/sessions/callback/twitter', methods=['GET'])
 @twitter.authorized_handler
 def twitter_authorized(resp):
-    session.clear()
     next_url = session.get('next_url', '/')
     if resp is None or not 'oauth_token' in resp:
         return redirect(next_url)
@@ -114,9 +112,10 @@ def twitter_authorized(resp):
 
 @blueprint.route('/api/1/sessions/login/facebook', methods=['GET'])
 def facebook_login():
-    if app.config.get('FACEBOOK_APP_ID'):
+    if not app.config.get('FACEBOOK_APP_ID'):
         return provider_not_enabled('facebook')
     callback=url_for('sessions_api.facebook_authorized')
+    session.clear()
     if not request.args.get('next_url'):
         raise BadRequest("No 'next_url' is specified.")
     session['next_url'] = request.args.get('next_url')
@@ -126,7 +125,6 @@ def facebook_login():
 @blueprint.route('/api/1/sessions/callback/facebook', methods=['GET'])
 @facebook.authorized_handler
 def facebook_authorized(resp):
-    session.clear()
     next_url = session.get('next_url', '/')
     if resp is None or not 'access_token' in resp:
         return redirect(next_url)
