@@ -70,7 +70,7 @@ def github_authorized(resp):
         'email': data.get('email'),
         'github_id': data.get('id')
     }
-    account = accounts.create(data_, account=account)
+    account = accounts.save(data_, account=account)
     db.session.commit()
     session['id'] = account.id
     return redirect(next_url)
@@ -104,7 +104,7 @@ def twitter_authorized(resp):
         'login': res.data.get('screen_name'),
         'twitter_id': res.data.get('id')
     }
-    account = accounts.create(data_, account=account)
+    account = accounts.save(data_, account=account)
     db.session.commit()
     session['id'] = account.id
     return redirect(next_url)
@@ -137,7 +137,7 @@ def facebook_authorized(resp):
         'email': data.get('email'),
         'facebook_id': data.get('id')
     }
-    account = accounts.create(data_, account=account)
+    account = accounts.save(data_, account=account)
     db.session.commit()
     session['id'] = account.id
     return redirect(next_url)

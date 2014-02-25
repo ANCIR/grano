@@ -1,8 +1,8 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model import Account
 
 
-def create(data, account=None):
+def save(data, account=None):
     if account is None:
         account = Account()
         account.github_id = data.get('github_id')
@@ -24,13 +24,14 @@ def create(data, account=None):
 def console_account(login='_system'):
     account = Account.by_login(login)
     if account is None:
-        account = create({'login': login, 'id': None, 'email': None})
+        account = save({'login': login, 'id': None, 'email': None})
     return account
 
 
 def to_rest_index(account):
     return {
         'id': account.id,
+        'api_url': url_for('accounts_api.view', id=account.id),
         'display_name': account.display_name
         }
 
