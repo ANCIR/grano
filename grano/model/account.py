@@ -6,7 +6,11 @@ from grano.model.common import IntBase
 class Account(db.Model, IntBase):
     __tablename__ = 'account'
 
-    github_id = db.Column(db.Integer)
+    github_id = db.Column(db.Unicode)
+    twitter_id = db.Column(db.Unicode)
+    facebook_id = db.Column(db.Unicode)
+
+    full_name = db.Column(db.Unicode)
     login = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
     api_key = db.Column(db.Unicode, default=make_token)
@@ -31,5 +35,15 @@ class Account(db.Model, IntBase):
 
     @classmethod
     def by_github_id(cls, github_id):
-        q = db.session.query(cls).filter_by(github_id=github_id)
+        q = db.session.query(cls).filter_by(github_id=str(github_id))
+        return q.first()
+
+    @classmethod
+    def by_twitter_id(cls, twitter_id):
+        q = db.session.query(cls).filter_by(twitter_id=str(twitter_id))
+        return q.first()
+
+    @classmethod
+    def by_facebook_id(cls, facebook_id):
+        q = db.session.query(cls).filter_by(facebook_id=str(facebook_id))
         return q.first()
