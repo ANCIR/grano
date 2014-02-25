@@ -13,6 +13,7 @@ from grano.background import ping
 UI_PREFIX = app.config.get('UI_PREFIX', '/')
 blueprint = Blueprint('ui', __name__)
 
+
 def angular_templates():
     if app.config.get('ASSETS_DEBUG'):
         return
@@ -29,4 +30,5 @@ def angular_templates():
 @blueprint.route(UI_PREFIX)
 def index(**kw):
     return render_template('app.html', ui_root=UI_PREFIX,
-        angular_templates=angular_templates())
+        angular_templates=angular_templates(),
+        app_name=app_name, app_version=__version__)
