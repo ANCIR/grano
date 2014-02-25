@@ -1,17 +1,21 @@
-var grano = angular.module('grano', ['ngRoute']);
+var grano = angular.module('grano', ['ngRoute', 'ui.bootstrap']);
 
-grano.config(['$routeProvider', '$locationProvider', '$sceProvider',
-    function($routeProvider, $locationProvider, $sceProvider) {
+grano.config(['$routeProvider', '$locationProvider',
+    function($routeProvider, $locationProvider) {
 
   $routeProvider.when('/', {
     templateUrl: '/static/templates/home.html',
-    //controller: HomeCtrl
+    controller: HomeCtrl
+  });
+
+  $routeProvider.when('/p/:slug', {
+    templateUrl: '/static/templates/projects/view.html',
+    controller: ProjectsViewCtrl
   });
 
   $routeProvider.otherwise({
-    redirectTo: '/' //visitPath
+    redirectTo: '/'
   });
 
   $locationProvider.html5Mode(false);
-  //$sceProvider.enabled(false);
 }]);

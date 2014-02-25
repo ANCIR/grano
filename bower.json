@@ -10,6 +10,7 @@
     "bootstrap": "~3.1.1",
     "jquery": "~2.1.0",
     "angular": "~1.2.13",
-    "angular-route": "~1.2.13"
+    "angular-route": "~1.2.13",
+    "angular-bootstrap": "~0.10.0"
   }
 }

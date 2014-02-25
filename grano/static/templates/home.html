@@ -1,7 +1,12 @@
 
 <div class="row">
     <div class="span-12">
-        hello world.
+        <h1 class="page-header">Welcome to grano</h1>
+        <div class="list-group">
+            <a ng-repeat="project in projects.results" href="#/p/{{project.slug}}" class="list-group-item">
+                {{project.label}}
+            </a>
+        </div>
     </div>
 </div>
 

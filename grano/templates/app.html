@@ -14,6 +14,7 @@
     <link type="text/css" href="{{ ASSET_URL }}" rel="stylesheet">
   {% endassets %}
 
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
   <link rel="shortcut icon" href="http://assets.pudo.org/img/favicon.ico" type="image/x-icon" />
 </head>
 <body ng-controller="AppCtrl">
@@ -32,7 +33,7 @@
       <div class="collapse navbar-collapse navbar-ex1-collapse navbar-right">
         <ul class="nav navbar-nav">
           <li ng-show="session.logged_in">
-            <a><i class="fa fa-cogs"></i> Profile</a>
+            <a ng-click="showAccount()"><i class="fa fa-cogs"></i> Profile</a>
           </li>
           <li ng-hide="session.logged_in">
             <a href="/api/1/sessions/login?next_url={{ui_root}}"><i class="fa fa-github"></i> Sign In</a>
@@ -68,17 +69,24 @@
     <script id="{{path}}" type="text/ng-template">{{tmpl|safe}}</script>
   {% endfor %}
 
-  {% assets filters="uglifyjs", output="gen/grano.app.js",
-        "vendor/jquery/dist/jquery.js",
-        "vendor/bootstrap/js/collapse.js",
+  <!--
+    
+    "vendor/bootstrap/js/collapse.js",
+  -->
 
+  {% assets filters="uglifyjs", output="gen/grano.app.js",
+        "vendor/jquery/dist/jquery.js",    
         "vendor/angular/angular.js",
+        "vendor/angular-bootstrap/ui-bootstrap-tpls.js",
         "vendor/angular-route/angular-route.js",
 
         "js/app.js",
         "js/services/core.js",
         "js/services/session.js",
-        "js/controllers/app.js"
+        "js/controllers/app.js",
+        "js/controllers/home.js",
+        "js/controllers/accounts.js",
+        "js/controllers/projects.js"
          %}
       <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {% endassets %}
