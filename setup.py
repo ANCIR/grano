@@ -1,4 +1,8 @@
 from setuptools import setup, find_packages
+import os
+
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 setup(
     name='grano',
@@ -20,8 +24,7 @@ setup(
     namespace_packages=[],
     include_package_data=False,
     zip_safe=False,
-    install_requires=[
-    ],
+    install_requires=required,
     entry_points={
         'grano.entity.change': [
     #        'indexer = grano.logic.indexer:AutoIndexer'
