@@ -11,8 +11,8 @@ your system (consider using `Vagrant <http://www.vagrantup.com/>`_ to isolate th
 project):
 
 * Python 2.7 and `virtualenv <http://www.virtualenv.org/en/latest/>`_
-* Twitter's `bower <https://github.com/bower/bower>`_ for installing JS dependencies.
-* `UglifyJS <https://github.com/mishoo/UglifyJS/>`_ for JS minification.
+* Postgres 9.3 or newer
+* ElasticSearch 0.9 or newer
 
 When you set up grano, first check out the application from GitHub, create a virtual
 environment and install the Python dependencies:
