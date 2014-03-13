@@ -1,7 +1,6 @@
 import logging
 
 from flask import Flask, url_for as _url_for
-from flask.ext.assets import Environment
 from flask.ext.oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 from elasticsearch import Elasticsearch
@@ -29,7 +28,6 @@ app.config.from_object(default_settings)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
 app_name = app.config.get('APP_NAME', 'grano')
 
-assets = Environment(app)
 db = SQLAlchemy(app)
 es = Elasticsearch()
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
