@@ -18,6 +18,8 @@ def validate(data, project):
             validator=colander.All(database_name, same_project))
         label = colander.SchemaNode(colander.String(),
             validator=colander.Length(min=3))
+        private = colander.SchemaNode(colander.Boolean(),
+            missing=False)
         author = colander.SchemaNode(AccountRef())
         settings = colander.SchemaNode(colander.Mapping(),
             missing={})
@@ -38,6 +40,7 @@ def save(data, project=None):
 
     project.settings = data.get('settings')
     project.label = data.get('label')
+    project.private = data.get('private')
     project.updated_at = datetime.utcnow()
     
     db.session.add(project)

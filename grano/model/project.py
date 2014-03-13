@@ -8,6 +8,7 @@ class Project(db.Model, IntBase):
 
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
+    private = db.Column(db.Boolean)
     settings = db.Column(MutableDict.as_mutable(JSONEncodedDict))
 
     author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
@@ -15,6 +16,7 @@ class Project(db.Model, IntBase):
     relations = db.relationship('Relation', backref='project', lazy='dynamic')
     entities = db.relationship('Entity', backref='project', lazy='dynamic')
     schemata = db.relationship('Schema', backref='project', lazy='dynamic')
+    roles = db.relationship('Role', backref='project', lazy='dynamic')
     
 
     @classmethod
