@@ -1,9 +1,8 @@
 import logging 
 
 from flask.ext.script import Manager
-from flask.ext.assets import ManageAssets
 
-from grano.core import db, assets
+from grano.core import db
 from grano.views import app
 from grano.model import Project
 from grano.logic import import_schema, export_schema
@@ -14,12 +13,13 @@ from grano.logic.searcher import search_entities
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as save_project
 from grano.logic import generate_sitemap
-from grano.plugins import list_plugins
+from grano.plugins import list_plugins, notify_plugins
 
 
 log = logging.getLogger('grano')
 manager = Manager(app)
-manager.add_command("assets", ManageAssets(assets))
+
+notify_plugins('grano.startup', lambda o: o.configure(manager))
 
 
 @manager.command

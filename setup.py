@@ -26,6 +26,8 @@ setup(
         'grano.entity.change': [
     #        'indexer = grano.logic.indexer:AutoIndexer'
         ],
+        'grano.relation.change': [],
+        'grano.startup': [],
         'console_scripts': [
             'grano = grano.manage:run',
         ]
