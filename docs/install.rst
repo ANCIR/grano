@@ -45,14 +45,11 @@ Once this is done, you can create the database and import schema specifications:
 
 .. code-block:: bash
 
-    alembic upgrade head
-    python grano/manage.py schema_import <YOUR_MODEL.yaml>
+    grano db upgrade head
+    grano schema_import <YOUR_MODEL.yaml>
     
 Finally, you can run grano:
 
 .. code-block:: bash
 
-    python grano/manage.py runserver 
-
-**Hint:** instead of typing out the commmand ``python grano/manage.py``, you can also 
-use the command-line script ``grano``, which points to the same code.
+    grano runserver 

@@ -61,13 +61,13 @@ and ``label_out``).
 On the command line, each schema is expected to be stored in its own 
 YAML file, which can be imported like this::
 
-    python grano/manage.py schema_import my-project my_schema.yaml
+    grano schema_import my-project my_schema.yaml
 
 The reverse command, ``schema_export`` expects a directory name as its
 sole argument. In the directory, one YAML file will be generated for 
 each schema that is currently defined in ``grano``::
 
-    python grano/manage.py schema_export my-project my_schemata/
+    grano schema_export my-project my_schemata/
 
 
 Base schema

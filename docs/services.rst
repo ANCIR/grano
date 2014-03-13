@@ -16,7 +16,7 @@ the most deeply linked once - essentially as indexing seeds.
 To use the service, make sure the variable ``ENTITY_VIEW_PATTERN`` is set in your settings
 file such that replacing ``%s`` will yield a valid URI for each entity. Then, simply run::
 
-    python grano/manage.py sitemap
+    grano sitemap
 
 The generated file will be located in ``grano/static/sitemap.xml``, which ``robots.txt`` 
 points towards.
