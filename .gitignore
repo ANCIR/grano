@@ -33,9 +33,7 @@ nosetests.xml
 .pydevproject
 
 # grano specific
-grano/static/uigen/*
 grano/static/sitemap.xml
-grano/static/.webassets-cache/*
 
 grano/development.db
 
