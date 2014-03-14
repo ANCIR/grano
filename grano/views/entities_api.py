@@ -78,12 +78,11 @@ def suggest():
     q = q.outerjoin(Permission)
     q = q.filter(or_(Project.private==False,
         and_(Permission.reader==True, Permission.account==request.account)))
-        
-    # TODO: authz check
+    
     q = q.filter(EntityProperty.name=='name')
     q = q.filter(EntityProperty.active==True)
     q = q.filter(EntityProperty.entity_id!=None)
-    q = q.filter(EntityProperty.value.ilike(request.args.get('q') + '%'))
+    q = q.filter(EntityProperty.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
         q = q.filter(Project.slug==request.args.get('project'))
     pager = Pager(q)
