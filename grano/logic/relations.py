@@ -81,24 +81,6 @@ def delete(relation):
     raise NotImplemented()
 
 
-def to_index(relation):
-    """ Convert a relation into a form appropriate for indexing within an 
-    entity (ie. do not include entity data). """
-
-    data = {
-        'id': relation.id,
-        'project': projects_logic.to_rest_index(relation.project),
-        'source': relation.source_id,
-        'target': relation.target_id,
-        'schema': schemata_logic.to_index(relation.schema),
-    }
-
-    for prop in relation.active_properties:
-        data[prop.name] = prop.value
-
-    return data
-
-
 def to_rest_base(relation):
     from grano.logic import entities as entities_logic
     return {
