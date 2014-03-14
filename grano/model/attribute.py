@@ -23,11 +23,18 @@ class Attribute(db.Model, IntBase):
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
     properties = db.relationship('Property', backref='attribute', lazy='dynamic')
 
+
+    @property
+    def value_column(self):
+        return self.DATATYPES.get(self.datatype)
+
+
     @classmethod
     def all_named(cls, name):
         q = db.session.query(cls)
         q = q.filter_by(name=name)
         return q.all()
+
 
     @classmethod
     def by_schema_and_name(cls, schema, name):

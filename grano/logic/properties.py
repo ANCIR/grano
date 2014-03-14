@@ -48,8 +48,7 @@ def set(obj, author, name, schema, attribute, value, active=True, source_url=Non
     prop._set_obj(obj)
     obj.updated_at = datetime.utcnow()
 
-    value_column = Attribute.DATATYPES.get(attribute.datatype)
-    setattr(prop, value_column, value)
+    setattr(prop, attribute.value_column, value)
 
     prop.name = name
     prop.author = author
