@@ -89,15 +89,6 @@ class ESSearcher(object):
                 }
             }
 
-        #query["fields"] = ['name']
-        #query["partial_fields"] = {
-        #    "partial1" : {
-        #        "include" : "*",
-        #        "exclude" : ["inbound.*", "outbound.*", "relations.*"]
-        #    }
-        #}
-
-
         if self._sort_field:
             field, order = self.get_sort()
             query['sort'] = [{field: {'order': order}}]
