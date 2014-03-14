@@ -21,6 +21,8 @@ class AttributeValidator(colander.MappingSchema):
         validator=colander.Length(min=3))
     description = colander.SchemaNode(colander.String(),
         missing='', default='')
+    datatype = colander.SchemaNode(colander.String(),
+        validator=colander.OneOf(Attribute.DATATYPES), missing='string')
     hidden = colander.SchemaNode(colander.Boolean(),
         missing=False)
 

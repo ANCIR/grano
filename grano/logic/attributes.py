@@ -15,6 +15,7 @@ def save(data):
     obj.label = data.get('label')
     obj.hidden = data.get('hidden')
     obj.description = data.get('description')
+    obj.datatype = data.get('datatype')
     obj.schema = schema
     db.session.add(obj)
     return obj
@@ -23,7 +24,8 @@ def save(data):
 def to_index(attribute):
     return {
         'name': attribute.name,
-        'label': attribute.label
+        'label': attribute.label,
+        'datatype': attribute.datatype
     }
 
 
