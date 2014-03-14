@@ -8,7 +8,7 @@ def save(data):
 
     schema = data.get('schema')
     name = data.get('name')
-    obj = Attribute.by_name(schema, name)
+    obj = Attribute.by_schema_and_name(schema, name)
     if obj is None:
         obj = Attribute()
     obj.name = name

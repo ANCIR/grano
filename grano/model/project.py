@@ -19,6 +19,14 @@ class Project(db.Model, IntBase):
     permissions = db.relationship('Permission', backref='project', lazy='dynamic')
     
 
+    def get_attribute(self, obj, name):
+        for schema in self.schemata:
+            if schema.obj == obj:
+                for attr in schema.attributes:
+                    if attr.name == name:
+                        return attr
+
+
     @classmethod
     def by_slug(cls, slug):
         q = db.session.query(cls).filter_by(slug=slug)

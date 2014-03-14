@@ -22,21 +22,29 @@ def validate_properties(data, schemata, name='root'):
         for attr in sche.attributes:
             attrib = colander.SchemaNode(colander.Mapping(),
                 name=attr.name, missing=colander.null)
+
             attrib.add(colander.SchemaNode(colander.String(),
                 validator=colander.Length(min=1),
                 default=None, missing=None, name='value'))
+            
             attrib.add(colander.SchemaNode(colander.Boolean(),
                 default=True, missing=True, name='active'))
             attrib.add(colander.SchemaNode(colander.String(),
-                name='schema', preparer=lambda x: sche))
+                name='schema', missing=sche))
             attrib.add(colander.SchemaNode(colander.String(),
-                name='attribute', preparer=lambda x: attr))
+                name='attribute', missing=attr))
 
             # TODO: check this is a URL?
             attrib.add(colander.SchemaNode(colander.String(),
                 missing=None, name='source_url'))
 
             schema.add(attrib)
+
+    for k, prop in data.items():
+        if 'schema' in prop:
+            del prop['schema']
+        if 'attribute' in prop:
+            del prop['attribute']
 
     data = schema.deserialize(data)
     out = {}

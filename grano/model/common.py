@@ -1,4 +1,6 @@
 from datetime import datetime
+from sqlalchemy import or_, and_
+from sqlalchemy.orm import aliased
 
 from grano.core import db
 from grano.model.util import make_token
@@ -63,19 +65,24 @@ class PropertyBase(object):
         return False
 
     @classmethod
-    def _filter_property(cls, q, name, value, only_active=True):
-        # TODO: move to logic layer?
-        q = q.join(cls.properties, aliased=True)
-        q = q.filter(cls.PropertyClass.name==name)
-        q = q.filter(cls.PropertyClass.value==value)
+    def _filter_property(cls, q, attributes, value, only_active=True):
+        # TODO: this is a steaming pile of shit and needs to be fixed 
+        # at a fundamental level.
+
+        from grano.model.attribute import Attribute
+        Prop = aliased(cls.PropertyClass)
+        q = q.join(Prop)
+        
+        nvs = []
+        for attribute in attributes:
+            column_name = Attribute.DATATYPES.get(attribute.datatype)
+            value_column = getattr(Prop, column_name)
+            nvs.append(and_(Prop.attribute==attribute,
+                            value_column==value))
+
+        q = q.filter(or_(*nvs))
         if only_active:
-            q = q.filter(cls.PropertyClass.active==True)
-        q = q.reset_joinpoint()
-        return q
-
-
-    @classmethod
-    def by_property(cls, name, value, only_active=True):
-        q = db.session.query(cls)
-        q = cls._filter_property(q, name, value, only_active=only_active)
+            q = q.filter(Prop.active==True)
+        
+        #q = q.reset_joinpoint()
         return q

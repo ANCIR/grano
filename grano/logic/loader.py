@@ -81,8 +81,10 @@ class EntityLoader(ObjectLoader):
         q = q.filter(Entity.project==self.loader.project)
         for name, only_active in self.update_criteria:
             value = self.properties.get(name).get('value')
-            q = Entity._filter_property(q, name, value,
+            attr = self.loader.project.get_attribute('entity', name)
+            q = Entity._filter_property(q, [attr], value,
                 only_active=only_active)
+
         entity = q.first()
 
         try:
@@ -121,8 +123,10 @@ class RelationLoader(ObjectLoader):
 
         for name, only_active in self.update_criteria:
             value = self.properties.get(name).get('value')
-            q = Entity._filter_property(q, name, value,
+            attr = self.loader.project.get_attribute('relation', name)
+            q = Entity._filter_property(q, [attr], value,
                 only_active=only_active)
+
         relation = q.first()
 
         try:
