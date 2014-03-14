@@ -47,7 +47,7 @@ class ESSearcher(object):
 
     @property
     def query_text(self):
-        return self.args.get('q', '').strip()
+        return self.args.get('q', '').strip().lower()
 
     @property
     def filters(self):
