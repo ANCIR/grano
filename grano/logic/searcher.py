@@ -66,11 +66,16 @@ class ESSearcher(object):
         query = {'from': self._offset, 'size': self._limit}
         qt = self.query_text
         if qt is not None and len(qt):
-            query["query"] = {
+            string_query = {
                 "query_string": {
                     "query": qt
                 }
             }
+            bool_query = {
+                "bool": {"must": string_query},
+                "should": {"term": {"names": {"value": qt, "boost": 3.0}}}
+                }
+            query["query"] = bool_query
         else:
             query['query'] = {"match_all": {}}
 
@@ -92,6 +97,8 @@ class ESSearcher(object):
             field, order = self.get_sort()
             query['sort'] = [{field: {'order': order}}]
 
+        from pprint import pprint
+        pprint(query)
         self.results = es.search(index=es_index, doc_type='entity',
             body=query)
 

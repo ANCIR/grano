@@ -140,48 +140,26 @@ def apply_alias(project, author, canonical_name, alias_name):
 
 def to_index(entity):
     """ Convert an entity to a form appropriate for search indexing. """
-
-    schemata = list(entity.schemata)
-    data = {
-        'id': entity.id,
-        'project': projects_logic.to_rest_index(entity.project),
-        'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
-        'num_schemata': len(schemata),
-        'num_properties': 0,
-    #    'inbound': [],
-    #    'outbound': [],
-    #    'relations': [],
-        'names': []
-        }
-
-    #for rel in entity.inbound:
-    #    rel_data = relations.to_index(rel)
-    #    data['inbound'].append(rel_data)
-    #    data['relations'].append(rel_data)
-
-    #for rel in entity.outbound:
-    #    rel_data = relations.to_index(rel)
-    #    data['outbound'].append(rel_data)
-    #    data['relations'].append(rel_data)
-
-    data['num_relations'] = entity.degree
-
+    data = to_rest(entity)
+    
+    data['names'] = []
     for prop in entity.properties:
         if prop.name == 'name':
             data['names'].append(prop.value)
-        if prop.active:
-            data[prop.name] = prop.value
-            data['num_properties'] += 1
 
     return data
 
 
 def to_rest_base(entity):
-    return {
+    data = {
         'id': entity.id,
         'project': projects_logic.to_rest_index(entity.project),
-        'api_url': url_for('entities_api.view', id=entity.id)
+        'api_url': url_for('entities_api.view', id=entity.id),
+        'same_as': entity.same_as
     }
+    if entity.same_as:
+        data['same_as_url'] = url_for('entities_api.view', id=entity.same_as)
+    return data
 
 
 def to_rest_index(entity):
