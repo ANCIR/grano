@@ -37,8 +37,7 @@ class ESSearcher(object):
         return self
 
     def add_facet(self, name, size=None):
-        if size is None:
-            size = self._facet_size
+        size = self._facet_size if size is None else size
         self._facets.append((name, size))
 
     def add_filter(self, field, value):
