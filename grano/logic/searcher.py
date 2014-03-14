@@ -97,8 +97,6 @@ class ESSearcher(object):
             field, order = self.get_sort()
             query['sort'] = [{field: {'order': order}}]
 
-        from pprint import pprint
-        pprint(query)
         self.results = es.search(index=es_index, doc_type='entity',
             body=query)
 
