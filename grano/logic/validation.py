@@ -13,42 +13,15 @@ database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
 database_name = colander.All(database_format, database_forbidden)
 
 
-def validate_properties(data, schemata, name='root'):
-    """ Compile a validator for the given set of properties, based on
-    the available schemata. """
-    
-    schema = colander.SchemaNode(colander.Mapping(), name=name)
-    for sche in schemata:
-        for attr in sche.attributes:
-            attrib = colander.SchemaNode(colander.Mapping(),
-                name=attr.name, missing=colander.null)
+class FixedValue(object):
+    def __init__(self, value):
+        self.value = value
 
-            attrib.add(colander.SchemaNode(colander.String(),
-                validator=colander.Length(min=1),
-                default=None, missing=None, name='value'))
-            
-            attrib.add(colander.SchemaNode(colander.Boolean(),
-                default=True, missing=True, name='active'))
-            attrib.add(colander.SchemaNode(colander.String(),
-                name='schema', missing=sche))
-            attrib.add(colander.SchemaNode(colander.String(),
-                name='attribute', missing=attr))
+    def serialize(self, node, appstruct):
+        return colander.null
 
-            # TODO: check this is a URL?
-            attrib.add(colander.SchemaNode(colander.String(),
-                missing=None, name='source_url'))
+    def deserialize(self, node, cstruct):
+        return self.value
 
-            schema.add(attrib)
-
-    for k, prop in data.items():
-        if 'schema' in prop:
-            del prop['schema']
-        if 'attribute' in prop:
-            del prop['attribute']
-
-    data = schema.deserialize(data)
-    out = {}
-    for k, v in data.items():
-        if v != colander.null:
-            out[k] = v
-    return out
+    def cstruct_children(self, node, cstruct):
+        return []

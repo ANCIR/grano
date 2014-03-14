@@ -7,7 +7,6 @@ from grano.lib.exc import NotImplemented
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.logic import projects as projects_logic
-from grano.logic.validation import validate_properties
 from grano.logic.references import ProjectRef, AccountRef, SchemaRef
 from grano.plugins import notify_plugins
 
@@ -38,7 +37,7 @@ def validate(data):
     sane.update(schemata_validator.deserialize(data))
     sane['schemata'] = list(set(sane['schemata']))
 
-    sane['properties'] = validate_properties(
+    sane['properties'] = properties_logic.validate(
         data.get('properties', []),
         sane.get('schemata'),
         name='properties')

@@ -1,7 +1,44 @@
 from datetime import datetime
 
+import colander
+
 from grano.core import db
+from grano.logic.validation import FixedValue
 from grano.model import Entity, Attribute
+
+
+def validate(data, schemata, name='root'):
+    """ Compile a validator for the given set of properties, based on
+    the available schemata. """
+    
+    schema = colander.SchemaNode(colander.Mapping(), name=name)
+    for sche in schemata:
+        for attr in sche.attributes:
+            attrib = colander.SchemaNode(colander.Mapping(),
+                name=attr.name, missing=colander.null)
+
+            attrib.add(colander.SchemaNode(colander.String(),
+                validator=colander.Length(min=1),
+                default=None, missing=None, name='value'))
+            
+            attrib.add(colander.SchemaNode(colander.Boolean(),
+                default=True, missing=True, name='active'))
+            attrib.add(colander.SchemaNode(FixedValue(sche),
+                name='schema'))
+            attrib.add(colander.SchemaNode(FixedValue(attr),
+                name='attribute'))
+
+            attrib.add(colander.SchemaNode(colander.String(),
+                missing=None, name='source_url'))
+
+            schema.add(attrib)
+
+    data = schema.deserialize(data)
+    out = {}
+    for k, v in data.items():
+        if v != colander.null:
+            out[k] = v
+    return out
 
 
 def save(obj, data):
