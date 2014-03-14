@@ -66,10 +66,19 @@ def save(data, entity=None):
         db.session.add(entity)
 
     entity.schemata = list(set(data.get('schemata')))
-    properties_logic.set_many(entity, data.get('author'),
-        data.get('properties'))
-    db.session.flush()
 
+    prop_names = set()
+    for name, prop in data.get('properties').items():
+        prop_names.add(name)
+        prop['name'] = name
+        prop['author'] = data.get('author')
+        properties_logic.save(entity, prop)
+
+    for prop in entity.properties:
+        if prop.name not in prop_names:
+            prop.active = False
+
+    db.session.flush()
     _entity_changed.delay(entity.id)    
     return entity
 

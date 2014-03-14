@@ -69,10 +69,20 @@ def save(data, relation=None):
     relation.source = data.get('source')
     relation.target = data.get('target')
     relation.schema = data.get('schema')
-    properties_logic.set_many(relation, data.get('author'),
-        data.get('properties'))
-    db.session.flush()
-    
+
+
+    prop_names = set()
+    for name, prop in data.get('properties').items():
+        prop_names.add(name)
+        prop['name'] = name
+        prop['author'] = data.get('author')
+        properties_logic.save(relation, prop)
+
+    for prop in relation.properties:
+        if prop.name not in prop_names:
+            prop.active = False
+
+    db.session.flush()    
     _relation_changed.delay(relation.id)
     return relation
 
