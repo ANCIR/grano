@@ -29,6 +29,8 @@ def validate_properties(data, schemata, name='root'):
                 default=True, missing=True, name='active'))
             attrib.add(colander.SchemaNode(colander.String(),
                 name='schema', preparer=lambda x: sche))
+            attrib.add(colander.SchemaNode(colander.String(),
+                name='attribute', preparer=lambda x: attr))
 
             # TODO: check this is a URL?
             attrib.add(colander.SchemaNode(colander.String(),

@@ -22,7 +22,7 @@ class AttributeValidator(colander.MappingSchema):
     description = colander.SchemaNode(colander.String(),
         missing='', default='')
     datatype = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(Attribute.DATATYPES), missing='string')
+        validator=colander.OneOf(Attribute.DATATYPES.keys()), missing='string')
     hidden = colander.SchemaNode(colander.Boolean(),
         missing=False)
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from grano.core import db
-from grano.model import Entity
+from grano.model import Entity, Attribute
 
 
 def set_many(obj, author, properties):
@@ -11,11 +11,11 @@ def set_many(obj, author, properties):
     current_properties = list(obj.properties)
     for name, prop in properties.items():
         relevant = [p for p in current_properties if p.name == name]
-        set(obj, author, name, prop.get('schema'), prop.get('value'),
+        set(obj, author, name, prop.get('schema'), prop.get('attribute'), prop.get('value'),
             prop.get('active'), prop.get('source_url'), relevant)
 
 
-def set(obj, author, name, schema, value, active=True, source_url=None,
+def set(obj, author, name, schema, attribute, value, active=True, source_url=None,
     properties=None):
     """ Set a property on the given object (entity or relation). This will
     either create a new property object or re-activate an existing object
@@ -48,10 +48,13 @@ def set(obj, author, name, schema, value, active=True, source_url=None,
     prop._set_obj(obj)
     obj.updated_at = datetime.utcnow()
 
+    value_column = Attribue.DATATYPES.get(attribute.datatype)
+    setattr(prop, value_column, value)
+
     prop.name = name
     prop.author = author
     prop.schema = schema
-    prop.value = value
+    prop.attribute = attribute
     prop.active = active
     prop.source_url = source_url
     prop.updated_at = datetime.utcnow()
@@ -59,9 +62,12 @@ def set(obj, author, name, schema, value, active=True, source_url=None,
 
 
 def to_rest_index(prop):
+    value = prop.value
+    if isinstance(value, datetime):
+        value = value.isoformat()
     return prop.name, {
         #'id': prop.id,
-        'value': prop.value,
+        'value': value,
         #'active': prop.active,
         'source_url': prop.source_url
     }
