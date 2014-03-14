@@ -18,10 +18,20 @@ blueprint = Blueprint('sessions_api', __name__)
 
 @blueprint.route('/api/1/sessions', methods=['GET'])
 def status():
+    permissions = {}
+    if authz.logged_in():
+        for permission in request.account.permissions:
+            permissions[permission.project.slug] = {
+                'reader': permission.reader,
+                'editor': permission.editor,
+                'admin': permission.admin
+            }
+
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': request.account.api_key if authz.logged_in() else None,
-        'account': accounts.to_rest(request.account) if request.account else None
+        'account': accounts.to_rest(request.account) if request.account else None,
+        'permissions': permissions
     })
 
 

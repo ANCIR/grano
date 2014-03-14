@@ -16,7 +16,7 @@ class Project(db.Model, IntBase):
     relations = db.relationship('Relation', backref='project', lazy='dynamic')
     entities = db.relationship('Entity', backref='project', lazy='dynamic')
     schemata = db.relationship('Schema', backref='project', lazy='dynamic')
-    roles = db.relationship('Role', backref='project', lazy='dynamic')
+    permissions = db.relationship('Permission', backref='project', lazy='dynamic')
     
 
     @classmethod

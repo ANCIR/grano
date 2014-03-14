@@ -1,6 +1,14 @@
 from flask import request
 
+from grano.model import Permission
 from grano.lib.exc import Forbidden
+
+
+def _find_permission(project):
+    q = Permission.all()
+    q = q.filter_by(project=project)
+    q = q.filter_by(account=request.account)
+    return q
 
 
 def logged_in():
@@ -14,13 +22,15 @@ def project_create():
 def project_edit(project):
     if not logged_in():
         return False
-    if project.author_id == request.account.id:
-        return True
-    return False
+    q = _find_permission(project).filter_by(editor=True)
+    return q.count() > 0
 
 
 def project_manage(project):
-    return project_edit(project)
+    if not logged_in():
+        return False
+    q = _find_permission(project).filter_by(admin=True)
+    return q.count() > 0
 
 
 def project_delete(project):

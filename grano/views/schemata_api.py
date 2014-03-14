@@ -50,7 +50,7 @@ def update(slug, name):
     authz.require(authz.project_manage(project))
     schema = object_or_404(Schema.by_name(project, name))
     data = request_data({'project': project})
-    project = schemata.save(data, schema=schema)
+    schema = schemata.save(data, schema=schema)
     db.session.commit()
     return jsonify(schemata.to_rest(schema))
 

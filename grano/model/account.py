@@ -19,7 +19,7 @@ class Account(db.Model, IntBase):
     properties = db.relationship('Property', backref='author', lazy='dynamic')
     relations = db.relationship('Relation', backref='author', lazy='dynamic')
     entities = db.relationship('Entity', backref='author', lazy='dynamic')
-    roles = db.relationship('Role', backref='account', lazy='dynamic')
+    permissions = db.relationship('Permission', backref='account', lazy='dynamic')
     
     @property
     def display_name(self):
