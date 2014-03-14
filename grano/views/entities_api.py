@@ -54,8 +54,11 @@ def view(id):
 @blueprint.route('/api/1/entities/_search', methods=['GET'])
 def search():
     searcher = ESSearcher(request.args)
+    if 'project' in request.args:
+        searcher.add_filter('project.slug', request.args.get('project'))
     pager = Pager(searcher)
-    conv = lambda c: [x for x in c]
+    # TODO: get all entities at once: 
+    conv = lambda res: [entities.to_rest_index(Entity.by_id(r.get('id'))) for r in res]
     data = pager.to_dict(results_converter=conv)
     data['facets'] = searcher.facets()
     return jsonify(data)
