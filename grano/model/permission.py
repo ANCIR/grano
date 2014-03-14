@@ -2,8 +2,8 @@ from grano.core import db
 from grano.model.common import IntBase
 
 
-class Role(db.Model, IntBase):
-    __tablename__ = 'role'
+class Permission(db.Model, IntBase):
+    __tablename__ = 'permission'
 
     reader = db.Column(db.Boolean)
     editor = db.Column(db.Boolean)
