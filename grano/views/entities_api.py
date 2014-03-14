@@ -54,6 +54,7 @@ def view(id):
 @blueprint.route('/api/1/entities/_search', methods=['GET'])
 def search():
     searcher = ESSearcher(request.args)
+    searcher.add_filter('same_as', None)
     if 'project' in request.args:
         searcher.add_filter('project.slug', request.args.get('project'))
     pager = Pager(searcher)
