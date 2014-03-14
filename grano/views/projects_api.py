@@ -20,7 +20,7 @@ blueprint = Blueprint('projects_api', __name__)
 @blueprint.route('/api/1/projects', methods=['GET'])
 def index():
     q = Project.all()
-    q = q.join(Permission)
+    q = q.outerjoin(Permission)
     q = q.filter(or_(Project.private==False,
         and_(Permission.reader==True, Permission.account==request.account)))
     pager = Pager(q)

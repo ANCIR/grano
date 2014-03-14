@@ -38,6 +38,13 @@ def save(data, project=None):
         project.slug = data.get('slug')
         project.author = data.get('author')
 
+        from grano.logic import permissions as permissions_logic
+        permissions_logic.save({
+            'account': data.get('author'),
+            'project': project,
+            'admin': True
+            })
+
     project.settings = data.get('settings')
     project.label = data.get('label')
     project.private = data.get('private')

@@ -20,8 +20,8 @@ def project_create():
 
 
 def project_read(project):
-    if not logged_in():
-        return False
+    if not project.private:
+        return True
     q = _find_permission(project).filter_by(reader=True)
     return q.count() > 0
 
