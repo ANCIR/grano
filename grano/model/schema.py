@@ -6,7 +6,7 @@ from grano.model.property import Property
 
 
 class Schema(db.Model, IntBase):
-    __tablename__ = 'schema'
+    __tablename__ = 'grano_schema'
 
     name = db.Column(db.Unicode())
     label = db.Column(db.Unicode())
@@ -18,7 +18,7 @@ class Schema(db.Model, IntBase):
     attributes = db.relationship(Attribute, backref='schema', lazy='joined')
     properties = db.relationship(Property, backref='schema', lazy='dynamic')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic')
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
 
     def get_attribute(self, name):
         for attribute in self.attributes:

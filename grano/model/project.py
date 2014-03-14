@@ -4,14 +4,14 @@ from grano.model.common import IntBase
 
 
 class Project(db.Model, IntBase):
-    __tablename__ = 'project'
+    __tablename__ = 'grano_project'
 
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
     private = db.Column(db.Boolean, default=False)
     settings = db.Column(MutableDict.as_mutable(JSONEncodedDict))
 
-    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     relations = db.relationship('Relation', backref='project', lazy='dynamic')
     entities = db.relationship('Entity', backref='project', lazy='dynamic')

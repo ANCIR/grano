@@ -53,20 +53,21 @@ def upgrade():
     connection = op.get_bind()
     rp = connection.execute(projects.select())
 
-    perm_seed = []
-    for row in rp.fetchall():
-        row = dict(zip(row.keys(), tuple(row)))
-        perm_seed.append({
-            'account_id': row.get('author_id'),
-            'project_id': row.get('id'),
-            'admin': True,
-            'reader': True,
-            'editor': True,
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow()
-            })
+    if rp is not None:
+        perm_seed = []
+        for row in rp.fetchall():
+            row = dict(zip(row.keys(), tuple(row)))
+            perm_seed.append({
+                'account_id': row.get('author_id'),
+                'project_id': row.get('id'),
+                'admin': True,
+                'reader': True,
+                'editor': True,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+                })
 
-    op.bulk_insert(perms, perm_seed)
+        op.bulk_insert(perms, perm_seed)
 
 
 def downgrade():

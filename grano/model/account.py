@@ -4,7 +4,7 @@ from grano.model.common import IntBase
 
 
 class Account(db.Model, IntBase):
-    __tablename__ = 'account'
+    __tablename__ = 'grano_account'
 
     github_id = db.Column(db.Unicode)
     twitter_id = db.Column(db.Unicode)

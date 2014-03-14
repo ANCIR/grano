@@ -3,10 +3,10 @@ from grano.model.common import IntBase
 
 
 class Property(db.Model, IntBase):
-    __tablename__ = 'property'
+    __tablename__ = 'grano_property'
 
-    schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     name = db.Column(db.Unicode(), index=True)
     value = db.Column(db.Unicode())
@@ -29,7 +29,7 @@ class Property(db.Model, IntBase):
 class EntityProperty(Property):
     __mapper_args__ = {'polymorphic_identity': 'entity'}
 
-    entity_id = db.Column(db.Unicode(), db.ForeignKey('entity.id'), index=True)
+    entity_id = db.Column(db.Unicode(), db.ForeignKey('grano_entity.id'), index=True)
 
     def _set_obj(self, obj):
         self.entity = obj
@@ -38,7 +38,7 @@ class EntityProperty(Property):
 class RelationProperty(Property):
     __mapper_args__ = {'polymorphic_identity': 'relation'}
 
-    relation_id = db.Column(db.Unicode(), db.ForeignKey('relation.id'),
+    relation_id = db.Column(db.Unicode(), db.ForeignKey('grano_relation.id'),
                             index=True)
 
     def _set_obj(self, obj):

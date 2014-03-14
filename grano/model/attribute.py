@@ -4,13 +4,13 @@ from grano.model.util import slugify_column
 
 
 class Attribute(db.Model, IntBase):
-    __tablename__ = 'attribute'
+    __tablename__ = 'grano_attribute'
 
     name = db.Column(db.Unicode())
     label = db.Column(db.Unicode())
     description = db.Column(db.Unicode())
     hidden = db.Column(db.Boolean())
-    schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
+    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
 
 
     @classmethod
