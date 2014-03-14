@@ -19,6 +19,13 @@ def project_create():
     return logged_in()
 
 
+def project_read(project):
+    if not logged_in():
+        return False
+    q = _find_permission(project).filter_by(reader=True)
+    return q.count() > 0
+
+
 def project_edit(project):
     if not logged_in():
         return False

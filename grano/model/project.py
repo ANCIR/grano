@@ -8,7 +8,7 @@ class Project(db.Model, IntBase):
 
     slug = db.Column(db.Unicode)
     label = db.Column(db.Unicode)
-    private = db.Column(db.Boolean)
+    private = db.Column(db.Boolean, default=False)
     settings = db.Column(MutableDict.as_mutable(JSONEncodedDict))
 
     author_id = db.Column(db.Integer, db.ForeignKey('account.id'))

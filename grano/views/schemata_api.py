@@ -18,6 +18,7 @@ blueprint = Blueprint('schemata_api', __name__)
 @blueprint.route('/api/1/projects/<slug>/schemata', methods=['GET'])
 def index(slug):
     project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_read(project))
     validate_cache(last_modified=project.updated_at)
     query = Schema.all()
     query = query.filter_by(project=project)
@@ -39,7 +40,9 @@ def create(slug):
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['GET'])
 def view(slug, name):
     project = object_or_404(Project.by_slug(slug))
-    validate_cache(last_modified=project.updated_at)
+    authz.require(authz.project_read(project))
+    if not project.private:
+        validate_cache(last_modified=project.updated_at)
     schema = object_or_404(Schema.by_name(project, name))
     return jsonify(schemata.to_rest(schema))
 

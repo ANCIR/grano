@@ -1,4 +1,7 @@
-from grano.model import Project
+from flask import request
+from sqlalchemy import or_, and_
+
+from grano.model import Project, Permission
 
 
 PROPERTY = 'property-'
@@ -6,10 +9,14 @@ ALIASES = 'aliases-'
 
 
 def filter_query(cls, q, args):
-
+    q = q.join(Project)
+    q = q.join(Permission)
+    q = q.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
+    
     project = args.getlist('project')
     if len(project) and len(project[0].strip()):
-        q = q.join(Project).filter(Project.slug==project[0])
+        q = q.filter(Project.slug==project[0])
     
     for key in args.keys():
         if key.startswith(PROPERTY):
