@@ -7,6 +7,15 @@ from grano.logic.validation import FixedValue
 from grano.model import Entity, Attribute
 
 
+DATATYPE_TYPES = {
+    'integer': colander.Integer,
+    'float': colander.Float,
+    'boolean': colander.Boolean,
+    'string': colander.String,
+    'datetime': colander.DateTime
+}
+
+
 def validate(data, schemata, name='root'):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
@@ -17,16 +26,13 @@ def validate(data, schemata, name='root'):
             attrib = colander.SchemaNode(colander.Mapping(),
                 name=attr.name, missing=colander.null)
 
-            attrib.add(colander.SchemaNode(colander.String(),
-                validator=colander.Length(min=1),
-                default=None, missing=None, name='value'))
+            T = DATATYPE_TYPES.get(attr.datatype)
+            attrib.add(colander.SchemaNode(T(), missing=None, name='value'))
             
             attrib.add(colander.SchemaNode(colander.Boolean(),
                 default=True, missing=True, name='active'))
-            attrib.add(colander.SchemaNode(FixedValue(sche),
-                name='schema'))
-            attrib.add(colander.SchemaNode(FixedValue(attr),
-                name='attribute'))
+            attrib.add(colander.SchemaNode(FixedValue(sche), name='schema'))
+            attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
 
             attrib.add(colander.SchemaNode(colander.String(),
                 missing=None, name='source_url'))
