@@ -1,0 +1,3 @@
+include LICENSE requirements.txt Procfile
+recursive-include alembic *
+global-exclude *.pyc

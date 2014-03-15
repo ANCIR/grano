@@ -11,8 +11,8 @@ your system (consider using `Vagrant <http://www.vagrantup.com/>`_ to isolate th
 project):
 
 * Python 2.7 and `virtualenv <http://www.virtualenv.org/en/latest/>`_
-* Twitter's `bower <https://github.com/bower/bower>`_ for installing JS dependencies.
-* `UglifyJS <https://github.com/mishoo/UglifyJS/>`_ for JS minification.
+* Postgres 9.3 or newer
+* ElasticSearch 0.9 or newer
 
 When you set up grano, first check out the application from GitHub, create a virtual
 environment and install the Python dependencies:
@@ -45,14 +45,11 @@ Once this is done, you can create the database and import schema specifications:
 
 .. code-block:: bash
 
-    alembic upgrade head
-    python grano/manage.py schema_import <YOUR_MODEL.yaml>
+    grano db upgrade head
+    grano schema_import <YOUR_MODEL.yaml>
     
 Finally, you can run grano:
 
 .. code-block:: bash
 
-    python grano/manage.py runserver 
-
-**Hint:** instead of typing out the commmand ``python grano/manage.py``, you can also 
-use the command-line script ``grano``, which points to the same code.
+    grano runserver 

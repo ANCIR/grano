@@ -1,9 +1,9 @@
 import logging 
 
 from flask.ext.script import Manager
-from flask.ext.assets import ManageAssets
+from flask.ext.migrate import MigrateCommand
 
-from grano.core import db, assets
+from grano.core import db, migrate
 from grano.views import app
 from grano.model import Project
 from grano.logic import import_schema, export_schema
@@ -14,18 +14,14 @@ from grano.logic.searcher import search_entities
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as save_project
 from grano.logic import generate_sitemap
-from grano.plugins import list_plugins
+from grano.plugins import list_plugins, notify_plugins
 
 
 log = logging.getLogger('grano')
 manager = Manager(app)
-manager.add_command("assets", ManageAssets(assets))
-
-
-@manager.command
-def createdb():
-    """ Create the database schema. """
-    db.create_all()
+manager.add_command('db', MigrateCommand)
+    
+notify_plugins('grano.startup', lambda o: o.configure(manager))
 
 
 @manager.command
@@ -104,10 +100,8 @@ def sitemap(count=40000):
 def search(text):
     """ Search for a query string. """
     res = search_entities({'q': text})
-
     for hit in res:
         log.info("%s: %s", hit.get('_id'), hit.get('_source').get('name'))
-
     log.info("Total hits: %s", res.count())
 
 

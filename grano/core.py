@@ -1,9 +1,10 @@
+import os
 import logging
 
 from flask import Flask, url_for as _url_for
-from flask.ext.assets import Environment
 from flask.ext.oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.migrate import Migrate
 from elasticsearch import Elasticsearch
 from celery import Celery
 
@@ -29,8 +30,11 @@ app.config.from_object(default_settings)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
 app_name = app.config.get('APP_NAME', 'grano')
 
-assets = Environment(app)
 db = SQLAlchemy(app)
+
+ALEMBIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../alembic'))
+migrate = Migrate(app, db, directory=ALEMBIC_DIR)
+
 es = Elasticsearch()
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
     broker=app.config['CELERY_BROKER_URL'])

@@ -50,6 +50,7 @@ def create():
 @blueprint.route('/api/1/relations/<id>', methods=['GET'])
 def view(id):
     relation = object_or_404(Relation.by_id(id))
+    authz.require(authz.project_read(relation.project))
     return jsonify(relations.to_rest(relation))
 
 

@@ -97,7 +97,7 @@ class GraphExtractor(object):
         filters.append(table.c.id==property_name.c.entity_id)
         filters.append(property_name.c.active==True)
         filters.append(property_name.c.name=='name')
-        fields.append(property_name.c.value.label(name + '.property.name'))
+        fields.append(property_name.c.value_string.label(name + '.property.name'))
         return (fields, filters, [table, property_name])
 
 

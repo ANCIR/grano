@@ -28,3 +28,13 @@ class RelationChangeProcessor(object):
         """ Notify the plugin that a relation has changed. The plugin 
         will only receive the ID and must query for the object itself. """
 
+
+class Startup(object):
+    """ This interface will be called when grano is started and allows
+    plugins to register additional functionality such as flask views.
+    """
+
+    @abc.abstractmethod
+    def configure(self, manager):
+        """ Run this on startup. """
+

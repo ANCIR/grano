@@ -37,8 +37,7 @@ class ESSearcher(object):
         return self
 
     def add_facet(self, name, size=None):
-        if size is None:
-            size = self._facet_size
+        size = self._facet_size if size is None else size
         self._facets.append((name, size))
 
     def add_filter(self, field, value):
@@ -48,7 +47,7 @@ class ESSearcher(object):
 
     @property
     def query_text(self):
-        return self.args.get('q', '').strip()
+        return self.args.get('q', '').strip().lower()
 
     @property
     def filters(self):
@@ -67,11 +66,16 @@ class ESSearcher(object):
         query = {'from': self._offset, 'size': self._limit}
         qt = self.query_text
         if qt is not None and len(qt):
-            query["query"] = {
+            string_query = {
                 "query_string": {
                     "query": qt
                 }
             }
+            bool_query = {
+                "bool": {"must": string_query},
+                "should": {"term": {"names": {"value": qt, "boost": 3.0}}}
+                }
+            query["query"] = bool_query
         else:
             query['query'] = {"match_all": {}}
 
@@ -88,15 +92,6 @@ class ESSearcher(object):
                     "filter": _filters
                 }
             }
-
-        #query["fields"] = ['name']
-        #query["partial_fields"] = {
-        #    "partial1" : {
-        #        "include" : "*",
-        #        "exclude" : ["inbound.*", "outbound.*", "relations.*"]
-        #    }
-        #}
-
 
         if self._sort_field:
             field, order = self.get_sort()

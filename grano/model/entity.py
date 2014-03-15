@@ -6,19 +6,19 @@ from grano.model.relation import Relation
 from grano.model.property import EntityProperty
 
 
-entity_schema = db.Table('entity_schema',
-    db.Column('entity_id', db.Unicode, db.ForeignKey('entity.id')),
-    db.Column('schema_id', db.Integer, db.ForeignKey('schema.id'))
+entity_schema = db.Table('grano_entity_schema',
+    db.Column('entity_id', db.Unicode, db.ForeignKey('grano_entity.id')),
+    db.Column('schema_id', db.Integer, db.ForeignKey('grano_schema.id'))
 )
 
 
 class Entity(db.Model, UUIDBase, PropertyBase):
-    __tablename__ = 'entity'
+    __tablename__ = 'grano_entity'
     PropertyClass = EntityProperty
 
-    same_as = db.Column(db.Unicode, db.ForeignKey('entity.id'), nullable=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    author_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    same_as = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'), nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     schemata = db.relationship('Schema', secondary=entity_schema,
         backref=db.backref('entities', lazy='dynamic'))

@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, Response, request
 from flask import redirect, make_response, url_for
+from sqlalchemy import or_, and_
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Project
+from grano.model import Project, Permission
 from grano.logic import projects
 from grano.lib.pager import Pager
 from grano.logic.graph import GraphExtractor
@@ -18,8 +19,11 @@ blueprint = Blueprint('projects_api', __name__)
 
 @blueprint.route('/api/1/projects', methods=['GET'])
 def index():
-    query = Project.all()
-    pager = Pager(query)
+    q = Project.all()
+    q = q.outerjoin(Permission)
+    q = q.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
+    pager = Pager(q)
     conv = lambda es: [projects.to_rest_index_stats(e) for e in es]
     return jsonify(pager.to_dict(conv))
 
@@ -35,15 +39,19 @@ def create():
 @blueprint.route('/api/1/projects/<slug>', methods=['GET'])
 def view(slug):
     project = object_or_404(Project.by_slug(slug))
-    validate_cache(last_modified=project.updated_at)
+    authz.require(authz.project_read(project))
+    if not project.private:
+        validate_cache(last_modified=project.updated_at)
     return jsonify(projects.to_rest(project))
 
 
 @blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])
 def graph(slug):
     project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_read(project))
     extractor = GraphExtractor(project_id=project.id)
-    validate_cache(keys=extractor.to_hash())
+    if not project.private:
+        validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')

@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, Response
 from flask import redirect, make_response
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, Schema, EntityProperty, Project
+from grano.model import Entity, Schema, EntityProperty, Project, Permission
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
@@ -48,14 +49,19 @@ def create():
 @blueprint.route('/api/1/entities/<id>', methods=['GET'])
 def view(id):
     entity = object_or_404(Entity.by_id(id))
+    authz.require(authz.project_read(entity.project))
     return jsonify(entities.to_rest(entity))
 
 
 @blueprint.route('/api/1/entities/_search', methods=['GET'])
 def search():
+    # TODO: move to be project-specific, the implement access control!
     searcher = ESSearcher(request.args)
+    if 'project' in request.args:
+        searcher.add_filter('project.slug', request.args.get('project'))
     pager = Pager(searcher)
-    conv = lambda c: [x for x in c]
+    # TODO: get all entities at once:
+    conv = lambda res: [entities.to_rest_index(Entity.by_id(r.get('id'))) for r in res]
     data = pager.to_dict(results_converter=conv)
     data['facets'] = searcher.facets()
     return jsonify(data)
@@ -67,13 +73,17 @@ def suggest():
         raise BadRequest("Missing the query ('q' parameter).")
 
     q = db.session.query(EntityProperty)
+    q = q.join(Entity)
+    q = q.join(Project)
+    q = q.outerjoin(Permission)
+    q = q.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
+    
     q = q.filter(EntityProperty.name=='name')
     q = q.filter(EntityProperty.active==True)
     q = q.filter(EntityProperty.entity_id!=None)
-    q = q.filter(EntityProperty.value.ilike(request.args.get('q') + '%'))
+    q = q.filter(EntityProperty.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
-        q = q.join(Entity)
-        q = q.join(Project)
         q = q.filter(Project.slug==request.args.get('project'))
     pager = Pager(q)
 
@@ -93,6 +103,7 @@ def suggest():
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
 def graph(id):
     entity = object_or_404(Entity.by_id(id))
+    authz.require(authz.project_read(entity.project))
     extractor = GraphExtractor(root_id=entity.id)
     validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':

@@ -7,7 +7,6 @@ from grano.lib.exc import NotImplemented
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.logic import projects as projects_logic
-from grano.logic.validation import validate_properties
 from grano.logic.references import ProjectRef, AccountRef, SchemaRef
 from grano.plugins import notify_plugins
 
@@ -38,7 +37,7 @@ def validate(data):
     sane.update(schemata_validator.deserialize(data))
     sane['schemata'] = list(set(sane['schemata']))
 
-    sane['properties'] = validate_properties(
+    sane['properties'] = properties_logic.validate(
         data.get('properties', []),
         sane.get('schemata'),
         name='properties')
@@ -66,10 +65,19 @@ def save(data, entity=None):
         db.session.add(entity)
 
     entity.schemata = list(set(data.get('schemata')))
-    properties_logic.set_many(entity, data.get('author'),
-        data.get('properties'))
-    db.session.flush()
 
+    prop_names = set()
+    for name, prop in data.get('properties').items():
+        prop_names.add(name)
+        prop['name'] = name
+        prop['author'] = data.get('author')
+        properties_logic.save(entity, prop)
+
+    for prop in entity.properties:
+        if prop.name not in prop_names:
+            prop.active = False
+
+    db.session.flush()
     _entity_changed.delay(entity.id)    
     return entity
 
@@ -140,48 +148,26 @@ def apply_alias(project, author, canonical_name, alias_name):
 
 def to_index(entity):
     """ Convert an entity to a form appropriate for search indexing. """
-
-    schemata = list(entity.schemata)
-    data = {
-        'id': entity.id,
-        'project': projects_logic.to_rest_index(entity.project),
-        'schemata': [schemata_logic.to_index(s) for s in schemata if s.name != 'base'],
-        'num_schemata': len(schemata),
-        'num_properties': 0,
-    #    'inbound': [],
-    #    'outbound': [],
-    #    'relations': [],
-        'names': []
-        }
-
-    #for rel in entity.inbound:
-    #    rel_data = relations.to_index(rel)
-    #    data['inbound'].append(rel_data)
-    #    data['relations'].append(rel_data)
-
-    #for rel in entity.outbound:
-    #    rel_data = relations.to_index(rel)
-    #    data['outbound'].append(rel_data)
-    #    data['relations'].append(rel_data)
-
-    data['num_relations'] = entity.degree
-
+    data = to_rest(entity)
+    
+    data['names'] = []
     for prop in entity.properties:
         if prop.name == 'name':
             data['names'].append(prop.value)
-        if prop.active:
-            data[prop.name] = prop.value
-            data['num_properties'] += 1
 
     return data
 
 
 def to_rest_base(entity):
-    return {
+    data = {
         'id': entity.id,
         'project': projects_logic.to_rest_index(entity.project),
-        'api_url': url_for('entities_api.view', id=entity.id)
+        'api_url': url_for('entities_api.view', id=entity.id),
+        'same_as': entity.same_as
     }
+    if entity.same_as:
+        data['same_as_url'] = url_for('entities_api.view', id=entity.same_as)
+    return data
 
 
 def to_rest_index(entity):

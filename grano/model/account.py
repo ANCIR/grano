@@ -4,7 +4,7 @@ from grano.model.common import IntBase
 
 
 class Account(db.Model, IntBase):
-    __tablename__ = 'account'
+    __tablename__ = 'grano_account'
 
     github_id = db.Column(db.Unicode)
     twitter_id = db.Column(db.Unicode)
@@ -19,6 +19,7 @@ class Account(db.Model, IntBase):
     properties = db.relationship('Property', backref='author', lazy='dynamic')
     relations = db.relationship('Relation', backref='author', lazy='dynamic')
     entities = db.relationship('Entity', backref='author', lazy='dynamic')
+    permissions = db.relationship('Permission', backref='account', lazy='dynamic')
     
     @property
     def display_name(self):

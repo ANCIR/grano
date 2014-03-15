@@ -7,7 +7,6 @@ from grano.model import Relation
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
 from grano.logic import projects as projects_logic
-from grano.logic.validation import validate_properties
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
 from grano.plugins import notify_plugins
@@ -39,7 +38,7 @@ def validate(data):
 
     sane.update(schema_validator.deserialize(data))
 
-    sane['properties'] = validate_properties(
+    sane['properties'] = properties_logic.validate(
         data.get('properties', []),
         [sane.get('schema')],
         name='properties')
@@ -69,34 +68,26 @@ def save(data, relation=None):
     relation.source = data.get('source')
     relation.target = data.get('target')
     relation.schema = data.get('schema')
-    properties_logic.set_many(relation, data.get('author'),
-        data.get('properties'))
-    db.session.flush()
-    
+
+
+    prop_names = set()
+    for name, prop in data.get('properties').items():
+        prop_names.add(name)
+        prop['name'] = name
+        prop['author'] = data.get('author')
+        properties_logic.save(relation, prop)
+
+    for prop in relation.properties:
+        if prop.name not in prop_names:
+            prop.active = False
+
+    db.session.flush()    
     _relation_changed.delay(relation.id)
     return relation
 
 
 def delete(relation):
     raise NotImplemented()
-
-
-def to_index(relation):
-    """ Convert a relation into a form appropriate for indexing within an 
-    entity (ie. do not include entity data). """
-
-    data = {
-        'id': relation.id,
-        'project': projects_logic.to_rest_index(relation.project),
-        'source': relation.source_id,
-        'target': relation.target_id,
-        'schema': schemata_logic.to_index(relation.schema),
-    }
-
-    for prop in relation.active_properties:
-        data[prop.name] = prop.value
-
-    return data
 
 
 def to_rest_base(relation):

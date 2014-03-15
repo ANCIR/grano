@@ -7,3 +7,4 @@ from grano.model.entity import Entity
 from grano.model.relation import Relation
 from grano.model.account import Account
 from grano.model.project import Project
+from grano.model.permission import Permission
