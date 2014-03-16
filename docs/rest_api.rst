@@ -192,6 +192,53 @@ are mutable, except for ``name``, ``project`` and the automatically generated
 fields.
 
 
+Permissions
++++++++++++
+
+Permissions connect projects and accounts, granting individual users one or multiple 
+of the following rights: ``reader``, ``editor``, ``admin``. Posessing a more important
+role automatically implies that less important roles will be granted, too.
+
+::
+
+    GET /api/1/projects/<slug>/permissions
+
+Retrieves a collection of all permissions that are available in the context of 
+the project identified by ``slug``. This collection is only available to
+administrators of the project. Standard :ref:`pager` arguments are available.
+
+::
+
+    GET /api/1/projects/<slug>/permissions/<id>
+
+Retrieves a single permission from the API, including all attributes. This
+resource is only available to administrators of the project or the user affected.
+
+::
+
+    POST /api/1/projects/<slug>/permissions
+
+Operation to create a new permission. The ``account`` property is required, and 
+a role such as ``reader``, ``editor`` or ``admin`` should be set to ``true``.
+``slug`` must be a valid url name, i.e. it may not contain non-alphanumeric
+characters, except the underscore.
+
+::
+
+    POST /api/1/projects/<slug>/permissions/<id>
+
+Update an existing permissions. Most of the fields returned by the ``GET`` operation 
+are mutable, except for ``account`` and ``project`` and the automatically generated
+fields.
+
+::
+
+    DELETE /api/1/projects/<slug>/permissions/<id>
+
+Revoke an existing permissions. This will delete the permission and remove all access
+rights from the affected user.
+
+
 Entities
 ++++++++
 
