@@ -24,7 +24,11 @@ def save(data, account=None):
 def console_account(login='_system'):
     account = Account.by_login(login)
     if account is None:
-        account = save({'login': login, 'id': None, 'email': None})
+        account = save({
+            'login': login,
+            'email': None,
+            'full_name': 'System Operations'
+            })
     return account
 
 
