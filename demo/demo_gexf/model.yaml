@@ -1,0 +1,53 @@
+- name: category
+  label: Category
+  obj: entity
+  hidden: no
+  attributes:
+    - name: category
+      label: Category
+
+- name: activity
+  label: Activity
+  obj: entity
+  hidden: no
+  attributes:
+    - name: type
+      label: Type
+      datatype: string
+
+- name: person
+  label: Person
+  obj: entity
+  hidden: no
+  attributes: []
+
+- name: university
+  label: University
+  obj: entity
+  attributes:
+    - name: latitude
+      label: Latitude
+      datatype: float
+    - name: longitude
+      label: Longitude
+      datatype: float
+
+- name: affiliation
+  label: Affiliation
+  label_in: Employed by
+  label_out: Affiliated to
+  obj: relation
+  attributes:
+    - name: weight
+      label: weight
+      datatype: float
+
+- name: participation
+  label: Participation
+  label_in: Participants
+  label_out: Participation in activity
+  obj: relation
+  attributes:
+    - name: weight
+      label: weight
+      datatype: float
