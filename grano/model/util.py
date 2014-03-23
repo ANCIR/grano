@@ -1,9 +1,13 @@
 import uuid
 import json
+import string
 
 from slugify import slugify
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.ext.mutable import Mutable
+
+ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits
+BASE = len(ALPHABET)
 
 
 def slugify_column(text):
@@ -11,7 +15,14 @@ def slugify_column(text):
 
 
 def make_token():
-    return uuid.uuid4().get_hex()[15:]
+    num = uuid.uuid4().int
+    s = []
+    while True:
+        num, r = divmod(num, BASE)
+        s.append(ALPHABET[r])
+        if num == 0:
+            break
+    return ''.join(reversed(s))[:15]
 
 
 class JSONEncodedDict(TypeDecorator):
