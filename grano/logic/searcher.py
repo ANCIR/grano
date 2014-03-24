@@ -66,15 +66,24 @@ class ESSearcher(object):
         query = {'from': self._offset, 'size': self._limit}
         qt = self.query_text
         if qt is not None and len(qt):
-            string_query = {
+            must_query = {
                 "query_string": {
                     "query": qt
                 }
             }
-            bool_query = {
-                "bool": {"must": string_query},
-                "should": {"term": {"names": {"value": qt, "boost": 3.0}}}
+
+            should_query = {
+                "query_string": {
+                    "query": qt, 
+                    "default_field": "names",
+                    "boost": 3.0,
+                    "use_dis_max" : True
                 }
+            }
+
+            bool_query = {
+                "bool": {"must": must_query, "should": should_query}
+            }
             query["query"] = bool_query
         else:
             query['query'] = {"match_all": {}}
