@@ -40,7 +40,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     def by_name(cls, project, name, only_active=False):
         q = db.session.query(cls)
         a = q.filter(cls.project==project)
-        q = cls._filter_property(q, 'name', name, only_active=only_active)
+        attr = project.get_attribute('entity', 'name')
+        q = cls._filter_property(q, [attr], name, only_active=only_active)
         return q.first()
 
     @property

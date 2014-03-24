@@ -15,8 +15,9 @@ def index_entities():
     for i, entity in enumerate(Entity.all().filter_by(same_as=None)):
         body = entities.to_index(entity)
         
-        if not 'name' in body.get('properties', {}):
+        if 'name' not in body.get('properties', {}):
             log.warn('No name: %s, skipping!', entity.id)
+            #pprint(body)
             continue
     
         es.index(index=es_index, doc_type='entity', id=body.pop('id'), body=body)

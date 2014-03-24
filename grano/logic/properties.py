@@ -8,11 +8,11 @@ from grano.model import Entity, Attribute
 
 
 DATATYPE_TYPES = {
-    'integer': colander.Integer,
-    'float': colander.Float,
-    'boolean': colander.Boolean,
-    'string': colander.String,
-    'datetime': colander.DateTime
+    'integer': colander.Integer(),
+    'float': colander.Float(),
+    'boolean': colander.Boolean(),
+    'string': colander.String(),
+    'datetime': colander.DateTime(default_tzinfo=None)
 }
 
 
@@ -27,7 +27,7 @@ def validate(data, schemata, name='root'):
                 name=attr.name, missing=colander.null)
 
             T = DATATYPE_TYPES.get(attr.datatype)
-            attrib.add(colander.SchemaNode(T(), missing=None, name='value'))
+            attrib.add(colander.SchemaNode(T, missing=None, name='value'))
             
             attrib.add(colander.SchemaNode(colander.Boolean(),
                 default=True, missing=True, name='active'))

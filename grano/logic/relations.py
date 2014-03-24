@@ -48,7 +48,7 @@ def validate(data):
 @celery.task
 def _relation_changed(relation_id):
     """ Notify plugins about changes to a relation. """
-    log.warn("Processing change in relation: %s", relation_id)
+    log.debug("Processing change in relation: %s", relation_id)
     def _handle(obj):
         obj.relation_changed(relation_id)
     notify_plugins('grano.relation.change', _handle)

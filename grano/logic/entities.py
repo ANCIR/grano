@@ -47,7 +47,7 @@ def validate(data):
 @celery.task
 def _entity_changed(entity_id):
     """ Notify plugins about changes to an entity. """
-    log.warn("Processing change in entity: %s", entity_id)
+    log.debug("Processing change in entity: %s", entity_id)
     def _handle(obj):
         obj.entity_changed(entity_id)
     notify_plugins('grano.entity.change', _handle)
@@ -123,6 +123,7 @@ def apply_alias(project, author, canonical_name, alias_name):
     canonical = Entity.by_name(project, canonical_name)
     alias = Entity.by_name(project, alias_name)
     schema = Schema.by_name(project, 'base')
+    attribute = schema.get_attribute('name')
 
     # Don't artificially increase entity counts.
     if canonical is None and alias is None:
@@ -130,10 +131,17 @@ def apply_alias(project, author, canonical_name, alias_name):
 
     # Rename an alias to its new, canonical name.
     if canonical is None:
-        properties_logic.set(alias, author, 'name', schema, canonical_name,
-            active=True, source_url=None)
+        data = {
+            'value': canonical_name,
+            'schema': schema,
+            'attribute': attribute,
+            'active': True,
+            'name': 'name',
+            'source_url': None
+        }
+        properties_logic.save(alias, data)
         _entity_changed.delay(alias.id)
-        return log.info("Renamed: %s", alias_name)
+        return log.info("Renamed: %s -> %s", alias_name, canonical_name)
 
     # Already done, thanks.
     if canonical == alias:
