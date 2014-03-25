@@ -151,7 +151,7 @@ def to_index(schema):
 def to_rest_index(schema):
     data = to_basic(schema)
     data['obj'] = schema.obj
-    data['project'] = projects_logic.to_rest_index(schema.project)
+    data['hidden'] = schema.hidden
     data['api_url'] = url_for('schemata_api.view', slug=schema.project.slug, name=schema.name)
     return data
 
@@ -159,7 +159,7 @@ def to_rest_index(schema):
 def to_rest(schema):
     data = to_rest_index(schema)
     data['id'] = schema.id
-    data['hidden'] = schema.hidden
+    data['project'] = projects_logic.to_rest_index(schema.project)
     if schema.label_in:
         data['label_in'] = schema.label_in
     if schema.label_out:

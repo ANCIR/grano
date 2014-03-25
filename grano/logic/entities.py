@@ -173,6 +173,10 @@ def to_rest_base(entity):
         'api_url': url_for('entities_api.view', id=entity.id),
         'same_as': entity.same_as
     }
+
+    ss = [schemata_logic.to_rest_index(s) for s in entity.schemata]
+    data['schemata'] = ss
+
     if entity.same_as:
         data['same_as_url'] = url_for('entities_api.view', id=entity.same_as)
     return data
@@ -193,9 +197,6 @@ def to_rest(entity):
     data = to_rest_base(entity)
     data['created_at'] = entity.created_at
     data['updated_at'] = entity.updated_at
-
-    ss = [schemata_logic.to_rest_index(s) for s in entity.schemata]
-    data['schemata'] = ss
 
     data['properties'] = {}
     for prop in entity.active_properties:

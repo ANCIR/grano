@@ -112,9 +112,12 @@ class Pager(object):
         return self.query.count()
 
     def to_dict(self, results_converter=lambda r: r):
+        format_args = [(k,v) for (k,v) in self.query_args if k != 'limit']
+        format_args.extend([('limit', 'LIMIT'), ('offset', 'OFFSET')])
         return {
             'next_url': self.next_url,
             'prev_url': self.prev_url,
+            'format': self.url(format_args),
             'total': len(self),
             'page': self.page,
             'pages': self.pages,
