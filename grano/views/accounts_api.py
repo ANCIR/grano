@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, Response
 from flask import redirect, make_response
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
@@ -7,10 +8,39 @@ from grano.lib.args import object_or_404, request_data
 from grano.model import Account
 from grano.logic import accounts
 from grano.core import app, db, url_for
+from grano.lib.exc import BadRequest
+from grano.lib.pager import Pager
+from grano.views.cache import validate_cache
 from grano import authz
 
 
 blueprint = Blueprint('accounts_api', __name__)
+
+
+@blueprint.route('/api/1/accounts/_suggest', methods=['GET'])
+def suggest():
+    authz.require(authz.logged_in())
+    if not 'q' in request.args or not len(request.args.get('q').strip()):
+        raise BadRequest("Missing the query ('q' parameter).")
+
+    query = request.args.get('q') + '%'
+    q = db.session.query(Account)
+    q = q.filter(or_(Account.full_name.ilike(query),
+                     Account.login.ilike(query),
+                     Account.email.ilike(query)))
+    pager = Pager(q)
+
+    def convert(accounts):
+        data = []
+        for account in accounts:
+            data.append({
+                'display_name': account.display_name,
+                'id': account.id
+            })
+        return data
+
+    validate_cache(keys='#'.join([d.display_name for d in pager]))
+    return jsonify(pager.to_dict(results_converter=convert))
 
 
 @blueprint.route('/api/1/accounts/<id>', methods=['GET'])
