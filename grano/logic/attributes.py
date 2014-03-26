@@ -1,5 +1,5 @@
 from grano.core import db
-from grano.model import Attribute
+from grano.model import Attribute, Property
 
 
 def save(data):
@@ -20,6 +20,13 @@ def save(data):
     obj.description = data.get('description')
     db.session.add(obj)
     return obj
+
+
+def delete(attribute):
+    q = db.session.query(Property)
+    q = q.filter(Property.attribute==attribute)
+    q.delete()
+    db.session.delete(attribute)
 
 
 def to_index(attribute):

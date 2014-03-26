@@ -77,7 +77,7 @@ def save(data, schema=None):
 
     for attr in schema.attributes:
         if attr.name not in names:
-            db.session.delete(attr)
+            attributes.delete(attr)
 
     return schema
 
