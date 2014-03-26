@@ -22,7 +22,7 @@ def index(slug):
     validate_cache(last_modified=project.updated_at)
     query = Schema.all()
     query = query.filter_by(project=project)
-    pager = Pager(query)
+    pager = Pager(query, slug=slug)
     conv = lambda es: [schemata.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 

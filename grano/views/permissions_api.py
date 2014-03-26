@@ -20,7 +20,7 @@ def index(slug):
     authz.require(authz.project_manage(project))
     query = Permission.all()
     query = query.filter_by(project=project)
-    pager = Pager(query)
+    pager = Pager(query, slug=slug)
     conv = lambda es: [permissions.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 
