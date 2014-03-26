@@ -35,7 +35,7 @@ def validate(data):
         schemata_node, name='schemata'))
 
     sane.update(schemata_validator.deserialize(data))
-    sane['schemata'] = list(set(sane['schemata']))
+    sane['schemata'] = [s for s in set(sane['schemata']) if s is not None]
 
     sane['properties'] = properties_logic.validate(
         data.get('properties', []),
