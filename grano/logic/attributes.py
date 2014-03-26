@@ -11,12 +11,13 @@ def save(data):
     obj = Attribute.by_schema_and_name(schema, name)
     if obj is None:
         obj = Attribute()
-    obj.name = name
+        obj.name = name
+        obj.datatype = data.get('datatype')
+        obj.schema = schema
+
     obj.label = data.get('label')
     obj.hidden = data.get('hidden')
     obj.description = data.get('description')
-    obj.datatype = data.get('datatype')
-    obj.schema = schema
     db.session.add(obj)
     return obj
 
