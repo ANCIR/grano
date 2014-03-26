@@ -55,14 +55,18 @@ def view(id):
 
 @blueprint.route('/api/1/entities/_search', methods=['GET'])
 def search():
-    # TODO: move to be project-specific, the implement access control!
     searcher = ESSearcher(request.args)
     if 'project' in request.args:
         searcher.add_filter('project.slug', request.args.get('project'))
     pager = Pager(searcher)
-    # TODO: get all entities at once:
-    conv = lambda res: [entities.to_rest_index(Entity.by_id(r.get('id'))) for r in res]
-    data = pager.to_dict(results_converter=conv)
+    
+    def convert(serp):
+        ents = Entity.by_id_many([r['id'] for r in serp], request.account)
+        results = [ents.get(r['id']) for r in serp]
+        results = [entities.to_rest_index(r) for r in results]
+        return results
+
+    data = pager.to_dict(results_converter=convert)
     data['facets'] = searcher.facets()
     return jsonify(data)
 

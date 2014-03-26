@@ -1,6 +1,7 @@
+from sqlalchemy import or_, and_
+
 from grano.core import db
 from grano.model.common import UUIDBase, PropertyBase
-
 from grano.model.schema import Schema
 from grano.model.relation import Relation
 from grano.model.property import EntityProperty
@@ -43,6 +44,21 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         attr = project.get_attribute('entity', 'name')
         q = cls._filter_property(q, [attr], name, only_active=only_active)
         return q.first()
+
+    @classmethod
+    def by_id_many(cls, ids, account):
+        from grano.model import Project, Permission
+        q = db.session.query(cls)
+        q = q.join(Project)
+        q = q.outerjoin(Permission)
+        q = q.filter(cls.id.in_(ids))
+        q = q.filter(or_(Project.private==False,
+            and_(Permission.reader==True, Permission.account==account)))
+
+        id_map = {}
+        for e in q.all():
+            id_map[e.id] = e
+        return id_map
 
     @property
     def inbound_schemata(self):
