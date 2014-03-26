@@ -24,10 +24,14 @@ class Pager(object):
 
     @property
     def page(self):
+        if self.limit == 0:
+            return 1
         return (self.offset/self.limit) + 1
 
     @property
     def pages(self):
+        if self.limit == 0:
+            return 1
         return int(math.ceil(len(self)/float(self.limit)))
 
     @property
