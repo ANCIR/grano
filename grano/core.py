@@ -9,6 +9,7 @@ from elasticsearch import Elasticsearch
 from celery import Celery
 
 from grano import default_settings
+from grano import constants
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -27,6 +28,7 @@ elasticsearch_log.setLevel(logging.WARNING)
 
 app = Flask(__name__)
 app.config.from_object(default_settings)
+app.config.from_object(constants)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
 app_name = app.config.get('APP_NAME', 'grano')
 
