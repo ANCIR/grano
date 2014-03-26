@@ -9,21 +9,7 @@ from elasticsearch import Elasticsearch
 from celery import Celery
 
 from grano import default_settings
-from grano import constants
-
-logging.basicConfig(level=logging.DEBUG)
-
-requests_log = logging.getLogger("requests")
-requests_log.setLevel(logging.WARNING)
-
-urllib3_log = logging.getLogger("urllib3")
-urllib3_log.setLevel(logging.WARNING)
-
-elasticsearch_log = logging.getLogger("elasticsearch")
-elasticsearch_log.setLevel(logging.WARNING)
-
-#sqlalchemy_log = logging.getLogger("sqlalchemy")
-#sqlalchemy_log.setLevel(logging.INFO)
+from grano import constants, logs
 
 
 app = Flask(__name__)
