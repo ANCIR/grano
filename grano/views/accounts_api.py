@@ -20,10 +20,7 @@ blueprint = Blueprint('accounts_api', __name__)
 @blueprint.route('/api/1/accounts/_suggest', methods=['GET'])
 def suggest():
     authz.require(authz.logged_in())
-    if not 'q' in request.args or not len(request.args.get('q').strip()):
-        raise BadRequest("Missing the query ('q' parameter).")
-
-    query = request.args.get('q') + '%'
+    query = request.args.get('q', '') + '%'
     q = db.session.query(Account)
     q = q.filter(or_(Account.full_name.ilike(query),
                      Account.login.ilike(query),

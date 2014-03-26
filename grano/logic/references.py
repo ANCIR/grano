@@ -67,11 +67,11 @@ class AccountRef(Ref):
     def decode(self, node, cstruct):
         if isinstance(cstruct, Account):
             return cstruct
-        if isinstance(cstruct, basestring):
-            return Account.by_login(cstruct)
+        if isinstance(cstruct, int):
+            return Account.by_id(cstruct)
         if isinstance(cstruct, dict):
-            if cstruct.get('login'):
-                return Account.by_login(cstruct.get('login'))
+            if cstruct.get('id'):
+                return Account.by_id(cstruct.get('id'))
         return None
 
 

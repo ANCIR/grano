@@ -69,6 +69,7 @@ def to_rest_index(project):
     return {
         'slug': project.slug,
         'label': project.label,
+        'private': project.private,
         'api_url': url_for('projects_api.view', slug=project.slug)
     }
 
