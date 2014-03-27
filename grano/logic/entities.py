@@ -47,7 +47,7 @@ def validate(data):
 @celery.task
 def _entity_changed(entity_id):
     """ Notify plugins about changes to an entity. """
-    log.debug("Processing change in entity: %s", entity_id)
+    #log.debug("Processing change in entity: %s", entity_id)
     def _handle(obj):
         obj.entity_changed(entity_id)
     notify_plugins('grano.entity.change', _handle)
