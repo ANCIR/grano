@@ -87,12 +87,8 @@ def save(obj, data):
 
 def to_rest_index(prop):
     value = prop.value
-    if isinstance(value, datetime):
-        value = value.isoformat()
     return prop.name, {
-        #'id': prop.id,
         'value': value,
-        #'active': prop.active,
         'source_url': prop.source_url
     }
 
