@@ -24,7 +24,7 @@ API key. The API key is available in the user profile page for users which have
 logged in.
 
 The API key must be submitted with each request, and it can either be given as the
-``api_key`` query parameter, or as the value of the ``Authorization``
+``api_key`` query parameter, or as the value of the ``X-Grano-API-Key``
 request header. When an API key is given, ``grano`` still performs authorization 
 checks and return an HTTP 401 error when the credentials are invalid, or an HTTP
 403 error, when the user tries to modify objects which he is not authorized to 

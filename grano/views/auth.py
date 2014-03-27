@@ -7,7 +7,7 @@ from grano.lib.exc import Unauthorized
 
 @app.before_request
 def check_auth():
-    api_key = request.headers.get('Authorization') \
+    api_key = request.headers.get('X-Grano-API-Key') \
               or request.args.get('api_key')
     if session.get('id'):
         request.account = Account.by_id(session.get('id'))
