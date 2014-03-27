@@ -83,7 +83,9 @@ def save(data, schema=None):
 
 
 def delete(schema):
-    raise NotImplemented()
+    for attr in schema.attributes:
+        attributes.delete(attr)
+    db.session.delete(schema)
 
 
 def import_schema(project, fh):
