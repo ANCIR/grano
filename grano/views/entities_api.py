@@ -25,7 +25,15 @@ blueprint = Blueprint('entities_api', __name__)
 def index():
     query = filter_query(Entity, Entity.all(), request.args)
 
+    if 'q' in request.args and len(request.args.get('q').strip()):
+        q = '%%%s%%' % request.args.get('q').strip()
+        query = query.join(EntityProperty)
+        query = query.filter(EntityProperty.name=='name')
+        query = query.filter(EntityProperty.value_string.ilike(q))
+
     for schema in request.args.getlist('schema'):
+        if not len(schema.strip()):
+            continue
         alias = aliased(Schema)
         query = query.join(alias, Entity.schemata)
         query = query.filter(alias.name.in_(schema.split(',')))
