@@ -2,7 +2,7 @@ from flask import Blueprint, render_template
 from flask import redirect, make_response, url_for
 
 from grano.lib.serialisation import jsonify
-from grano.lib.args import object_or_404, request_data
+from grano.lib.args import object_or_404, request_data, arg_bool
 from grano.model import Schema, Project
 from grano.logic import schemata
 from grano.lib.pager import Pager
@@ -23,7 +23,10 @@ def index(slug):
     query = Schema.all()
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
-    conv = lambda es: [schemata.to_rest_index(e) for e in es]
+    if arg_bool('full'):
+        conv = lambda es: [schemata.to_rest(e) for e in es]
+    else:
+        conv = lambda es: [schemata.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 
 
