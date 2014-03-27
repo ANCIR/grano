@@ -16,7 +16,7 @@ class JSONEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime):
-            return obj.isoformat()
+            return obj.isoformat() + 'Z'
         if isinstance(obj, UUID):
             return str(obj)
         if isinstance(obj, Decimal):
