@@ -262,6 +262,8 @@ parameters:
   indicated by its ``name``. Alternatives can be separated by commata, while 
   multiple values for the query parameters mean that all schemata must be 
   present.
+* ``q`` filters results by matching their ``name`` property to see if it contains
+  the given parameter. 
 
 ::
 
@@ -331,6 +333,13 @@ expected to be a dictionary, where each key is a property name defined by one of
 Update an existing entity. Most of the fields returned by the ``GET`` operation 
 are mutable, except for the ``project``, and automatically generated fields.
 
+::
+
+    DELETE /api/1/entities/<id>
+
+Delete an entity. This will also delete any relations to which this entity is a
+party.
+
 
 Relations
 +++++++++
@@ -378,3 +387,9 @@ expected to be a dictionary, where each key is a property name defined by the
 
 Update an existing relation. Most of the fields returned by the ``GET`` operation 
 are mutable, except for the ``project``, ``schema`` and automatically generated fields.
+
+::
+
+    DELETE /api/1/relations/<id>
+
+Delete a relation. 

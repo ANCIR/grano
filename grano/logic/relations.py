@@ -3,7 +3,7 @@ import colander
 
 from grano.core import db, url_for, celery
 from grano.lib.exc import NotImplemented
-from grano.model import Relation
+from grano.model import Relation, RelationProperty
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
 from grano.logic import projects as projects_logic
@@ -87,7 +87,11 @@ def save(data, relation=None):
 
 
 def delete(relation):
-    raise NotImplemented()
+    """ Delete the relation and its properties. """
+    q = db.session.query(RelationProperty)
+    q = q.filter(RelationProperty.relation==relation)
+    q.delete()
+    db.session.delete(relation)
 
 
 def to_rest_base(relation):

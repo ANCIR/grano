@@ -2,10 +2,11 @@ import logging
 import colander
 
 from grano.core import db, url_for, celery
-from grano.model import Entity, Schema
+from grano.model import Entity, Schema, EntityProperty
 from grano.lib.exc import NotImplemented
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
+from grano.logic import relations as relations_logic
 from grano.logic import projects as projects_logic
 from grano.logic.references import ProjectRef, AccountRef, SchemaRef
 from grano.plugins import notify_plugins
@@ -83,7 +84,16 @@ def save(data, entity=None):
 
 
 def delete(entity):
-    raise NotImplemented()
+    """ Delete the entity and its properties, as well as any associated 
+    relations. """
+    for relation in entity.inbound:
+        relations_logic.delete(relation)
+    for relation in entity.outbound:
+        relations_logic.delete(relation)
+    q = db.session.query(EntityProperty)
+    q = q.filter(EntityProperty.entity==entity)
+    q.delete()
+    db.session.delete(entity)
 
 
 def _merge_entities(source, target):

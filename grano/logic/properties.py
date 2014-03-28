@@ -85,6 +85,11 @@ def save(obj, data):
     return prop
 
 
+def delete(prop):
+    """ Delete a property. """
+    db.session.delete(prop)
+
+
 def to_rest_index(prop):
     value = prop.value
     return prop.name, {
