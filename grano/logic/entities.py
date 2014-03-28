@@ -90,9 +90,8 @@ def delete(entity):
         relations_logic.delete(relation)
     for relation in entity.outbound:
         relations_logic.delete(relation)
-    q = db.session.query(EntityProperty)
-    q = q.filter(EntityProperty.entity==entity)
-    q.delete()
+    for prop in entity.properties:
+        db.session.delete(prop)
     db.session.delete(entity)
 
 

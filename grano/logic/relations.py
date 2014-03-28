@@ -88,9 +88,8 @@ def save(data, relation=None):
 
 def delete(relation):
     """ Delete the relation and its properties. """
-    q = db.session.query(RelationProperty)
-    q = q.filter(RelationProperty.relation==relation)
-    q.delete()
+    for prop in relation.properties:
+        db.session.delete(prop)
     db.session.delete(relation)
 
 

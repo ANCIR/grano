@@ -61,6 +61,18 @@ def view(id):
     return jsonify(entities.to_rest(entity))
 
 
+@blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
+def graph(id):
+    entity = object_or_404(Entity.by_id(id))
+    authz.require(authz.project_read(entity.project))
+    extractor = GraphExtractor(root_id=entity.id)
+    validate_cache(keys=extractor.to_hash())
+    if extractor.format == 'gexf':
+        return Response(extractor.to_gexf(),
+                mimetype='text/xml')
+    return jsonify(extractor.to_dict())
+
+
 @blueprint.route('/api/1/entities/_search', methods=['GET'])
 def search():
     searcher = ESSearcher(request.args)
@@ -110,18 +122,6 @@ def suggest():
 
     validate_cache(keys='#'.join([d['name'] for d in data]))
     return jsonify(pager.to_dict(results_converter=convert))
-
-
-@blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
-def graph(id):
-    entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
-    extractor = GraphExtractor(root_id=entity.id)
-    validate_cache(keys=extractor.to_hash())
-    if extractor.format == 'gexf':
-        return Response(extractor.to_gexf(),
-                mimetype='text/xml')
-    return jsonify(extractor.to_dict())
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['POST', 'PUT'])
