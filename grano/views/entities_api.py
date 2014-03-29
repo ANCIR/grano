@@ -38,6 +38,7 @@ def index():
         query = query.join(alias, Entity.schemata)
         query = query.filter(alias.name.in_(schema.split(',')))
 
+    query = query.distinct()
     pager = Pager(query)
     conv = lambda es: [entities.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
@@ -109,6 +110,8 @@ def suggest():
     q = q.filter(EntityProperty.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
         q = q.filter(Project.slug==request.args.get('project'))
+
+    q = q.distinct()
     pager = Pager(q)
 
     data = []
@@ -116,6 +119,7 @@ def suggest():
         for prop in props:
             data.append({
                 'name': prop.value,
+                'id': prop.entity_id,
                 'api_url': url_for('entities_api.view', id=prop.entity_id)
             })
         return data

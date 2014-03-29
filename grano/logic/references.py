@@ -57,7 +57,7 @@ class EntityRef(Ref):
         if isinstance(cstruct, dict):
             if cstruct.get('id'):
                 entity = Entity.by_id(cstruct.get('id'))
-                if entity.project == self.project:
+                if entity is not None and entity.project == self.project:
                     return entity
         return None
 
