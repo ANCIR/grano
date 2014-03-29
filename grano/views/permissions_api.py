@@ -4,6 +4,7 @@ from flask import redirect, make_response, url_for
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
 from grano.model import Permission, Project
+from grano.views.cache import validate_cache
 from grano.logic import permissions
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
@@ -21,6 +22,7 @@ def index(slug):
     query = Permission.all()
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
+    validate_cache(keys=pager.cache_keys())
     conv = lambda es: [permissions.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 

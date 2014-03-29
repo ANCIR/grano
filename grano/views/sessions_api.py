@@ -27,6 +27,12 @@ def status():
                 'admin': permission.admin
             }
 
+    keys = {
+        'p': repr(permissions),
+        'i': request.account.id if authz.logged_in() else None
+    }
+    validate_cache(keys=keys)
+
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': request.account.api_key if authz.logged_in() else None,

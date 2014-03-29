@@ -6,6 +6,7 @@ from grano.lib.args import object_or_404, request_data
 from grano.model import Relation, Schema
 from grano.logic import relations
 from grano.logic.references import ProjectRef
+from grano.views.cache import validate_cache
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import app, db
@@ -32,6 +33,7 @@ def index():
         query = query.filter(Schema.name.in_(schemata))
 
     pager = Pager(query)
+    validate_cache(keys=pager.cache_keys())
     conv = lambda es: [relations.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 

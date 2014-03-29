@@ -24,6 +24,7 @@ def index():
     q = q.filter(or_(Project.private==False,
         and_(Permission.reader==True, Permission.account==request.account)))
     pager = Pager(q)
+    validate_cache(keys=pager.cache_keys())
     conv = lambda es: [projects.to_rest_index_stats(e) for e in es]
     return jsonify(pager.to_dict(conv))
 

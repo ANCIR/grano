@@ -16,6 +16,7 @@ class Pager(object):
         self.pager_range = pager_range
         self.offset = arg_int(self.arg_name('offset'), default=0)
         self.limit = get_limit(default=limit, field=self.arg_name('limit'))
+        self._results = None
         
     def arg_name(self, arg):
         if self.name is None:
@@ -107,13 +108,23 @@ class Pager(object):
         return url
 
     def __iter__(self):
-        query = self.query
-        query = query.limit(self.limit)
-        query = query.offset(self.offset)
-        return query.all().__iter__()
+        if self._results is None:
+            query = self.query
+            query = query.limit(self.limit)
+            query = query.offset(self.offset)
+            self._results = query.all()
+        return self._results.__iter__()
 
     def __len__(self):
         return self.query.count()
+
+    def cache_keys(self):
+        # TODO: consider including count.
+        keys = {}
+        for i, res in enumerate(self):
+            k = res.id if hasattr(res, 'id') else repr(res)
+            keys[str(i)] = k
+        return keys
 
     def to_dict(self, results_converter=lambda r: r):
         format_args = [(k,v) for (k,v) in self.query_args if k != 'limit']

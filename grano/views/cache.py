@@ -36,6 +36,7 @@ def validate_cache(keys=None, last_modified=None):
         raise NotModified()
     if request.if_none_match == request._grano_etag:
         raise NotModified()
+    request.no_cache = False
 
 
 def disable_cache():
@@ -46,7 +47,7 @@ def disable_cache():
 def setup_cache():
     request._grano_etag = None
     request._grano_modified = None
-    request.no_cache = False
+    request.no_cache = True
 
 
 @app.after_request
@@ -56,10 +57,10 @@ def configure_cache_headers(response_class):
     if request.method in ['GET', 'HEAD', 'OPTIONS'] \
         and response_class.status_code < 400 \
         and not response_class.is_streamed:
-        response_class.cache_control.max_age = app.config.get('CACHE_AGE')
+        #response_class.cache_control.max_age = app.config.get('CACHE_AGE')
         
+        response_class.cache_control.must_revalidate = True
         if request.account is not None:
-            response_class.cache_control.must_revalidate = True
             response_class.cache_control.private = True
         else:
             response_class.cache_control.public = True

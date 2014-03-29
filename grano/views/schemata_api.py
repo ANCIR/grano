@@ -23,6 +23,7 @@ def index(slug):
     query = Schema.all()
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
+    validate_cache(keys=pager.cache_keys())
     if arg_bool('full'):
         conv = lambda es: [schemata.to_rest(e) for e in es]
     else:

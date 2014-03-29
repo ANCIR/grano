@@ -40,6 +40,7 @@ def index():
 
     query = query.distinct()
     pager = Pager(query)
+    validate_cache(keys=pager.cache_keys())
     conv = lambda es: [entities.to_rest_index(e) for e in es]
     return jsonify(pager.to_dict(conv))
 
