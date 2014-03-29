@@ -43,7 +43,7 @@ class ProjectRef(Ref):
 
 class EntityRef(Ref):
 
-    def __init__(self, project):
+    def __init__(self, project=None):
         self.project = project
 
     def decode(self, node, cstruct):
@@ -57,6 +57,8 @@ class EntityRef(Ref):
         if isinstance(cstruct, dict):
             if cstruct.get('id'):
                 entity = Entity.by_id(cstruct.get('id'))
+                if self.project is None:
+                    return entity
                 if entity is not None and entity.project == self.project:
                     return entity
         return None

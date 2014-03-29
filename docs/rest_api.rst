@@ -314,7 +314,6 @@ The following query paramters are available:
   custom format for easy integration into visualizations, while ``gexf`` is a 
   widely-used exchange format.
 
-
 ::
 
     POST /api/1/entities
@@ -332,6 +331,16 @@ expected to be a dictionary, where each key is a property name defined by one of
 
 Update an existing entity. Most of the fields returned by the ``GET`` operation 
 are mutable, except for the ``project``, and automatically generated fields.
+
+::
+
+    POST /api/1/entities/_merge
+
+Merge two entities, re-direct relations and copy over properties. The expected
+payload is two entity references, ``orig`` and ``dest``. After the merge, ``orig``
+will be a pointer towards ``dest``, and ``dest`` will have taken on any properties
+and relations ``orig`` had. If both entities have a property, the version on 
+``dest`` is marked active.
 
 ::
 

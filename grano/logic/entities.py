@@ -3,12 +3,12 @@ import colander
 
 from grano.core import db, url_for, celery
 from grano.model import Entity, Schema, EntityProperty
-from grano.lib.exc import NotImplemented
 from grano.logic import relations, schemata as schemata_logic
 from grano.logic import properties as properties_logic
 from grano.logic import relations as relations_logic
 from grano.logic import projects as projects_logic
-from grano.logic.references import ProjectRef, AccountRef, SchemaRef
+from grano.logic.references import ProjectRef, AccountRef
+from grano.logic.references import SchemaRef, EntityRef
 from grano.plugins import notify_plugins
 
 
@@ -18,6 +18,11 @@ log = logging.getLogger(__name__)
 class EntityBaseValidator(colander.MappingSchema):
     author = colander.SchemaNode(AccountRef())
     project = colander.SchemaNode(ProjectRef())
+
+
+class MergeValidator(colander.MappingSchema):
+    orig = colander.SchemaNode(EntityRef())
+    dest = colander.SchemaNode(EntityRef())
     
 
 def validate(data):
@@ -93,29 +98,31 @@ def delete(entity):
     for prop in entity.properties:
         db.session.delete(prop)
     db.session.delete(entity)
+    
 
-
-def _merge_entities(source, target):
+def merge(orig, dest):
     """ Copy all properties and relations from one entity onto another, then 
     mark the source entity as an ID alias for the destionation entity. """
 
-    target_active = [p.name for p in target.active_properties]
-    target.schemata = list(set(target.schemata + source.schemata))
+    dest_active = [p.name for p in dest.active_properties]
+    dest.schemata = list(set(dest.schemata + orig.schemata))
 
-    for prop in source.properties:
-        if prop.name in target_active:
+    for prop in orig.properties:
+        if prop.name in dest_active:
             prop.active = False
-        prop.entity = target
+        prop.entity = dest
     
-    for rel in source.inbound:
+    for rel in orig.inbound:
         # TODO: what if this relation now points at the same thing on both ends?
-        rel.target = target
+        rel.target = dest
     
-    for rel in source.outbound:
-        rel.source = target
+    for rel in orig.outbound:
+        rel.source = dest
     
-    source.same_as = target.id
+    orig.same_as = dest.id
     db.session.flush()
+    _entity_changed.delay(dest.id)
+    return dest
 
 
 def apply_alias(project, author, canonical_name, alias_name):
@@ -159,8 +166,7 @@ def apply_alias(project, author, canonical_name, alias_name):
 
     # Merge two existing entities, declare one as "same_as"
     if canonical is not None and alias is not None:
-        _merge_entities(alias, canonical)
-        _entity_changed.delay(canonical.id)
+        merge(alias, canonical)
         return log.info("Mapped: %s -> %s", alias.id, canonical.id)
 
 

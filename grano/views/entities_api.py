@@ -4,6 +4,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
+from grano.lib.exc import BadRequest
 from grano.lib.args import object_or_404, request_data
 from grano.model import Entity, Schema, EntityProperty, Project, Permission
 from grano.logic import entities, relations
@@ -137,6 +138,23 @@ def update(id):
     entity = entities.save(data, entity=entity)
     db.session.commit()
     return jsonify(entities.to_rest(entity))
+
+
+@blueprint.route('/api/1/entities/_merge', methods=['POST', 'PUT'])
+def merge():
+    validator = entities.MergeValidator()
+    data = validator.deserialize(request_data())
+    authz.require(authz.project_edit(data['orig'].project))
+
+    if data['orig'].id == data['dest'].id:
+        raise BadRequest('Origin and destination are identical.')
+
+    if data['orig'].project_id != data['dest'].project_id:
+        raise BadRequest('Entities belong to different projects.')
+    
+    dest = entities.merge(data['orig'], data['dest'])
+    db.session.commit()
+    return jsonify(entities.to_rest(dest))
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['DELETE'])

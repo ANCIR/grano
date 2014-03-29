@@ -31,9 +31,9 @@ def validate(data):
     schema_validator = colander.SchemaNode(colander.Mapping())
     schema_validator.add(colander.SchemaNode(SchemaRef(project),
         name='schema'))
-    schema_validator.add(colander.SchemaNode(EntityRef(project),
+    schema_validator.add(colander.SchemaNode(EntityRef(project=project),
         name='source'))
-    schema_validator.add(colander.SchemaNode(EntityRef(project),
+    schema_validator.add(colander.SchemaNode(EntityRef(project=project),
         name='target'))
 
     sane.update(schema_validator.deserialize(data))
