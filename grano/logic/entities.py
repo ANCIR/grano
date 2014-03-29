@@ -126,8 +126,9 @@ def apply_alias(project, author, canonical_name, alias_name):
     canonical_name = canonical_name.strip()
 
     # Don't import meaningless aliases.
-    if canonical_name == alias_name or not len(canonical_name):
-        return log.info("No alias: %s", canonical_name)
+    if canonical_name == alias_name or not len(canonical_name) \
+        or not len(alias_name):
+        return log.info("Not an alias: %s", canonical_name)
 
     canonical = Entity.by_name(project, canonical_name)
     alias = Entity.by_name(project, alias_name)

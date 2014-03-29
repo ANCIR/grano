@@ -26,8 +26,14 @@ def validate(data, schemata, name='root'):
             attrib = colander.SchemaNode(colander.Mapping(),
                 name=attr.name, missing=colander.null)
 
-            T = DATATYPE_TYPES.get(attr.datatype)
-            attrib.add(colander.SchemaNode(T, missing=None, name='value'))
+            if attr.name == 'name':
+                attrib.add(colander.SchemaNode(colander.String(),
+                    missing=colander.required,
+                    validator=colander.Length(min=1),
+                    name='value'))
+            else:
+                T = DATATYPE_TYPES.get(attr.datatype)
+                attrib.add(colander.SchemaNode(T, missing=None, name='value'))
             
             attrib.add(colander.SchemaNode(colander.Boolean(),
                 default=True, missing=True, name='active'))
