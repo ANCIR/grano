@@ -1,9 +1,10 @@
 import logging
 from unicodecsv import DictReader, DictWriter
+from sqlalchemy.orm import aliased
 
 from grano.core import db
 from grano.logic import entities
-from grano.model import Entity, Schema
+from grano.model import Entity, EntityProperty, Schema
 
 log = logging.getLogger(__name__)
 
@@ -35,33 +36,26 @@ def export_aliases(project, path):
     """ Dump a list of all entity names to a CSV file. The table will contain the 
     active name of each entity, and one of the other existing names as an alias. """
     with open(path, 'w') as fh:
-        writer = DictWriter(fh, ['entity_id', 'alias', 'canonical', 'schemata'])
+        writer = DictWriter(fh, ['entity_id', 'alias', 'canonical'])
         writer.writeheader()
-        q = Entity.all().filter_by(same_as=None)
-        q = q.filter(Entity.project==project)
-        for i, entity in enumerate(q):
-            export_entity(entity, writer)
-            if i % 100 == 0:
-                log.info("Dumped %s entity names...", i)
 
-
-def export_entity(entity, writer):
-    canonical = None
-    aliases = []
-    schemata = ':'.join([s.name for s in entity.schemata])
-    schemata = ":%s:" % schemata
-    for prop in entity.properties:
-        if prop.name != 'name':
-            continue
-        aliases.append(prop.value)
-        if prop.active:
-            canonical = prop.value
-    for alias in aliases:
-        writer.writerow({
-            'entity_id': entity.id,
-            'alias': alias,
-            'canonical': canonical,
-            'schemata': schemata
+        alias = aliased(EntityProperty)
+        canonical = aliased(EntityProperty)
+        q = db.session.query(alias.value_string.label('alias'), alias.entity_id)
+        q = q.join(Entity)
+        q = q.join(canonical)
+        q = q.filter(Entity.project_id==project.id)
+        q = q.filter(alias.entity_id!=None)
+        q = q.filter(alias.name=='name')
+        q = q.filter(canonical.name=='name')
+        q = q.filter(canonical.active==True)
+        q = q.add_columns(canonical.value_string.label('canonical'))
+        for row in q.all():
+            #if row.alias == row.canonical:
+            #    continue
+            writer.writerow({
+                'entity_id': str(row.entity_id),
+                'alias': row.alias,
+                'canonical': row.canonical
             })
-
-
+        
