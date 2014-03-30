@@ -25,12 +25,15 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         backref=db.backref('entities', lazy='dynamic'))
     
     inbound = db.relationship('Relation', lazy='dynamic', backref='target',
-        primaryjoin='Entity.id==Relation.target_id')
+        primaryjoin='Entity.id==Relation.target_id',
+        cascade='all, delete, delete-orphan')
     outbound = db.relationship('Relation', lazy='dynamic', backref='source',
-        primaryjoin='Entity.id==Relation.source_id')
+        primaryjoin='Entity.id==Relation.source_id',
+        cascade='all, delete, delete-orphan')
 
     properties = db.relationship(EntityProperty, backref='entity',
         order_by=EntityProperty.created_at.desc(),
+        cascade='all, delete, delete-orphan',
         lazy='joined')
 
     @property

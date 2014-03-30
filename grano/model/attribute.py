@@ -21,7 +21,8 @@ class Attribute(db.Model, IntBase):
     datatype = db.Column(db.Unicode())
     
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
-    properties = db.relationship('Property', backref='attribute', lazy='dynamic')
+    properties = db.relationship('Property', backref='attribute',
+        cascade='all, delete, delete-orphan', lazy='dynamic')
 
 
     @property

@@ -15,6 +15,7 @@ class Relation(db.Model, UUIDBase, PropertyBase):
 
     properties = db.relationship(RelationProperty,
     	order_by=RelationProperty.created_at.desc(),
+        cascade='all, delete, delete-orphan',
     	backref='relation', lazy='dynamic')
 
     @property

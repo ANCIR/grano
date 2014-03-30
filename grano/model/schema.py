@@ -15,9 +15,12 @@ class Schema(db.Model, IntBase):
     hidden = db.Column(db.Boolean())
     obj = db.Column(db.Unicode())
 
-    attributes = db.relationship(Attribute, backref='schema', lazy='joined')
-    properties = db.relationship(Property, backref='schema', lazy='dynamic')
-    relations = db.relationship('Relation', backref='schema', lazy='dynamic')
+    attributes = db.relationship(Attribute, backref='schema', lazy='joined',
+        cascade='all, delete, delete-orphan')
+    properties = db.relationship(Property, backref='schema', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
+    relations = db.relationship('Relation', backref='schema', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
 
     def get_attribute(self, name):

@@ -13,10 +13,14 @@ class Project(db.Model, IntBase):
 
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
-    relations = db.relationship('Relation', backref='project', lazy='dynamic')
-    entities = db.relationship('Entity', backref='project', lazy='dynamic')
-    schemata = db.relationship('Schema', backref='project', lazy='dynamic')
-    permissions = db.relationship('Permission', backref='project', lazy='dynamic')
+    relations = db.relationship('Relation', backref='project', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
+    entities = db.relationship('Entity', backref='project', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
+    schemata = db.relationship('Schema', backref='project', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
+    permissions = db.relationship('Permission', backref='project', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
     
 
     def get_attribute(self, obj, name):

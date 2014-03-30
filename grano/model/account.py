@@ -19,7 +19,8 @@ class Account(db.Model, IntBase):
     properties = db.relationship('Property', backref='author', lazy='dynamic')
     relations = db.relationship('Relation', backref='author', lazy='dynamic')
     entities = db.relationship('Entity', backref='author', lazy='dynamic')
-    permissions = db.relationship('Permission', backref='account', lazy='dynamic')
+    permissions = db.relationship('Permission', backref='account', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
     
     @property
     def display_name(self):
