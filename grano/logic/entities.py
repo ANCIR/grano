@@ -25,7 +25,7 @@ class MergeValidator(colander.MappingSchema):
     dest = colander.SchemaNode(EntityRef())
     
 
-def validate(data):
+def validate(data, entity):
     """ Due to some fairly weird interdependencies between the different elements
     of the model, validation of entities has to happen in three steps. """
 
@@ -44,9 +44,8 @@ def validate(data):
     sane['schemata'] = [s for s in set(sane['schemata']) if s is not None]
 
     sane['properties'] = properties_logic.validate(
-        data.get('properties', []),
-        sane.get('schemata'),
-        name='properties')
+        'entity', entity, sane.get('project'),
+        data.get('properties', []))
     return sane
 
 
@@ -62,7 +61,7 @@ def _entity_changed(entity_id):
 def save(data, entity=None):
     """ Save or update an entity. """
 
-    data = validate(data)
+    data = validate(data, entity)
     
     if entity is None:
         entity = Entity()

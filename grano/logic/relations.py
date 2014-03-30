@@ -20,7 +20,7 @@ class RelationBaseValidator(colander.MappingSchema):
     project = colander.SchemaNode(ProjectRef())
 
 
-def validate(data):
+def validate(data, relation):
     """ Due to some fairly weird interdependencies between the different elements
     of the model, validation of relations has to happen in three steps. """
 
@@ -39,9 +39,8 @@ def validate(data):
     sane.update(schema_validator.deserialize(data))
 
     sane['properties'] = properties_logic.validate(
-        data.get('properties', []),
-        [sane.get('schema')],
-        name='properties')
+        'relation', relation, project,
+        data.get('properties', []))
     return sane
 
 
@@ -57,7 +56,7 @@ def _relation_changed(relation_id):
 def save(data, relation=None):
     """ Save or update a relation with the given properties. """
 
-    data = validate(data)
+    data = validate(data, relation)
 
     if relation is None:
         relation = Relation()
