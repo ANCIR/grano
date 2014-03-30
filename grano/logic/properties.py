@@ -30,12 +30,12 @@ def validate_name(project, obj):
     return colander.All(name_unique, colander.Length(min=1))
 
 
-def validate(obj_type, obj, project, properties):
+def validate(obj_type, obj, schemata, project, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
     
     schema = colander.SchemaNode(colander.Mapping(), name='properties')
-    for sche in obj.schemata:
+    for sche in schemata:
         for attr in sche.attributes:
             attrib = colander.SchemaNode(colander.Mapping(),
                 name=attr.name, missing=colander.null)

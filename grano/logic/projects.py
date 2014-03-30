@@ -62,7 +62,8 @@ def save(data, project=None):
 
 
 def delete(project):
-    raise NotImplemented()
+    """ Delete the project and all related data. """
+    db.session.delete(project)
 
 
 def to_rest_index(project):

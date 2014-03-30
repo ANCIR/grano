@@ -44,7 +44,7 @@ def validate(data, entity):
     sane['schemata'] = [s for s in set(sane['schemata']) if s is not None]
 
     sane['properties'] = properties_logic.validate(
-        'entity', entity, sane.get('project'),
+        'entity', entity, sane['schemata'], sane.get('project'),
         data.get('properties', []))
     return sane
 
@@ -90,12 +90,6 @@ def save(data, entity=None):
 def delete(entity):
     """ Delete the entity and its properties, as well as any associated 
     relations. """
-    for relation in entity.inbound:
-        relations_logic.delete(relation)
-    for relation in entity.outbound:
-        relations_logic.delete(relation)
-    for prop in entity.properties:
-        db.session.delete(prop)
     db.session.delete(entity)
     
 

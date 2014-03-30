@@ -39,7 +39,7 @@ def validate(data, relation):
     sane.update(schema_validator.deserialize(data))
 
     sane['properties'] = properties_logic.validate(
-        'relation', relation, project,
+        'relation', relation, [sane.get('schema')], project,
         data.get('properties', []))
     return sane
 
@@ -87,8 +87,6 @@ def save(data, relation=None):
 
 def delete(relation):
     """ Delete the relation and its properties. """
-    for prop in relation.properties:
-        db.session.delete(prop)
     db.session.delete(relation)
 
 
