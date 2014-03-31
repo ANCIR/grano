@@ -113,6 +113,7 @@ def merge(orig, dest):
         rel.source = dest
     
     orig.same_as = dest.id
+    dest.same_as = None
     db.session.flush()
     _entity_changed.delay(dest.id)
     return dest
