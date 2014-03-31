@@ -13,7 +13,6 @@ from grano.logic import flush_entities, rebuild as rebuild_
 from grano.logic.searcher import search_entities
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as save_project
-from grano.logic import generate_sitemap
 from grano.plugins import list_plugins, notify_plugins
 
 
@@ -88,12 +87,6 @@ def plugins():
     """ List all available plugins. """
     for namespace, plugins in list_plugins().items():
         print "%s: %s" % (namespace, ' '.join(plugins)) 
-
-
-@manager.command
-def sitemap(count=40000):
-    """ Generate a static sitemap for SEO. """
-    generate_sitemap(count=count)
 
 
 @manager.command
