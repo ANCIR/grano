@@ -29,11 +29,11 @@ def validate(data, project):
 
 
 @celery.task
-def _relation_changed(relation_id, operation):
+def _project_changed(project_id, operation):
     """ Notify plugins about changes to a relation. """
     def _handle(obj):
-        obj.relation_changed(relation_id, operation)
-    notify_plugins('grano.relation.change', _handle)
+        obj.project_changed(project_id, operation)
+    notify_plugins('grano.project.change', _handle)
 
 
 def save(data, project=None):
@@ -41,6 +41,7 @@ def save(data, project=None):
 
     data = validate(data, project)
 
+    operation = 'create' if project is None else 'update'
     if project is None:
         project = Project()
         project.slug = data.get('slug')
@@ -66,16 +67,19 @@ def save(data, project=None):
         import_schema(project, fh)
 
     db.session.flush()
+    _project_changed(project.id, operation)
     return project
 
 
 def delete(project):
     """ Delete the project and all related data. """
+    _project_changed(project.id, 'delete')
     db.session.delete(project)
 
 
 def to_rest_index(project):
     return {
+        'id': project.id,
         'slug': project.slug,
         'label': project.label,
         'private': project.private,
