@@ -10,7 +10,6 @@ from grano.model import Entity, Schema, EntityProperty, Project, Permission
 from grano.logic import entities, relations
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
-from grano.logic.searcher import ESSearcher
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone, BadRequest
 from grano.core import app, db, url_for
@@ -75,24 +74,6 @@ def graph(id):
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')
     return jsonify(extractor.to_dict())
-
-
-@blueprint.route('/api/1/entities/_search', methods=['GET'])
-def search():
-    searcher = ESSearcher(request.args)
-    if 'project' in request.args:
-        searcher.add_filter('project.slug', request.args.get('project'))
-    pager = Pager(searcher)
-    
-    def convert(serp):
-        ents = Entity.by_id_many([r['id'] for r in serp], request.account)
-        results = [ents.get(r['id']) for r in serp]
-        results = [entities.to_rest_index(r) for r in results]
-        return results
-
-    data = pager.to_dict(results_converter=convert)
-    data['facets'] = searcher.facets()
-    return jsonify(data)
 
 
 @blueprint.route('/api/1/entities/_suggest', methods=['GET'])

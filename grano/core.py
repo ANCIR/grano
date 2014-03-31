@@ -5,7 +5,6 @@ from flask import Flask, url_for as _url_for
 from flask.ext.oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate
-from elasticsearch import Elasticsearch
 from celery import Celery
 
 from grano import default_settings
@@ -23,13 +22,9 @@ db = SQLAlchemy(app)
 ALEMBIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../alembic'))
 migrate = Migrate(app, db, directory=ALEMBIC_DIR)
 
-es = Elasticsearch()
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
     broker=app.config['CELERY_BROKER_URL'])
 celery.config_from_object(app.config)
-
-es_index = app.config.get('ES_INDEX', app_name)
-
 
 oauth = OAuth()
 

@@ -27,9 +27,7 @@ setup(
     zip_safe=False,
     install_requires=REQUIREMENTS,
     entry_points={
-        'grano.entity.change': [
-    #        'indexer = grano.logic.indexer:AutoIndexer'
-        ],
+        'grano.entity.change': [],
         'grano.relation.change': [],
         'grano.startup': [],
         'console_scripts': [

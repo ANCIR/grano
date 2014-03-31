@@ -8,9 +8,7 @@ from grano.views import app
 from grano.model import Project
 from grano.logic import import_schema, export_schema
 from grano.logic import import_aliases, export_aliases
-from grano.logic import index_entities, index_single
-from grano.logic import flush_entities, rebuild as rebuild_
-from grano.logic.searcher import search_entities
+from grano.logic import rebuild as rebuild_
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as save_project
 from grano.plugins import list_plugins, notify_plugins
@@ -62,24 +60,9 @@ def alias_export(project, path):
 
 
 @manager.command
-def index(entity_id=None):
-    """ (Re-)create a full text search index. """
-    if entity_id is not None:
-        index_single(entity_id)
-    else:
-        index_entities()
-
-
-@manager.command
 def rebuild():
     """ Trigger change processing on all relations and entities. """
     rebuild_()
-
-
-@manager.command
-def flush_index():
-    """ Delete the full text search index. """
-    flush_entities()
 
 
 @manager.command
@@ -87,15 +70,6 @@ def plugins():
     """ List all available plugins. """
     for namespace, plugins in list_plugins().items():
         print "%s: %s" % (namespace, ' '.join(plugins)) 
-
-
-@manager.command
-def search(text):
-    """ Search for a query string. """
-    res = search_entities({'q': text})
-    for hit in res:
-        log.info("%s: %s", hit.get('_id'), hit.get('_source').get('name'))
-    log.info("Total hits: %s", res.count())
 
 
 def run():

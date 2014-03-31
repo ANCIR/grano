@@ -38,7 +38,7 @@ class ProjectChangeProcessor(object):
     """
 
     @abc.abstractmethod
-    def relation_changed(self, project_id, operation):
+    def project_changed(self, project_slug, operation):
         """ Notify the plugin that a project has changed. The plugin 
         will only receive the ID and must query for the object itself. """
 

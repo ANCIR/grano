@@ -1,7 +1,7 @@
 import colander
 from datetime import datetime
 
-from grano.core import app, db, url_for
+from grano.core import app, db, url_for, celery
 from grano.lib.exc import NotImplemented
 from grano.logic.validation import database_name
 from grano.logic.references import AccountRef
@@ -29,10 +29,10 @@ def validate(data, project):
 
 
 @celery.task
-def _project_changed(project_id, operation):
+def _project_changed(project_slug, operation):
     """ Notify plugins about changes to a relation. """
     def _handle(obj):
-        obj.project_changed(project_id, operation)
+        obj.project_changed(project_slug, operation)
     notify_plugins('grano.project.change', _handle)
 
 
@@ -67,19 +67,18 @@ def save(data, project=None):
         import_schema(project, fh)
 
     db.session.flush()
-    _project_changed(project.id, operation)
+    _project_changed(project.slug, operation)
     return project
 
 
 def delete(project):
     """ Delete the project and all related data. """
-    _project_changed(project.id, 'delete')
+    _project_changed(project.slug, 'delete')
     db.session.delete(project)
 
 
 def to_rest_index(project):
     return {
-        'id': project.id,
         'slug': project.slug,
         'label': project.label,
         'private': project.private,
