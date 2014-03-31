@@ -166,6 +166,7 @@ def apply_alias(project, author, canonical_name, alias_name):
 def to_index(entity):
     """ Convert an entity to a form appropriate for search indexing. """
     data = to_rest(entity)
+    data['degree'] = entity.degree
     
     data['names'] = []
     for prop in entity.properties:
