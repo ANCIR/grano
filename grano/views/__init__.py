@@ -20,14 +20,22 @@ from grano.views.auth import check_auth
 @app.errorhandler(410)
 @app.errorhandler(500)
 def handle_exceptions(exc):
-    message = exc.get_description(request.environ)
-    message = message.replace('<p>', '').replace('</p>', '')
-    body = {
-        'status': exc.code,
-        'name': exc.name,
-        'message': message
-    }
-    headers = exc.get_headers(request.environ)
+    if not hasattr(exc, 'get_description'):
+        message = exc.get_description(request.environ)
+        message = message.replace('<p>', '').replace('</p>', '')
+        body = {
+            'status': exc.code,
+            'name': exc.name,
+            'message': message
+        }
+        headers = exc.get_headers(request.environ)
+    else:
+        body = {
+            'status': 500,
+            'name': exc.__class__.__name__,
+            'message': unicode(exc)
+        }
+        headers = {}
     return jsonify(body, status=exc.code,
         headers=headers)
 
