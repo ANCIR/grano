@@ -28,6 +28,14 @@ def validate(data, project):
     return validator.deserialize(data)
 
 
+@celery.task
+def _relation_changed(relation_id, operation):
+    """ Notify plugins about changes to a relation. """
+    def _handle(obj):
+        obj.relation_changed(relation_id, operation)
+    notify_plugins('grano.relation.change', _handle)
+
+
 def save(data, project=None):
     """ Create or update a project with a given slug. """
 

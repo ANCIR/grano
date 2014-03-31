@@ -45,11 +45,10 @@ def validate(data, relation):
 
 
 @celery.task
-def _relation_changed(relation_id):
+def _relation_changed(relation_id, operation):
     """ Notify plugins about changes to a relation. """
-    #log.debug("Processing change in relation: %s", relation_id)
     def _handle(obj):
-        obj.relation_changed(relation_id)
+        obj.relation_changed(relation_id, operation)
     notify_plugins('grano.relation.change', _handle)
 
 
@@ -58,6 +57,7 @@ def save(data, relation=None):
 
     data = validate(data, relation)
 
+    operation = 'create' if relation is None else 'update'
     if relation is None:
         relation = Relation()
         relation.project = data.get('project')
@@ -81,13 +81,14 @@ def save(data, relation=None):
             prop.active = False
 
     db.session.flush()    
-    _relation_changed.delay(relation.id)
+    _relation_changed.delay(relation.id, operation)
     return relation
 
 
 def delete(relation):
     """ Delete the relation and its properties. """
     db.session.delete(relation)
+    _relation_changed.delay(relation.id, 'delete')
 
 
 def to_rest_base(relation):

@@ -50,11 +50,10 @@ def validate(data, entity):
 
 
 @celery.task
-def _entity_changed(entity_id):
+def _entity_changed(entity_id, operation):
     """ Notify plugins about changes to an entity. """
-    #log.debug("Processing change in entity: %s", entity_id)
     def _handle(obj):
-        obj.entity_changed(entity_id)
+        obj.entity_changed(entity_id, operation)
     notify_plugins('grano.entity.change', _handle)
 
 
@@ -63,6 +62,7 @@ def save(data, entity=None):
 
     data = validate(data, entity)
     
+    operation = 'create' if entity is None else 'update'
     if entity is None:
         entity = Entity()
         entity.project = data.get('project')
@@ -83,7 +83,7 @@ def save(data, entity=None):
             prop.active = False
 
     db.session.flush()
-    _entity_changed.delay(entity.id)    
+    _entity_changed.delay(entity.id, operation)
     return entity
 
 
@@ -91,6 +91,7 @@ def delete(entity):
     """ Delete the entity and its properties, as well as any associated 
     relations. """
     db.session.delete(entity)
+    _entity_changed.delay(entity.id, 'delete')
     
 
 def merge(orig, dest):
@@ -115,7 +116,8 @@ def merge(orig, dest):
     orig.same_as = dest.id
     dest.same_as = None
     db.session.flush()
-    _entity_changed.delay(dest.id)
+    _entity_changed.delay(dest.id, 'update')
+    _entity_changed.delay(orig.id, 'update')
     return dest
 
 
@@ -151,7 +153,7 @@ def apply_alias(project, author, canonical_name, alias_name):
             'source_url': None
         }
         properties_logic.save(alias, data)
-        _entity_changed.delay(alias.id)
+        _entity_changed.delay(alias.id, 'update')
         return log.info("Renamed: %s -> %s", alias_name, canonical_name)
 
     # Already done, thanks.

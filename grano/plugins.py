@@ -3,7 +3,8 @@ from stevedore.enabled import EnabledExtensionManager
 NAMESPACES = [
     'grano.startup',
     'grano.entity.change',
-    'grano.relation.change'
+    'grano.relation.change',
+    'grano.project.change'
     ]
 MANAGERS = {}
 

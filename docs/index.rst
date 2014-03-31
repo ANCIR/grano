@@ -65,7 +65,7 @@ Contents
    technical
    install
    schema
-   services
+   plugins
    rest_api
    rest_client
    bulk_api

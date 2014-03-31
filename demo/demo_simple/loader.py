@@ -7,7 +7,7 @@ DEFAULT_SOURCE_URL = 'http://www.opennews.org/'
 # Any settings (free-form dict):
 PROJECT_SETTINGS = {}
  
-loader = Loader('opennews', project_label='opennews',
+loader = Loader('opennews2', project_label='opennews',
     project_settings=PROJECT_SETTINGS, source_url=DEFAULT_SOURCE_URL)
  
 reader = unicodecsv.reader(open('fellows.csv'))
