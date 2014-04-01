@@ -3,6 +3,7 @@ from flask import request, session
 from grano.core import app
 from grano.model import Account
 from grano.lib.exc import Unauthorized
+from grano.lib.args import arg_bool
 
 
 @app.before_request
@@ -18,5 +19,7 @@ def check_auth():
         request.account = Account.by_api_key(api_key)
         if request.account is None:
             raise Unauthorized()
+        if arg_bool('api_key_cookie'):
+            session['id'] = request.account.id
     else: 
         request.account = None
