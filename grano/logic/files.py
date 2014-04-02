@@ -63,6 +63,7 @@ def to_rest_index(file):
         'id': file.id,
         'project': projects_logic.to_rest_index(file.project),
         'api_url': url_for('files_api.view', id=file.id),
+        'serve_api_url': url_for('files_api.serve', id=file.id),
         'file_name': file.file_name,
         'mime_type': file.mime_type
     }

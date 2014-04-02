@@ -388,3 +388,47 @@ are mutable, except for the ``project``, ``schema`` and automatically generated 
     DELETE /api/1/relations/<id>
 
 Delete a relation. 
+
+
+File uploads
+++++++++++++
+
+::
+
+    GET /api/1/files
+
+Retrieves a collection of all uploaded files that are currently available on
+grano. Standard :ref:`pager` arguments are available. As a means to filter
+the results, the following arguments can be given as query parameters:
+
+* ``project`` will filter for relations belonging to a specific project, based 
+  on the ``slug`` provided.
+
+::
+
+    GET /api/1/files/<id>
+
+Retrieves a single file's metadata from the API, including the author, project,
+file name and mime type.
+
+::
+
+    GET /api/1/files/<id>/_serve
+
+Retrieves a single file's body.
+
+::
+
+    POST /api/1/relations
+
+Operation to create a new file. The ``project`` and ``file`` fields are required.
+
+**WARNING:** Unlike all other endpoints in ``grano``, the submitted content is
+expected to be ``multipart/form-data``, not ``application/json``. File ``file`` 
+parameter is expected to be a raw file upload.
+
+::
+
+    DELETE /api/1/files/<id>
+
+Delete a file. 

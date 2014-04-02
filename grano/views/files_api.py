@@ -1,5 +1,7 @@
+from StringIO import StringIO
+
 from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import redirect, make_response, send_file
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
@@ -51,9 +53,21 @@ def create():
 
 @blueprint.route('/api/1/files/<id>', methods=['GET'])
 def view(id):
-    entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
-    return jsonify(entities.to_rest(entity))
+    file = object_or_404(File.by_id(id))
+    authz.require(authz.project_read(file.project))
+    return jsonify(files.to_rest(file))
+
+
+@blueprint.route('/api/1/files/<id>/_serve', methods=['GET'])
+def serve(id):
+    file = object_or_404(File.by_id(id))
+    authz.require(authz.project_read(file.project))
+    sio = StringIO()
+    sio.write(file.data)
+    sio.seek(0)
+    return send_file(sio,
+        attachment_filename=file.file_name,
+        as_attachment=False)
 
 
 @blueprint.route('/api/1/files/<id>', methods=['DELETE'])
