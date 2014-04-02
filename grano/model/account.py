@@ -16,6 +16,7 @@ class Account(db.Model, IntBase):
     api_key = db.Column(db.Unicode, default=make_token)
     
     projects = db.relationship('Project', backref='author', lazy='dynamic')
+    files = db.relationship('File', backref='author', lazy='dynamic')
     properties = db.relationship('Property', backref='author', lazy='dynamic')
     relations = db.relationship('Relation', backref='author', lazy='dynamic')
     entities = db.relationship('Entity', backref='author', lazy='dynamic')

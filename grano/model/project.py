@@ -21,6 +21,8 @@ class Project(db.Model, IntBase):
         cascade='all, delete, delete-orphan')
     permissions = db.relationship('Permission', backref='project', lazy='dynamic',
         cascade='all, delete, delete-orphan')
+    files = db.relationship('File', backref='project', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
     
 
     def get_attribute(self, obj, name):

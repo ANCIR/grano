@@ -36,7 +36,7 @@ def request_data(overlay={}):
     """ Decode a JSON-formatted POST body. """
     data = request.json
     if data is None:
-        raise BadRequest()
+        data = dict(request.form.items())
     data.update(overlay)
     return data
 

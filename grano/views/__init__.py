@@ -10,6 +10,7 @@ from grano.views.schemata_api import blueprint as schemata_api
 from grano.views.sessions_api import blueprint as sessions_api
 from grano.views.projects_api import blueprint as projects_api
 from grano.views.accounts_api import blueprint as accounts_api
+from grano.views.files_api import blueprint as files_api
 from grano.views.permissions_api import blueprint as permissions_api
 from grano.views.auth import check_auth
 
@@ -58,4 +59,5 @@ app.register_blueprint(schemata_api)
 app.register_blueprint(sessions_api)
 app.register_blueprint(projects_api)
 app.register_blueprint(accounts_api)
+app.register_blueprint(files_api)
 app.register_blueprint(permissions_api)
