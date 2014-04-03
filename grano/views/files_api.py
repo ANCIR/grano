@@ -7,7 +7,7 @@ from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.exc import BadRequest
-from grano.lib.args import object_or_404, request_data
+from grano.lib.args import object_or_404, request_data, get_limit
 from grano.model import Project, File, Permission
 from grano.logic import files
 from grano.logic.references import ProjectRef
@@ -68,6 +68,15 @@ def serve(id):
     return send_file(sio,
         attachment_filename=file.file_name,
         as_attachment=False)
+
+
+@blueprint.route('/api/1/files/<id>/_table', methods=['GET'])
+def table(id):
+    file = object_or_404(File.by_id(id))
+    authz.require(authz.project_read(file.project))
+    limit = get_limit(10)
+    validate_cache(keys={'id': file.id, 'limit': limit})
+    return jsonify(files.as_table(file, limit))
 
 
 @blueprint.route('/api/1/files/<id>', methods=['DELETE'])

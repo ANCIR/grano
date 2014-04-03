@@ -1,4 +1,6 @@
-
+from StringIO import StringIO
+from unicodecsv import DictReader, DictWriter
+from unicodecsv import Error as CSVError
 import logging
 import colander
 
@@ -57,6 +59,22 @@ def delete(file):
     """ Delete the file. """
     db.session.delete(file)
 
+
+def as_table(file, limit=None):
+    try:
+        sio = StringIO(file.data)
+        reader = DictReader(sio)
+        data = {'headers': None, 'rows': [], 'total': 0}
+        for i, row in enumerate(reader):
+            if data['headers'] is None:
+                data['headers'] = row.keys()
+            if limit is None or i < limit:
+                rd = [row.get(k) for k in data['headers']]
+                data['rows'].append(rd)
+            data['total'] = i
+        return data
+    except CSVError, e:
+        return {'status': 'error', 'error': unicode(e)}
 
 def to_rest_index(file):
     data = {
