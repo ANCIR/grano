@@ -34,8 +34,7 @@ def index():
 
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    conv = lambda es: [relations.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=True)
 
 
 @blueprint.route('/api/1/relations', methods=['POST', 'PUT'])
@@ -46,14 +45,14 @@ def create():
     authz.require(authz.project_edit(project))
     relation = relations.save(data)
     db.session.commit()
-    return jsonify(relations.to_rest(relation))
+    return jsonify(relation)
 
 
 @blueprint.route('/api/1/relations/<id>', methods=['GET'])
 def view(id):
     relation = object_or_404(Relation.by_id(id))
     authz.require(authz.project_read(relation.project))
-    return jsonify(relations.to_rest(relation))
+    return jsonify(relation)
 
 
 @blueprint.route('/api/1/relations/<id>', methods=['POST', 'PUT'])
@@ -63,7 +62,7 @@ def update(id):
     data = request_data({'author': request.account})
     relation = relations.save(data, relation=relation)
     db.session.commit()
-    return jsonify(relations.to_rest(relation))
+    return jsonify(relation)
 
 
 @blueprint.route('/api/1/relations/<id>', methods=['DELETE'])

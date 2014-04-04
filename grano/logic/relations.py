@@ -89,32 +89,3 @@ def delete(relation):
     """ Delete the relation and its properties. """
     db.session.delete(relation)
     _relation_changed.delay(relation.id, 'delete')
-
-
-def to_rest_base(relation):
-    from grano.logic import entities as entities_logic
-    return {
-        'id': relation.id,
-        'properties': {},
-        'project': projects_logic.to_rest_index(relation.project),
-        'api_url': url_for('relations_api.view', id=relation.id),
-        'schema': schemata_logic.to_rest_index(relation.schema),
-        'source': entities_logic.to_rest_index(relation.source),
-        'target': entities_logic.to_rest_index(relation.target)
-    }
-
-
-def to_rest(relation):
-    data = to_rest_base(relation)
-    for prop in relation.active_properties:
-        name, prop = properties_logic.to_rest(prop)
-        data['properties'][name] = prop
-    return data
-
-
-def to_rest_index(relation):
-    data = to_rest_base(relation)
-    for prop in relation.active_properties:
-        name, prop = properties_logic.to_rest_index(prop)
-        data['properties'][name] = prop
-    return data

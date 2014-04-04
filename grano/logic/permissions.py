@@ -43,18 +43,3 @@ def save(data, permission=None):
 def delete(permission):
     db.session.delete(permission)
     db.session.flush()
-
-
-def to_rest_index(permission):
-    return {
-        'id': permission.id,
-        'reader': permission.reader,
-        'editor': permission.editor,
-        'admin': permission.admin,
-        'project': projects_logic.to_rest_index(permission.project),
-        'account': accounts_logic.to_rest_index(permission.account),
-        'api_url': url_for('permissions_api.view', slug=permission.project.slug, id=permission.id)
-        }
-
-def to_rest(permission):
-    return to_rest_index(permission)

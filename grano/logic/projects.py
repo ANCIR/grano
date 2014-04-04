@@ -75,29 +75,3 @@ def delete(project):
     """ Delete the project and all related data. """
     _project_changed(project.slug, 'delete')
     db.session.delete(project)
-
-
-def to_rest_index(project):
-    return {
-        'slug': project.slug,
-        'label': project.label,
-        'private': project.private,
-        'api_url': url_for('projects_api.view', slug=project.slug)
-    }
-
-
-def to_rest_index_stats(project):
-    data = to_rest_index(project)
-    data['entities_count'] = project.entities.count()
-    data['relations_count'] = project.relations.count()
-    return data
-
-
-def to_rest(project):
-    data = to_rest_index_stats(project)
-    data['settings'] = project.settings
-    data['author'] = accounts.to_rest_index(project.author)
-    data['schemata_index_url'] = url_for('schemata_api.index', slug=project.slug)
-    data['entities_index_url'] = url_for('entities_api.index', project=project.slug)
-    data['relations_index_url'] = url_for('relations_api.index', project=project.slug)
-    return data

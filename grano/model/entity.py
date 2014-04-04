@@ -1,6 +1,6 @@
 from sqlalchemy import or_, and_
 
-from grano.core import db
+from grano.core import db, url_for
 from grano.model.common import UUIDBase, PropertyBase
 from grano.model.schema import Schema
 from grano.model.relation import Relation
@@ -91,5 +91,64 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     def degree(self):
         return self.inbound.count() + self.outbound.count()
 
+
+    def to_dict_base(self):
+        data = {
+            'id': self.id,
+            'project': self.project.to_dict_index(),
+            'api_url': url_for('entities_api.view', id=self.id),
+        }
+
+        data['schemata'] = [s.to_dict_index() for s in self.schemata]
+
+        if self.same_as:
+            data['same_as'] = self.same_as
+            data['same_as_url'] = url_for('entities_api.view', id=self.same_as)
+        return data
+
+
+    def to_dict_index(self):
+        """ Convert an entity to the REST API form. """
+        data = self.to_dict_base()
+        data['properties'] = {}
+        for prop in self.active_properties:
+            name, prop = prop.to_dict_index()
+            data['properties'][name] = prop
+        return data
+
+
+    def to_dict(self):
+        """ Full serialization of the entity. """
+        data = self.to_dict_base()
+        data['created_at'] = self.created_at
+        data['updated_at'] = self.updated_at
+
+        data['properties'] = {}
+        for prop in self.active_properties:
+            name, prop = prop.to_dict()
+            data['properties'][name] = prop
+
+        data['inbound_relations'] = self.inbound.count()
+        if data['inbound_relations'] > 0:
+            data['inbound_url'] = url_for('relations_api.index', target=self.id)
+        
+        data['outbound_relations'] = self.outbound.count()
+        if data['outbound_relations'] > 0:
+            data['outbound_url'] = url_for('relations_api.index', source=self.id)
+        
+        return data
+
+
+    def to_index(self):
+        """ Convert an entity to a form appropriate for search indexing. """
+        data = self.to_rest()
+        data['degree'] = self.degree
+        
+        data['names'] = []
+        for prop in self.properties:
+            if prop.name == 'name':
+                data['names'].append(prop.value)
+
+        return data
 
 

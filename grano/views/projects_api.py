@@ -25,8 +25,7 @@ def index():
         and_(Permission.reader==True, Permission.account==request.account)))
     pager = Pager(q)
     validate_cache(keys=pager.cache_keys())
-    conv = lambda es: [projects.to_rest_index_stats(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=True)
 
 
 @blueprint.route('/api/1/projects', methods=['POST', 'PUT'])
@@ -34,7 +33,7 @@ def create():
     authz.require(authz.project_create())
     project = projects.save(request_data({'author': request.account}))
     db.session.commit()
-    return jsonify(projects.to_rest(project), status=201)
+    return jsonify(project, status=201)
 
 
 @blueprint.route('/api/1/projects/<slug>', methods=['GET'])
@@ -43,7 +42,7 @@ def view(slug):
     authz.require(authz.project_read(project))
     if not project.private:
         validate_cache(last_modified=project.updated_at)
-    return jsonify(projects.to_rest(project))
+    return jsonify(project)
 
 
 @blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])
@@ -56,7 +55,7 @@ def graph(slug):
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')
-    return jsonify(extractor.to_dict())
+    return jsonify(extractor)
 
 
 @blueprint.route('/api/1/projects/<slug>', methods=['POST', 'PUT'])
@@ -66,7 +65,7 @@ def update(slug):
     data = request_data({'author': request.account})
     project = projects.save(data, project=project)
     db.session.commit()
-    return jsonify(projects.to_rest(project))
+    return jsonify(project)
 
 
 @blueprint.route('/api/1/projects/<slug>', methods=['DELETE'])

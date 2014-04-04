@@ -23,8 +23,7 @@ def index(slug):
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
     validate_cache(keys=pager.cache_keys())
-    conv = lambda es: [permissions.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=True)
 
 
 @blueprint.route('/api/1/projects/<slug>/permissions', methods=['POST', 'PUT'])
@@ -34,7 +33,7 @@ def create(slug):
     data = request_data({'project': project})
     permission = permissions.save(data)
     db.session.commit()
-    return jsonify(permissions.to_rest(permission), status=201)
+    return jsonify(permission, status=201)
 
 
 @blueprint.route('/api/1/projects/<slug>/permissions/<id>', methods=['GET'])
@@ -42,7 +41,7 @@ def view(slug, id):
     project = object_or_404(Project.by_slug(slug))
     permission = object_or_404(Permission.by_project_and_id(project, id))
     authz.require(authz.project_manage(project) or request.account==permission.account)
-    return jsonify(permissions.to_rest(permission))
+    return jsonify(permission)
 
 
 @blueprint.route('/api/1/projects/<slug>/permissions/<id>', methods=['POST', 'PUT'])
@@ -53,7 +52,7 @@ def update(slug, id):
     data = request_data({'project': project})
     permission = permissions.save(data, permission=permission)
     db.session.commit()
-    return jsonify(permissions.to_rest(permission))
+    return jsonify(permission)
 
 
 @blueprint.route('/api/1/projects/<slug>/permissions/<id>', methods=['DELETE'])

@@ -1,4 +1,4 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model.util import make_token, MutableDict, JSONEncodedDict
 from grano.model.common import IntBase
 
@@ -37,3 +37,24 @@ class Project(db.Model, IntBase):
     def by_slug(cls, slug):
         q = db.session.query(cls).filter_by(slug=slug)
         return q.first()
+
+
+    def to_dict_index(self):
+        return {
+            'slug': self.slug,
+            'label': self.label,
+            'private': self.private,
+            'api_url': url_for('projects_api.view', slug=self.slug),
+            'entities_count': self.entities.count(),
+            'relations_count': self.relations.count()
+        }
+
+
+    def to_dict(self):
+        data = self.to_dict_index()
+        data['settings'] = self.settings
+        data['author'] = self.author.to_dict_index()
+        data['schemata_index_url'] = url_for('schemata_api.index', slug=self.slug)
+        data['entities_index_url'] = url_for('entities_api.index', project=self.slug)
+        data['relations_index_url'] = url_for('relations_api.index', project=self.slug)
+        return data

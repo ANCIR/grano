@@ -1,4 +1,4 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model.common import UUIDBase, PropertyBase
 from grano.model.property import RelationProperty
 
@@ -22,3 +22,30 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     def schemata(self):
         return [self.schema]
 
+
+    def to_dict_base(self):
+        return {
+            'id': self.id,
+            'properties': {},
+            'project': self.project.to_dict_index(),
+            'api_url': url_for('relations_api.view', id=self.id),
+            'schema': self.schema.to_dict_index(),
+            'source': self.source.to_dict_index(),
+            'target': self.target.to_dict_index()
+        }
+
+
+    def to_dict(self):
+        data = self.to_dict_base()
+        for prop in self.active_properties:
+            name, prop = prop.to_dict()
+            data['properties'][name] = prop
+        return data
+
+
+    def to_dict_index(self):
+        data = self.to_dict_base()
+        for prop in self.active_properties:
+            name, prop = prop.to_dict_index()
+            data['properties'][name] = prop
+        return data

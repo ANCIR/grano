@@ -42,8 +42,7 @@ def index():
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    conv = lambda es: [entities.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=True)
 
 
 @blueprint.route('/api/1/entities', methods=['POST', 'PUT'])
@@ -54,14 +53,14 @@ def create():
     authz.require(authz.project_edit(project))
     entity = entities.save(data)
     db.session.commit()
-    return jsonify(entities.to_rest(entity))
+    return jsonify(entity)
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['GET'])
 def view(id):
     entity = object_or_404(Entity.by_id(id))
     authz.require(authz.project_read(entity.project))
-    return jsonify(entities.to_rest(entity))
+    return jsonify(entity)
 
 
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
@@ -73,7 +72,7 @@ def graph(id):
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
                 mimetype='text/xml')
-    return jsonify(extractor.to_dict())
+    return jsonify(extractor)
 
 
 @blueprint.route('/api/1/entities/_suggest', methods=['GET'])
@@ -119,7 +118,7 @@ def update(id):
     data = request_data({'author': request.account})
     entity = entities.save(data, entity=entity)
     db.session.commit()
-    return jsonify(entities.to_rest(entity))
+    return jsonify(entity)
 
 
 @blueprint.route('/api/1/entities/_merge', methods=['POST', 'PUT'])
@@ -136,7 +135,7 @@ def merge():
     
     dest = entities.merge(data['orig'], data['dest'])
     db.session.commit()
-    return jsonify(entities.to_rest(dest))
+    return jsonify(dest)
 
 
 @blueprint.route('/api/1/entities/<id>', methods=['DELETE'])

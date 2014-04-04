@@ -24,11 +24,7 @@ def index(slug):
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
     validate_cache(keys=pager.cache_keys())
-    if arg_bool('full'):
-        conv = lambda es: [schemata.to_rest(e) for e in es]
-    else:
-        conv = lambda es: [schemata.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=not arg_bool('full'))
 
 
 @blueprint.route('/api/1/projects/<slug>/schemata', methods=['POST', 'PUT'])
@@ -38,7 +34,7 @@ def create(slug):
     data = request_data({'project': project})
     schema = schemata.save(data)
     db.session.commit()
-    return jsonify(schemata.to_rest(schema), status=201)
+    return jsonify(schema, status=201)
 
 
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['GET'])
@@ -48,7 +44,7 @@ def view(slug, name):
     if not project.private:
         validate_cache(last_modified=project.updated_at)
     schema = object_or_404(Schema.by_name(project, name))
-    return jsonify(schemata.to_rest(schema))
+    return jsonify(schema)
 
 
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['POST', 'PUT'])
@@ -59,7 +55,7 @@ def update(slug, name):
     data = request_data({'project': project})
     schema = schemata.save(data, schema=schema)
     db.session.commit()
-    return jsonify(schemata.to_rest(schema))
+    return jsonify(schema)
 
 
 @blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['DELETE'])

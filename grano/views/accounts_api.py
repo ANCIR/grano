@@ -43,7 +43,7 @@ def suggest():
 @blueprint.route('/api/1/accounts/<id>', methods=['GET'])
 def view(id):
     account = object_or_404(Account.by_id(id))
-    return jsonify(accounts.to_rest(account))
+    return jsonify(account)
 
 
 @blueprint.route('/api/1/accounts/<id>', methods=['POST', 'PUT'])
@@ -53,4 +53,4 @@ def update(id):
     data = request_data()
     entity = accounts.save(data, account=account)
     db.session.commit()
-    return jsonify(accounts.to_rest(account))
+    return jsonify(account)

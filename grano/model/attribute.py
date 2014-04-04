@@ -1,4 +1,4 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model.common import IntBase
 from grano.model.util import slugify_column
 
@@ -44,3 +44,18 @@ class Attribute(db.Model, IntBase):
         q = q.filter_by(name=name)
         return q.first()
 
+
+    def to_index(self):
+        return {
+            'name': self.name,
+            'label': self.label,
+            'datatype': self.datatype
+        }
+
+    def to_dict(self):
+        data = self.to_index()
+        data['id'] = self.id
+        data['hidden'] = self.hidden
+        if self.description and len(self.description):
+            data['description'] = self.description
+        return data

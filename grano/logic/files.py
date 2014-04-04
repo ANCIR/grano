@@ -75,19 +75,3 @@ def as_table(file, limit=None):
         return data
     except CSVError, e:
         return {'status': 'error', 'error': unicode(e)}
-
-def to_rest_index(file):
-    data = {
-        'id': file.id,
-        'project': projects_logic.to_rest_index(file.project),
-        'api_url': url_for('files_api.view', id=file.id),
-        'serve_api_url': url_for('files_api.serve', id=file.id),
-        'file_name': file.file_name,
-        'mime_type': file.mime_type
-    }
-    return data
-
-
-def to_rest(file):
-    """ Full serialization of the file metadata. """
-    return to_rest_index(file)

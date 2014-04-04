@@ -23,32 +23,8 @@ def save(data):
 
 
 def delete(attribute):
+    """ Delete the attribute and all related properties. """
     q = db.session.query(Property)
     q = q.filter(Property.attribute==attribute)
     q.delete()
     db.session.delete(attribute)
-
-
-def to_index(attribute):
-    return {
-        'name': attribute.name,
-        'label': attribute.label,
-        'datatype': attribute.datatype
-    }
-
-
-def to_rest(attribute):
-    data = to_index(attribute)
-    data['id'] = attribute.id
-    data['hidden'] = attribute.hidden
-    if attribute.description:
-        data['description'] = attribute.description
-    return data
-
-
-def to_dict(attribute):
-    data = to_index(attribute)
-    data['id'] = attribute.id
-    data['hidden'] = attribute.hidden
-    data['description'] = attribute.description
-    return data

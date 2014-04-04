@@ -138,5 +138,5 @@ class Pager(object):
             'pages': self.pages,
             'limit': self.limit,
             'offset': self.offset,
-            'results': results_converter(self)
+            'results': results_converter(list(self))
         }

@@ -37,7 +37,7 @@ def index():
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     conv = lambda es: [files.to_rest_index(e) for e in es]
-    return jsonify(pager.to_dict(conv))
+    return jsonify(pager, index=True)
 
 
 @blueprint.route('/api/1/files', methods=['POST', 'PUT'])
@@ -48,14 +48,14 @@ def create():
     authz.require(authz.project_edit(project))
     file_ = files.save(data, request.files.get('file'))
     db.session.commit()
-    return jsonify(files.to_rest(file_))
+    return jsonify(file_)
 
 
 @blueprint.route('/api/1/files/<id>', methods=['GET'])
 def view(id):
     file = object_or_404(File.by_id(id))
     authz.require(authz.project_read(file.project))
-    return jsonify(files.to_rest(file))
+    return jsonify(file)
 
 
 @blueprint.route('/api/1/files/<id>/_serve', methods=['GET'])

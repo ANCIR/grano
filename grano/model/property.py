@@ -1,4 +1,4 @@
-from grano.core import db
+from grano.core import db, url_for
 from grano.model.common import IntBase
 from grano.model.attribute import Attribute
 
@@ -32,14 +32,20 @@ class Property(db.Model, IntBase):
     obj = db.Column(db.String(20))
     __mapper_args__ = {'polymorphic_on': obj}
 
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'schema': self.schema.name,
-            'value': self.value,
-            'source_url': self.source_url,
-            'active': self.active
+
+    def to_dict_index(self):
+        value = self.value
+        return self.name, {
+            'value': value,
+            'source_url': self.source_url
         }
+
+
+    def to_dict(self):
+        name, data = self.to_dict_index()
+        data['id'] = self.id
+        data['active'] = self.active
+        return name, data
 
 
 class EntityProperty(Property):
