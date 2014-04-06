@@ -17,6 +17,8 @@ class Project(db.Model, IntBase):
         cascade='all, delete, delete-orphan')
     entities = db.relationship('Entity', backref='project', lazy='dynamic',
         cascade='all, delete, delete-orphan')
+    pipelines = db.relationship('Pipeline', backref='author', lazy='dynamic',
+        cascade='all, delete, delete-orphan')
     schemata = db.relationship('Schema', backref='project', lazy='dynamic',
         cascade='all, delete, delete-orphan')
     permissions = db.relationship('Permission', backref='project', lazy='dynamic',

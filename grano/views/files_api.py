@@ -30,13 +30,10 @@ def index():
         and_(Permission.reader==True, Permission.account==request.account)))
 
     if request.args.get('project'):
-        alias = aliased(Project)
-        query = query.join(project, File.project)
         query = query.filter(Project.slug==request.args.get('project'))
     
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    conv = lambda es: [files.to_rest_index(e) for e in es]
     return jsonify(pager, index=True)
 
 
