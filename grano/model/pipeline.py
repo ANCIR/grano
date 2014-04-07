@@ -12,9 +12,14 @@ from grano.model.common import IntBase
 class Pipeline(db.Model, IntBase):
     __tablename__ = 'grano_pipeline'
 
+    STATUS_PENDING = 'pending'
+    STATUS_RUNNING = 'running'
+    STATUS_FAILED = 'failed'
+    STATUS_COMPLETE = 'complete'
+
     operation = db.Column(db.Unicode)
     status = db.Column(db.Unicode)
-    percent_complete = db.Column(db.Integer)
+    percent_complete = db.Column(db.Integer, default=int)
 
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
@@ -40,7 +45,7 @@ class Pipeline(db.Model, IntBase):
             'updated_at': self.updated_at,
             'started_at': self.started_at,
             'ended_at': self.ended_at,
-            'details': self.details,
+            'details': self.config,
             'percent_complete': self.percent_complete
         }
 
@@ -67,9 +72,10 @@ class LogEntry(db.Model, IntBase):
     def to_dict_index(self):
         return {
             'id': self.id,
-            'level': level,
-            'message': message,
-            'error': self.operation,
+            'level': self.level,
+            'message': self.message,
+            'error': self.error,
+            #'details': self.details,
             'api_url': url_for('log_entries_api.view_entry',
                 pipeline_id=self.pipeline.id, id=self.id),
             'created_at': self.created_at, 

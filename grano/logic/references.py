@@ -2,7 +2,7 @@ import colander
 
 from grano.lib.exc import BadRequest
 from grano.model import Project, Entity, Account
-from grano.model import Schema
+from grano.model import Schema, File
 
 
 class Ref(object):
@@ -14,7 +14,10 @@ class Ref(object):
     def deserialize(self, node, cstruct):
         if cstruct is colander.null:
             return colander.null
-        return self.decode(node, cstruct)
+        value = self.decode(node, cstruct)
+        if value is None:
+            raise colander.Invalid(node, 'Missing')
+        return value
 
     def cstruct_children(self, node, cstruct):
         return []
@@ -74,6 +77,19 @@ class AccountRef(Ref):
         if isinstance(cstruct, dict):
             if cstruct.get('id'):
                 return Account.by_id(cstruct.get('id'))
+        return None
+
+
+class FileRef(Ref):
+    
+    def decode(self, node, cstruct):
+        if isinstance(cstruct, File):
+            return cstruct
+        if isinstance(cstruct, (int, basestring)):
+            return File.by_id(cstruct)
+        if isinstance(cstruct, dict):
+            if cstruct.get('id'):
+                return File.by_id(cstruct.get('id'))
         return None
 
 

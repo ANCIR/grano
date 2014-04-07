@@ -10,25 +10,24 @@ log = logging.getLogger(__name__)
 
 
 ## Import commands
-def import_aliases(project, author, path):
+def import_aliases(project, author, fh):
     """ Import aliases from a CSV file. This will not create new entities, but
     re-name existing entities or merge two entities if one's name is given as 
     an alias for the other. """
-    with open(path, 'r') as fh:
-        reader = DictReader(fh)
-        for i, row in enumerate(reader):
-            data = {}
-            for k, v in row.items():
-                k = k.lower().strip()
-                data[k] = v
-            assert 'canonical' in data, 'No "canonical" column!'
-            assert 'alias' in data, 'No "alias" column!'
-            entities.apply_alias(project, author,
-                data.get('canonical'),
-                data.get('alias'))
-            if i % 1000 == 0:
-                db.session.commit()
-        db.session.commit()
+    reader = DictReader(fh)
+    for i, row in enumerate(reader):
+        data = {}
+        for k, v in row.items():
+            k = k.lower().strip()
+            data[k] = v
+        assert 'canonical' in data, 'No "canonical" column!'
+        assert 'alias' in data, 'No "alias" column!'
+        entities.apply_alias(project, author,
+            data.get('canonical'),
+            data.get('alias'))
+        if i % 1000 == 0:
+            db.session.commit()
+    db.session.commit()
 
 
 ## Export commands

@@ -15,7 +15,7 @@ class File(db.Model, IntBase):
 
 
     def to_dict_index(self):
-        data = {
+        return {
             'id': self.id,
             'project': self.project.to_dict_index(),
             'api_url': url_for('files_api.view', id=self.id),
@@ -23,7 +23,6 @@ class File(db.Model, IntBase):
             'file_name': self.file_name,
             'mime_type': self.mime_type
         }
-        return data
 
 
     def to_dict(self):

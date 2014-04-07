@@ -9,4 +9,4 @@ from grano.model.account import Account
 from grano.model.project import Project
 from grano.model.permission import Permission
 from grano.model.file import File
-from grano.model.pipeline import Pipeline #, LogEntry
+from grano.model.pipeline import Pipeline, LogEntry
