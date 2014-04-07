@@ -5,6 +5,7 @@ from grano.core import app, db, url_for, celery
 from grano.lib.exc import NotImplemented
 from grano.logic.validation import database_name
 from grano.logic.references import AccountRef
+from grano.plugins import notify_plugins
 from grano.logic import accounts
 from grano.model import Project
 

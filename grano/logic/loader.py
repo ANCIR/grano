@@ -149,13 +149,13 @@ class Loader(object):
     database transactions. """
 
     def __init__(self, project_slug, source_url=None, project_label=None,
-            project_settings=None):
+            project_settings=None, account=None):
         self.source_url = source_url
-        self.account = accounts.console_account()
+        self.account = account or accounts.console_account()
         
         project = Project.by_slug(project_slug)
         project_settings = project_settings or (project.settings if project else {})
-        project_label= project_label or (project.labek if project else project_slug)
+        project_label= project_label or (project.label if project else project_slug)
         self.project = projects.save({
             'slug': project_slug,
             'author': self.account,

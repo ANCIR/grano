@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from grano.core import db, url_for
@@ -33,6 +34,11 @@ class Pipeline(db.Model, IntBase):
         cascade='all, delete, delete-orphan')
 
 
+    def has_errors(self):
+        q = self.entries.filter_by(level=logging.ERROR)
+        return q.count() > 0
+
+
     def to_dict_index(self):
         return {
             'id': self.id,
@@ -62,7 +68,7 @@ class LogEntry(db.Model, IntBase):
 
     pipeline_id = db.Column(db.Integer, db.ForeignKey('grano_pipeline.id'))
     
-    level = db.Column(db.Unicode)
+    level = db.Column(db.Integer)
     message = db.Column(db.Unicode)
     error = db.Column(db.Unicode)
 

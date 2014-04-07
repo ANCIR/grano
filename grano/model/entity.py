@@ -141,7 +141,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     def to_index(self):
         """ Convert an entity to a form appropriate for search indexing. """
-        data = self.to_rest()
+        data = self.to_dict()
         data['degree'] = self.degree
         
         data['names'] = []

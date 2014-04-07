@@ -3,7 +3,7 @@ from unicodecsv import DictReader, DictWriter
 from sqlalchemy.orm import aliased
 
 from grano.core import db
-from grano.logic import entities
+from grano.logic import entities, pipelines, imports
 from grano.model import Entity, EntityProperty, Schema
 
 log = logging.getLogger(__name__)
@@ -11,23 +11,16 @@ log = logging.getLogger(__name__)
 
 ## Import commands
 def import_aliases(project, author, fh):
-    """ Import aliases from a CSV file. This will not create new entities, but
-    re-name existing entities or merge two entities if one's name is given as 
-    an alias for the other. """
-    reader = DictReader(fh)
-    for i, row in enumerate(reader):
-        data = {}
-        for k, v in row.items():
-            k = k.lower().strip()
-            data[k] = v
-        assert 'canonical' in data, 'No "canonical" column!'
-        assert 'alias' in data, 'No "alias" column!'
-        entities.apply_alias(project, author,
-            data.get('canonical'),
-            data.get('alias'))
-        if i % 1000 == 0:
-            db.session.commit()
-    db.session.commit()
+    """ Set up a data pipeline and execute it. """
+    config = {'mapping': {
+        'canonical': {'attribute': 'canonical'},
+        'alias': {'attribute': 'alias'}
+    }}
+    pipeline = pipelines.create(project, 'import',
+        config, author)
+    pipelines.start(pipeline)
+    imports.import_aliases(pipeline, fh)
+    pipelines.finish(pipeline)
 
 
 ## Export commands

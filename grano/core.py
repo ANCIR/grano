@@ -29,4 +29,7 @@ celery.config_from_object(app.config)
 oauth = OAuth()
 
 def url_for(*a, **kw):
-    return _url_for(*a, _external=True, **kw)
+    try:
+        return _url_for(*a, _external=True, **kw)
+    except RuntimeError:
+        return None

@@ -1,3 +1,5 @@
+from StringIO import StringIO
+
 from grano.core import db, url_for
 from grano.model.common import IntBase
 
@@ -12,6 +14,10 @@ class File(db.Model, IntBase):
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     data = db.Column(db.LargeBinary)
+
+    @property
+    def fh(self):
+        return StringIO(self.data)
 
 
     def to_dict_index(self):
