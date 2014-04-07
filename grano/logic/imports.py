@@ -33,7 +33,8 @@ def make_importer(project, account, data):
         'mapping': data.get('mapping'),
         'relation_schema': data.get('relation_schema')
     }
-    pipeline = pipelines.create(project, 'import', config, account)
+    pipeline = pipelines.create(project, 'import',
+        sane.get('file').file_name, config, account)
     run_importer.delay(pipeline.id)
     return pipeline
 

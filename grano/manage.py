@@ -48,8 +48,7 @@ def alias_import(project, path):
     """ Load a set of entity aliases from a CSV file. """
     pobj = Project.by_slug(project)
     assert pobj is not None, 'Project not available: %s' % project
-    with open(path, 'r') as fh:
-        import_aliases(pobj, console_account(), fh)
+    import_aliases(pobj, console_account(), path)
 
 
 @manager.command

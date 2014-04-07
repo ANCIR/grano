@@ -1,3 +1,4 @@
+import os
 import logging
 from unicodecsv import DictReader, DictWriter
 from sqlalchemy.orm import aliased
@@ -10,17 +11,19 @@ log = logging.getLogger(__name__)
 
 
 ## Import commands
-def import_aliases(project, author, fh):
+def import_aliases(project, author, path):
     """ Set up a data pipeline and execute it. """
-    config = {'mapping': {
-        'canonical': {'attribute': 'canonical'},
-        'alias': {'attribute': 'alias'}
-    }}
-    pipeline = pipelines.create(project, 'import',
-        config, author)
-    pipelines.start(pipeline)
-    imports.import_aliases(pipeline, fh)
-    pipelines.finish(pipeline)
+    with open(path, 'r') as fh:
+        config = {'mapping': {
+            'canonical': {'attribute': 'canonical'},
+            'alias': {'attribute': 'alias'}
+        }}
+        name = os.path.basename(path)
+        pipeline = pipelines.create(project, 'import',
+            name, config, author)
+        pipelines.start(pipeline)
+        imports.import_aliases(pipeline, fh)
+        pipelines.finish(pipeline)
 
 
 ## Export commands

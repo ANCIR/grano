@@ -6,11 +6,12 @@ from grano.model import Pipeline, LogEntry
 from grano.logic.accounts import console_account
 
 
-def create(project, operation, config=None, author=None):
+def create(project, operation, label=None, config=None, author=None):
     """ Create a new pipeline object, in PENDING state. """
     pipeline = Pipeline()
     pipeline.status = Pipeline.STATUS_PENDING
     pipeline.project = project
+    pipeline.label = label
     pipeline.operation = operation
     pipeline.percent_complete = 0
     pipeline.author = author or console_account()

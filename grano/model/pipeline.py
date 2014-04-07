@@ -19,6 +19,7 @@ class Pipeline(db.Model, IntBase):
     STATUS_COMPLETE = 'complete'
 
     operation = db.Column(db.Unicode)
+    label = db.Column(db.Unicode)
     status = db.Column(db.Unicode)
     percent_complete = db.Column(db.Integer, default=int)
 
