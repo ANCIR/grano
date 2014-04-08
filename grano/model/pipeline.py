@@ -43,6 +43,7 @@ class Pipeline(db.Model, IntBase):
     def to_dict_index(self):
         return {
             'id': self.id,
+            'label': self.label,
             'project': self.project.to_dict_index() if self.project else None,
             'author': self.author.to_dict_index(),
             'api_url': url_for('pipelines_api.view', id=self.id),
@@ -52,7 +53,7 @@ class Pipeline(db.Model, IntBase):
             'updated_at': self.updated_at,
             'started_at': self.started_at,
             'ended_at': self.ended_at,
-            'details': self.config,
+            'config': self.config,
             'percent_complete': self.percent_complete
         }
 

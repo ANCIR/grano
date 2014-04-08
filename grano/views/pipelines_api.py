@@ -28,6 +28,7 @@ def index():
     if request.args.get('operation'):
         query = query.filter(Pipeline.operation==request.args.get('operation'))
     
+    query = query.order_by(Pipeline.updated_at.desc())
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)
