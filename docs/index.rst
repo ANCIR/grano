@@ -96,6 +96,6 @@ well.
 Contributors
 ------------
 
-``grano`` is written and maintained by `Friedrich Lindenberg <http://pudo.org>`_.
-Please feel free to contribute any improvements as pull requests on GitHub, or
-create an issue to discuss them first.
+``grano`` is a free software project hosted by `Code for Africa <http://www.codeforafrica.org/>`_.
+It relies on contributions from people like you, so please contribute any improvements as pull
+requests on GitHub, or create an issue to discuss them first.
