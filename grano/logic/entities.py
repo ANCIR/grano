@@ -121,7 +121,7 @@ def merge(orig, dest):
     return dest
 
 
-def apply_alias(project, author, canonical_name, alias_name):
+def apply_alias(project, author, canonical_name, alias_name, source_url=None):
     """ Given two names, find out if there are existing entities for one or 
     both of them. If so, merge them into a single entity - or, if only the 
     entity associated with the alias exists - re-name the entity. """
@@ -150,7 +150,7 @@ def apply_alias(project, author, canonical_name, alias_name):
             'attribute': attribute,
             'active': True,
             'name': 'name',
-            'source_url': None
+            'source_url': source_url
         }
         properties_logic.save(alias, data)
         _entity_changed.delay(alias.id, 'update')

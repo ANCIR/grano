@@ -15,6 +15,8 @@ MODES = ['aliases', 'entities', 'relations']
 class ImportBaseValidator(colander.MappingSchema):
     file = colander.SchemaNode(FileRef())
     project = colander.SchemaNode(ProjectRef())
+    source_url = colander.SchemaNode(colander.String(),
+        empty=None, missing=None)
     mode = colander.SchemaNode(colander.String(),
         validator=colander.OneOf(MODES))
 
@@ -30,6 +32,7 @@ def make_importer(project, account, data):
     config = {
         'mode': sane.get('mode'),
         'file': sane.get('file').id,
+        'source_url': sane.get('source_url'),
         'mapping': data.get('mapping'),
         'relation_schema': data.get('relation_schema')
     }
@@ -59,6 +62,20 @@ def run_importer(pipeline_id):
     pipelines.finish(pipeline)
 
 
+def _row_source_url(pipeline, row):
+    """ Determine the best available source URL for the given 
+    row of data. """
+    for k, v in pipeline.config.get('mapping', {}).items():
+        if v.get('attribute') == '_source_url':
+            value = row.get(k, '').strip()
+            if len(value):
+                return value
+    source_url = pipeline.config.get('source_url')
+    if source_url is not None and len(source_url.strip()):
+        return source_url
+    return None
+
+
 def import_aliases(pipeline, fh):
     """ Import aliases from a CSV source. This will not create
     new entities, but re-name existing entities or merge two
@@ -73,10 +90,12 @@ def import_aliases(pipeline, fh):
             canonical_column = k
 
     for i, row in enumerate(importer):
-        print row
+        source_url = _row_source_url(pipeline, row)
+        print [row, source_url]
         entities.apply_alias(pipeline.project, pipeline.author,
             row.get(canonical_column),
-            row.get(alias_column))
+            row.get(alias_column), 
+            source_url=source_url)
         
         if i % 100 == 0:
             percentage = int((float(i) / max(1, len(importer)))*100)
@@ -119,10 +138,11 @@ def import_objects(pipeline, fh):
     loader_ = loader.Loader(pipeline.project.slug, account=pipeline.author)
 
     for i, row in enumerate(importer):
+        source_url = _row_source_url(pipeline, row)
         rel_data = {}
-        source = loader_.make_entity(source_schemata)
-        target = loader_.make_entity(target_schemata)
-        entity = loader_.make_entity(entity_schemata)
+        source = loader_.make_entity(source_schemata, source_url=source_url)
+        target = loader_.make_entity(target_schemata, source_url=source_url)
+        entity = loader_.make_entity(entity_schemata, source_url=source_url)
 
         # Try to assign each column to the appropriate object in this
         # loader. 
@@ -149,7 +169,8 @@ def import_objects(pipeline, fh):
         if mode == 'relations':
             source.save()
             target.save()
-            rel = loader_.make_relation(relation_schema, source, target)
+            rel = loader_.make_relation(relation_schema, source,
+                target, source_url=source_url)
             for k, v in rel_data.items():
                 rel.set(k, v)
             rel.save()
