@@ -39,6 +39,8 @@ ENTITY_VIEW_PATTERN = 'http://beta.grano.cc/entities/%s'
 # turn it off with: 
 
 CELERY_ALWAYS_EAGER = True
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
 
 # Otherwise, just set the task broker URI which you intend to 
 # use:
