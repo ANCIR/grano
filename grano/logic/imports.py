@@ -91,7 +91,6 @@ def import_aliases(pipeline, fh):
 
     for i, row in enumerate(importer):
         source_url = _row_source_url(pipeline, row)
-        print [row, source_url]
         entities.apply_alias(pipeline.project, pipeline.author,
             row.get(canonical_column),
             row.get(alias_column), 
