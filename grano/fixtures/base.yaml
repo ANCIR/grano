@@ -6,6 +6,3 @@ attributes:
   - name: name
     label: Name
     hidden: yes
-  - name: opencorporates_uri
-    label: "OpenCorporates URI"
-    hidden: yes
