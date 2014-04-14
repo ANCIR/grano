@@ -1,11 +1,14 @@
+from StringIO import StringIO
+
 from flask import Blueprint, render_template, Response, request
-from flask import redirect, make_response, url_for
+from flask import redirect, make_response, url_for, send_file
 from sqlalchemy import or_, and_
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
 from grano.model import Project, Permission
 from grano.logic import projects
+from grano.logic.aliases import export_aliases
 from grano.lib.pager import Pager
 from grano.logic.graph import GraphExtractor
 from grano.lib.exc import Gone
@@ -43,6 +46,18 @@ def view(slug):
     if not project.private:
         validate_cache(last_modified=project.updated_at)
     return jsonify(project)
+
+
+@blueprint.route('/api/1/projects/<slug>/aliases', methods=['GET'])
+def aliases(slug):
+    project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_read(project))
+    sio = StringIO()
+    export_aliases(project, sio)
+    sio.seek(0)
+    res = send_file(sio, mimetype='text/csv')
+    res.headers['Content-Disposition'] = 'filename=%s-aliases.csv' % project.slug
+    return res
 
 
 @blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])

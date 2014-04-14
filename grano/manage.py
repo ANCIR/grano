@@ -56,7 +56,8 @@ def alias_export(project, path):
     """ Export all known entity aliases to a CSV file. """
     pobj = Project.by_slug(project)
     assert pobj is not None, 'Project not available: %s' % project
-    export_aliases(pobj, path)
+    with open(path, 'w') as fh:
+        export_aliases(pobj, fh)
 
 
 @manager.command

@@ -62,9 +62,9 @@ def serve(id):
     sio = StringIO()
     sio.write(file.data)
     sio.seek(0)
-    return send_file(sio,
-        attachment_filename=file.file_name,
-        as_attachment=False)
+    res = send_file(sio, mimetype=file.mime_type)
+    res.headers['Content-Disposition'] = 'filename=%s' % file.file_name
+    return res
 
 
 @blueprint.route('/api/1/files/<id>/_table', methods=['GET'])

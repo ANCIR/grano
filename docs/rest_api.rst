@@ -141,6 +141,17 @@ The following query paramters are available:
 
 ::
 
+    GET /api/1/projects/<slug>/aliases
+
+This endpoint will return a list of names and their aliases for this dataset. That 
+means, for any entity which has only a single assigned name, that name will be
+exported. If an entity has a single active name but many inactive aliases, each 
+alias is exported as well, with the canonical name given alongside. 
+
+This can be used for name-based deduplication in external utilities.
+
+::
+
     POST /api/1/projects
 
 Operation to create a new dataset. The ``slug`` and ``label`` properties are
@@ -415,7 +426,18 @@ file name and mime type.
 
     GET /api/1/files/<id>/_serve
 
-Retrieves a single file's body.
+Retrieves a single file's body, with the appropriate MIME type and file name 
+set in the response headers.
+
+::
+
+    GET /api/1/files/<id>/_table
+
+If the file is CSV data, a JSON tabular representation will be returned that 
+can be used for tabular file previews. If the format is not CSV, this endpoint 
+will yield an error.
+
+* ``limit`` number of rows to be returned. No ``offset`` is supported.
 
 ::
 
