@@ -6,6 +6,7 @@ from grano.lib.data import CSVImporter
 from grano.model import Pipeline, File, Attribute
 from grano.logic import pipelines, entities, loader
 from grano.logic.references import FileRef, ProjectRef
+from grano.logic.validation import Invalid
 
 
 log = logging.getLogger(__name__)
@@ -134,51 +135,57 @@ def import_objects(pipeline, fh):
     entity_schemata = _mapping_schemata(pipeline.project, mapping, '')
 
     importer = CSVImporter(fh)
-    loader_ = loader.Loader(pipeline.project.slug, account=pipeline.author)
+    loader_ = loader.Loader(pipeline.project.slug, account=pipeline.author,
+        ignore_errors=False)
 
     for i, row in enumerate(importer):
-        source_url = _row_source_url(pipeline, row)
-        rel_data = {}
-        source = loader_.make_entity(source_schemata, source_url=source_url)
-        target = loader_.make_entity(target_schemata, source_url=source_url)
-        entity = loader_.make_entity(entity_schemata, source_url=source_url)
+        try:
+            source_url = _row_source_url(pipeline, row)
+            rel_data = {}
+            source = loader_.make_entity(source_schemata, source_url=source_url)
+            target = loader_.make_entity(target_schemata, source_url=source_url)
+            entity = loader_.make_entity(entity_schemata, source_url=source_url)
 
-        # Try to assign each column to the appropriate object in this
-        # loader. 
-        for column, spec in mapping.items():
-            attr = spec.get('attribute')
-            obj = spec.get('object')
-            value = row.get(column)
+            # Try to assign each column to the appropriate object in this
+            # loader. 
+            for column, spec in mapping.items():
+                attr = spec.get('attribute')
+                obj = spec.get('object')
+                value = row.get(column)
 
-            if not attr or not len(attr.strip()):
-                continue
+                if not attr or not len(attr.strip()):
+                    continue
 
-            if mode == 'entities':
-                entity.set(attr, value)
-            elif obj == 'relation':
-                rel_data[attr] = value
-            elif obj == 'source':
-                source.set(attr, value)
-            elif obj == 'target':
-                target.set(attr, value)
+                if mode == 'entities':
+                    entity.set(attr, value)
+                elif obj == 'relation':
+                    rel_data[attr] = value
+                elif obj == 'source':
+                    source.set(attr, value)
+                elif obj == 'target':
+                    target.set(attr, value)
 
-        # Relation can only be saved once the entities are available,
-        # hence we're storing the relation property values and now 
-        # making the whole thing.
-        if mode == 'relations':
-            source.save()
-            target.save()
-            rel = loader_.make_relation(relation_schema, source,
-                target, source_url=source_url)
-            for k, v in rel_data.items():
-                rel.set(k, v)
-            rel.save()
-        else:
-            entity.save()
-        
-        # indicate progress, and commit every now and then.
-        if i % 100 == 0:
-            percentage = int((float(i) / max(1, len(importer)))*100)
-            pipeline.percent_complete = percentage
-            loader_.persist()
+            # Relation can only be saved once the entities are available,
+            # hence we're storing the relation property values and now 
+            # making the whole thing.
+            if mode == 'relations':
+                source.save()
+                target.save()
+                rel = loader_.make_relation(relation_schema, source,
+                    target, source_url=source_url)
+                for k, v in rel_data.items():
+                    rel.set(k, v)
+                rel.save()
+            else:
+                entity.save()
+            
+            # indicate progress, and commit every now and then.
+            if i % 100 == 0:
+                percentage = int((float(i) / max(1, len(importer)))*100)
+                pipeline.percent_complete = percentage
+                loader_.persist()
+        except Invalid, inv:
+            pipelines.log_warn(pipeline, unicode(inv), 'Invalid data', inv.as_dict())
+        except Exception, exc:
+            pipelines.log_error(pipeline, unicode(exc), 'Error', {})
 

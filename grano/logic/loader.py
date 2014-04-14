@@ -44,8 +44,8 @@ class ObjectLoader(object):
             information.
         """
         source_url = source_url or self.source_url
-        if source_url is None:
-            log.warning('No source for property %s.', name)
+        #if source_url is None:
+        #    log.warning('No source for property %s.', name)
         self.properties[name] = {
             'name': name,
             'value': value if value is None else unicode(value),
@@ -97,6 +97,8 @@ class EntityLoader(ObjectLoader):
             self._entity = entities.save(data, entity=entity)
 
         except Invalid, inv:
+            if not self.loader.ignore_errors:
+                raise
             log.warning("Validation error: %r", inv)
 
 
@@ -140,6 +142,8 @@ class RelationLoader(ObjectLoader):
             }
             self._relation = relations.save(data, relation=relation)
         except Invalid, inv:
+            if not self.loader.ignore_errors:
+                raise
             log.warning("Validation error: %r", inv)
         
 
@@ -149,9 +153,10 @@ class Loader(object):
     database transactions. """
 
     def __init__(self, project_slug, source_url=None, project_label=None,
-            project_settings=None, account=None):
+            project_settings=None, account=None, ignore_errors=True):
         self.source_url = source_url
         self.account = account or accounts.console_account()
+        self.ignore_errors = ignore_errors
         
         project = Project.by_slug(project_slug)
         project_settings = project_settings or (project.settings if project else {})
