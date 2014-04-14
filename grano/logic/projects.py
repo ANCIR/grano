@@ -76,3 +76,18 @@ def delete(project):
     """ Delete the project and all related data. """
     _project_changed(project.slug, 'delete')
     db.session.delete(project)
+
+
+def truncate(project):
+    """ Delete all entities and relations from this project, 
+    but leave the project, schemata and attributes intact. """
+    from grano.logic import relations
+    from grano.logic import entities
+
+    project.updated_at = datetime.utcnow()
+
+    for relation in project.relations:
+        relations.delete(relation)
+
+    for entity in project.entities:
+        entities.delete(entity)

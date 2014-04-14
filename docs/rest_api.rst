@@ -163,8 +163,22 @@ configured in the ``settings`` property, which is a dictionary.
 
     POST /api/1/projects/<slug>
 
-Update an existing dataset. Most of the fields returned by the ``GET`` operation 
+Update an existing project. Most of the fields returned by the ``GET`` operation 
 are mutable, except for ``slug`` and the automatically generated fields.
+
+::
+
+    DELETE /api/1/projects/<slug>
+
+Delete a project and all related objects, such as entities, relations, schemata and 
+attributes.
+
+::
+
+    DELETE /api/1/projects/<slug>/_truncate
+
+Delete all entities and relations that are part of this project, but leave the project
+itself, and the schema definitions, intact.
 
 
 Schemata

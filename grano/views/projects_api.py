@@ -90,3 +90,12 @@ def delete(slug):
     projects.delete(project)
     db.session.commit()
     raise Gone()
+
+
+@blueprint.route('/api/1/projects/<slug>/_truncate', methods=['DELETE'])
+def truncate(slug):
+    project = object_or_404(Project.by_slug(slug))
+    authz.require(authz.project_delete(project))
+    projects.truncate(project)
+    db.session.commit()
+    return jsonify(project)
