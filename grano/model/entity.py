@@ -23,7 +23,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     schemata = db.relationship('Schema', secondary=entity_schema,
         backref=db.backref('entities', lazy='dynamic'))
-    
+
     inbound = db.relationship('Relation', lazy='dynamic', backref='target',
         primaryjoin='Entity.id==Relation.target_id',
         cascade='all, delete, delete-orphan')
@@ -43,20 +43,21 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     @classmethod
     def by_name(cls, project, name, only_active=False):
         q = db.session.query(cls)
-        a = q.filter(cls.project==project)
+        q = q.filter(cls.project == project)
         attr = project.get_attribute('entity', 'name')
         q = cls._filter_property(q, [attr], name, only_active=only_active)
         return q.first()
 
     @classmethod
-    def by_id_many(cls, ids, account):
+    def by_id_many(cls, ids, account=None):
         from grano.model import Project, Permission
         q = db.session.query(cls)
-        q = q.join(Project)
-        q = q.outerjoin(Permission)
         q = q.filter(cls.id.in_(ids))
-        q = q.filter(or_(Project.private==False,
-            and_(Permission.reader==True, Permission.account==account)))
+        if account is not None:
+            q = q.join(Project)
+            q = q.outerjoin(Permission)
+            q = q.filter(or_(Project.private == False, # noqa
+                and_(Permission.reader == True, Permission.account == account)))
 
         id_map = {}
         for e in q.all():
@@ -65,10 +66,9 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     @property
     def inbound_schemata(self):
-        from grano.model.relation import Relation
         q = db.session.query(Schema)
         q = q.join(Schema.relations)
-        q = q.filter(Relation.target_id==self.id)
+        q = q.filter(Relation.target_id == self.id)
         return q.distinct()
 
     def inbound_by_schema(self, schema):
@@ -80,7 +80,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         from grano.model.relation import Relation
         q = db.session.query(Schema)
         q = q.join(Schema.relations)
-        q = q.filter(Relation.source_id==self.id)
+        q = q.filter(Relation.source_id == self.id)
         return q.distinct()
 
     def outbound_by_schema(self, schema):
@@ -90,7 +90,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     @property
     def degree(self):
         return self.inbound.count() + self.outbound.count()
-
 
     def to_dict_base(self):
         data = {
@@ -106,7 +105,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             data['same_as_url'] = url_for('entities_api.view', id=self.same_as)
         return data
 
-
     def to_dict_index(self):
         """ Convert an entity to the REST API form. """
         data = self.to_dict_base()
@@ -115,7 +113,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             name, prop = prop.to_dict_index()
             data['properties'][name] = prop
         return data
-
 
     def to_dict(self):
         """ Full serialization of the entity. """
@@ -131,24 +128,21 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         data['inbound_relations'] = self.inbound.count()
         if data['inbound_relations'] > 0:
             data['inbound_url'] = url_for('relations_api.index', target=self.id)
-        
+
         data['outbound_relations'] = self.outbound.count()
         if data['outbound_relations'] > 0:
             data['outbound_url'] = url_for('relations_api.index', source=self.id)
-        
-        return data
 
+        return data
 
     def to_index(self):
         """ Convert an entity to a form appropriate for search indexing. """
         data = self.to_dict()
         data['degree'] = self.degree
-        
+
         data['names'] = []
         for prop in self.properties:
             if prop.name == 'name':
                 data['names'].append(prop.value)
 
         return data
-
-
