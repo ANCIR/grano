@@ -69,3 +69,10 @@ def configure_cache_headers(response_class):
         if request._grano_etag:
             response_class.add_etag(request._grano_etag)    
     return response_class
+
+
+@app.after_request
+def add_cors_header(response):
+    if request.method in ('GET', 'HEAD', 'OPTIONS'):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
