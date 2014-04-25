@@ -21,9 +21,13 @@ from grano.model import Entity, Relation, Schema, EntityProperty
 
 class GraphExtractor(object):
 
-    def __init__(self, project_id=None, root_id=None):
+    def __init__(self, project_id=None, root_id=None, entity_properties=None):
         self.root_id = root_id
         self.project_id = project_id
+        self.entity_properties = []
+        if entity_properties is not None:
+            self.entity_properties = entity_properties
+
         self._rows = None
         self._seen = set()
         self._entities = set()
@@ -95,12 +99,23 @@ class GraphExtractor(object):
         q = q.filter(EntityProperty.name == 'name')
         q = q.filter(EntityProperty.active == True) # noqa
 
-        q = q.add_columns(EntityProperty.value_string.label('name'),
-            Schema.name.label('schema'))
+        q = q.add_columns(
+            EntityProperty.value_string.label('name'),
+            Schema.name.label('schema')
+        )
         entities = {}
         for id_, name, schema in q.all():
             entities.setdefault(id_, {'property.name': name, 'schemata': []})
             entities[id_]['schemata'].append(schema)
+
+        if self.entity_properties:
+            q = db.session.query(EntityProperty)
+            q = q.filter(EntityProperty.entity_id.in_(entity_ids))
+            q = q.filter(EntityProperty.name.in_(self.entity_properties))
+            q = q.filter(EntityProperty.active == True) # noqa
+            for row in q.all():
+                entities[row.entity_id]['property.' + row.name] = row.value
+
         return entities
 
     def sweep_ids(self):

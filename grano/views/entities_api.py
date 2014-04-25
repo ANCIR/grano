@@ -67,7 +67,8 @@ def view(id):
 def graph(id):
     entity = object_or_404(Entity.by_id(id))
     authz.require(authz.project_read(entity.project))
-    extractor = GraphExtractor(root_id=entity.id)
+    extractor = GraphExtractor(root_id=entity.id,
+        entity_properties=request.args.getlist('entity_property'))
     validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
