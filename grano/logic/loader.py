@@ -99,7 +99,7 @@ class EntityLoader(ObjectLoader):
         except Invalid, inv:
             if not self.loader.ignore_errors:
                 raise
-            log.warning("Validation error: %r", inv)
+            log.warning("Validation error: %r", inv.asdict())
 
 
 class RelationLoader(ObjectLoader):
@@ -144,7 +144,7 @@ class RelationLoader(ObjectLoader):
         except Invalid, inv:
             if not self.loader.ignore_errors:
                 raise
-            log.warning("Validation error: %r", inv)
+            log.warning("Validation error: %r", inv.asdict())
         
 
 class Loader(object):

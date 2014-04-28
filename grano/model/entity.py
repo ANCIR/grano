@@ -23,7 +23,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     schemata = db.relationship('Schema', secondary=entity_schema,
                                backref=db.backref('entities', lazy='dynamic'))
-    
     inbound = db.relationship('Relation', lazy='dynamic', backref='target',
                               primaryjoin='Entity.id==Relation.target_id',
                               cascade='all, delete, delete-orphan')
@@ -49,16 +48,15 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         return q.first()
 
     @classmethod
-    def by_id_many(cls, ids, account):
+    def by_id_many(cls, ids, account=None):
         from grano.model import Project, Permission
         q = db.session.query(cls)
-        q = q.join(Project)
-        q = q.outerjoin(Permission)
         q = q.filter(cls.id.in_(ids))
-        q = q.filter(or_(Project.private == False,
-                         and_(Permission.reader == True,
-                              Permission.account == account)))
-
+        if account is not None:
+            q = q.join(Project)
+            q = q.outerjoin(Permission)
+            q = q.filter(or_(Project.private == False, # noqa
+                and_(Permission.reader == True, Permission.account == account)))
         id_map = {}
         for e in q.all():
             id_map[e.id] = e
@@ -66,7 +64,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     @property
     def inbound_schemata(self):
-        from grano.model.relation import Relation
         q = db.session.query(Schema)
         q = q.join(Schema.relations)
         q = q.filter(Relation.target_id == self.id)
@@ -133,9 +130,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         data['outbound_relations'] = self.outbound.count()
         if data['outbound_relations'] > 0:
             data['outbound_url'] = url_for('relations_api.index', source=self.id)
-
         return data
-
 
     def to_index(self):
         """ Convert an entity to a form appropriate for search indexing. """
@@ -148,5 +143,3 @@ class Entity(db.Model, UUIDBase, PropertyBase):
                 data['names'].append(prop.value)
 
         return data
-
-
