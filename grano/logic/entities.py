@@ -40,8 +40,13 @@ def validate(data, entity):
     schemata_validator.add(colander.SchemaNode(colander.Sequence(),
         schemata_node, name='schemata'))
 
-    sane.update(schemata_validator.deserialize(data))
-    sane['schemata'] = [s for s in set(sane['schemata']) if s is not None]
+    sane['schemata'] = []
+    ids = set()
+    for schema in schemata_validator.deserialize(data).get('schemata'):
+        if schema is None or schema.id in ids:
+            continue
+        ids.add(schema.id)
+        sane['schemata'].append(schema)
 
     sane['properties'] = properties_logic.validate(
         'entity', entity, sane['schemata'], sane.get('project'),

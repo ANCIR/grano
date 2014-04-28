@@ -34,9 +34,9 @@ def validate(obj_type, obj, schemata, project, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
     
-    schema = colander.SchemaNode(colander.Mapping(), name='properties')
-    for sche in schemata:
-        for attr in sche.attributes:
+    validator = colander.SchemaNode(colander.Mapping(), name='properties')
+    for schema in schemata:
+        for attr in schema.attributes:
             attrib = colander.SchemaNode(colander.Mapping(),
                 name=attr.name, missing=colander.null)
 
@@ -50,15 +50,15 @@ def validate(obj_type, obj, schemata, project, properties):
             
             attrib.add(colander.SchemaNode(colander.Boolean(),
                 default=True, missing=True, name='active'))
-            attrib.add(colander.SchemaNode(FixedValue(sche), name='schema'))
+            attrib.add(colander.SchemaNode(FixedValue(schema), name='schema'))
             attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
 
             attrib.add(colander.SchemaNode(colander.String(),
                 missing=None, name='source_url'))
 
-            schema.add(attrib)
+            validator.add(attrib)
 
-    properties = schema.deserialize(properties)
+    properties = validator.deserialize(properties)
     out = {}
     for k, v in properties.items():
         if v != colander.null:
