@@ -34,5 +34,6 @@ setup(
             'grano = grano.manage:run',
         ]
     },
-    tests_require=[]
+    tests_require=[],
+    test_suite='grano.test'
 )
