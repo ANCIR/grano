@@ -26,8 +26,9 @@ def property_filters(args):
 def filter_query(cls, q, args):
     q = q.join(Project)
     q = q.outerjoin(Permission)
-    q = q.filter(or_(Permission.account==request.account, Permission.account==None))
-    q = q.filter(or_(Project.private==False, Permission.reader==True))
+    q = q.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
+    
     project = args.get('project')
     if project:
         q = q.filter(Project.slug==project)

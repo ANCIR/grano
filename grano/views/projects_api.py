@@ -24,9 +24,8 @@ blueprint = Blueprint('projects_api', __name__)
 def index():
     q = Project.all()
     q = q.outerjoin(Permission)
-    q = q.filter(or_(Permission.account==request.account, Permission.account==None))
-    q = q.filter(or_(Project.private==False, Permission.reader==True))
-    
+    q = q.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
     pager = Pager(q)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)

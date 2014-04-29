@@ -26,9 +26,9 @@ def index():
     query = File.all()
     query = query.join(Project)
     query = query.outerjoin(Permission)
-    query = query.filter(or_(Permission.account==request.account, Permission.account==None))
-    query = query.filter(or_(Project.private==False, Permission.reader==True))
-    
+    query = query.filter(or_(Project.private==False,
+        and_(Permission.reader==True, Permission.account==request.account)))
+
     if request.args.get('project'):
         query = query.filter(Project.slug==request.args.get('project'))
     
