@@ -38,4 +38,5 @@ def filter_query(cls, q, args):
         q = cls._filter_property(q, attributes, value,
                 only_active=only_active)
 
+    q = q.distinct()
     return q

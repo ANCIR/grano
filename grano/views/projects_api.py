@@ -26,6 +26,7 @@ def index():
     q = q.outerjoin(Permission)
     q = q.filter(or_(Project.private==False,
         and_(Permission.reader==True, Permission.account==request.account)))
+    q = q.distinct()
     pager = Pager(q)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)

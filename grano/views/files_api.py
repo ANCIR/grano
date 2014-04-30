@@ -32,6 +32,8 @@ def index():
     if request.args.get('project'):
         query = query.filter(Project.slug==request.args.get('project'))
     
+
+    query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)
