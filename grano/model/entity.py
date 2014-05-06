@@ -64,6 +64,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
 
     @property
     def inbound_schemata(self):
+        from grano.model.relation import Relation
         q = db.session.query(Schema)
         q = q.join(Schema.relations)
         q = q.filter(Relation.target_id == self.id)
