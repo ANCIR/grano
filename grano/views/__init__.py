@@ -1,5 +1,6 @@
 from colander import Invalid
 from flask import request
+from werkzeug.exceptions import HTTPException
 
 from grano.core import app
 from grano.lib.serialisation import jsonify
@@ -24,7 +25,7 @@ from grano.views.auth import check_auth
 @app.errorhandler(410)
 @app.errorhandler(500)
 def handle_exceptions(exc):
-    if not hasattr(exc, 'get_description'):
+    if isinstance(exc, HTTPException):
         message = exc.get_description(request.environ)
         message = message.replace('<p>', '').replace('</p>', '')
         body = {
@@ -40,7 +41,7 @@ def handle_exceptions(exc):
             'message': unicode(exc)
         }
         headers = {}
-    return jsonify(body, status=exc.code,
+    return jsonify(body, status=body.get('status'),
         headers=headers)
 
 
