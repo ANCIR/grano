@@ -8,6 +8,17 @@ uses for these notifications include storing the graph in an alternate form
 (e.g. as raw files, in a full-text search index or in a graph database).
 
 
+Enabling plugins
+----------------
+
+Plugins need to be enabled individually in the configuration file through a setting
+called ``PLUGINS``. Be aware that one extension (e.g. the ElasticSearch support)
+may expose multiple plugins - all of which need to be enabled for the extension to 
+work correctly::
+
+  PLUGINS = ['ui', 'es_boot', 'es_entity_indexer', 'es_project_indexer']
+
+
 Exposing plugins
 ----------------
 
