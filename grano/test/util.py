@@ -10,6 +10,7 @@ def make_test_app(use_cookies=False):
     db.create_all()
     return app.test_client(use_cookies=use_cookies)
 
+
 def tear_down_test_app():
     #db.session.rollback()
     db.drop_all()

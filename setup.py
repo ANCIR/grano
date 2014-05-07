@@ -8,14 +8,14 @@ REQUIREMENTS = open(REQUIREMENTS, 'r').read().splitlines()
 setup(
     name='grano',
     version='0.3.2',
-    description="An entity and social network tracking software for news applications",
+    description="An investigative toolkit for influence influence mapping",
     long_description=open('README.rst').read(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        ],
+    ],
     keywords='sql graph sna networks journalism ddj entities',
     author='Friedrich Lindenberg',
     author_email='friedrich@pudo.org',
