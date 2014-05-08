@@ -46,7 +46,15 @@ Once this is done, you can create the database and import schema specifications:
 .. code-block:: bash
 
     grano db upgrade head
-    grano schema_import <YOUR_MODEL.yaml>
+    grano schema_import <projectname> <YOUR_MODEL.yaml>
+
+To load the demo project:
+
+.. code-block:: bash
+
+    cd demo/demo_simple
+    grano schema_import opennews2 ./model.yaml
+    python ./loader.py
     
 Finally, you can run grano:
 
