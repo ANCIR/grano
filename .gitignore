@@ -47,3 +47,5 @@ grano/development.db
 settings.py
 
 docs/_build/*
+
+env
