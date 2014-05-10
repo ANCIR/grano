@@ -26,8 +26,9 @@ class MergeValidator(colander.MappingSchema):
     
 
 def validate(data, entity):
-    """ Due to some fairly weird interdependencies between the different elements
-    of the model, validation of entities has to happen in three steps. """
+    """ Due to some fairly weird interdependencies between the different
+    elements of the model, validation of entities has to happen in three
+    steps. """
 
     # a bit hacky
     data['schemata'] = data.get('schemata', []) + ['base']
@@ -38,7 +39,7 @@ def validate(data, entity):
     schemata_validator = colander.SchemaNode(colander.Mapping())
     schemata_node = colander.SchemaNode(SchemaRef(sane.get('project')))
     schemata_validator.add(colander.SchemaNode(colander.Sequence(),
-        schemata_node, name='schemata'))
+                           schemata_node, name='schemata'))
 
     sane['schemata'] = []
     ids = set()
@@ -93,18 +94,26 @@ def save(data, entity=None):
 
 
 def delete(entity):
-    """ Delete the entity and its properties, as well as any associated 
+    """ Delete the entity and its properties, as well as any associated
     relations. """
     db.session.delete(entity)
     _entity_changed.delay(entity.id, 'delete')
     
 
 def merge(orig, dest):
-    """ Copy all properties and relations from one entity onto another, then 
+    """ Copy all properties and relations from one entity onto another, then
     mark the source entity as an ID alias for the destionation entity. """
 
     dest_active = [p.name for p in dest.active_properties]
-    dest.schemata = list(set(dest.schemata + orig.schemata))
+    
+    schemata, seen_schemata = list(), set()
+    for schema in dest.schemata + orig.schemata:
+        if schema.id in seen_schemata:
+            continue
+        seen_schemata.add(schema.id)
+        schemata.append(schema)
+
+    dest.schemata = schemata
 
     for prop in orig.properties:
         if prop.name in dest_active:
@@ -112,7 +121,6 @@ def merge(orig, dest):
         prop.entity = dest
     
     for rel in orig.inbound:
-        # TODO: what if this relation now points at the same thing on both ends?
         rel.target = dest
     
     for rel in orig.outbound:
@@ -122,50 +130,68 @@ def merge(orig, dest):
     dest.same_as = None
     db.session.flush()
     _entity_changed.delay(dest.id, 'update')
-    _entity_changed.delay(orig.id, 'update')
+    _entity_changed.delay(orig.id, 'delete')
     return dest
 
 
 def apply_alias(project, author, canonical_name, alias_name, source_url=None):
-    """ Given two names, find out if there are existing entities for one or 
-    both of them. If so, merge them into a single entity - or, if only the 
+    """ Given two names, find out if there are existing entities for one or
+    both of them. If so, merge them into a single entity - or, if only the
     entity associated with the alias exists - re-name the entity. """
 
     canonical_name = canonical_name.strip()
 
     # Don't import meaningless aliases.
-    if canonical_name == alias_name or not len(canonical_name) \
-        or not len(alias_name):
+    if not len(canonical_name) or not len(alias_name):
         return log.info("Not an alias: %s", canonical_name)
 
     canonical = Entity.by_name(project, canonical_name)
-    alias = Entity.by_name(project, alias_name)
     schema = Schema.by_name(project, 'base')
     attribute = schema.get_attribute('name')
 
-    # Don't artificially increase entity counts.
-    if canonical is None and alias is None:
-        return log.info("Neither alias nor canonical exist: %s", canonical_name)
+    for alias in Entity.by_name_many(project, alias_name):
 
-    # Rename an alias to its new, canonical name.
-    if canonical is None:
-        data = {
-            'value': canonical_name,
-            'schema': schema,
-            'attribute': attribute,
-            'active': True,
-            'name': 'name',
-            'source_url': source_url
-        }
-        properties_logic.save(alias, data)
-        _entity_changed.delay(alias.id, 'update')
-        return log.info("Renamed: %s -> %s", alias_name, canonical_name)
+        # Don't artificially increase entity counts.
+        if canonical is None and alias is None:
+            return log.info("Neither alias nor canonical exist: %s", canonical_name)
 
-    # Already done, thanks.
-    if canonical == alias:
-        return log.info("Already aliased: %s", canonical_name)
+        # Rename an alias to its new, canonical name.
+        if canonical is None:
+            data = {
+                'value': canonical_name,
+                'schema': schema,
+                'attribute': attribute,
+                'active': True,
+                'name': 'name',
+                'source_url': source_url
+            }
+            canonical = properties_logic.save(alias, data)
+            _entity_changed.delay(alias.id, 'update')
+            log.info("Renamed: %s -> %s", alias_name, canonical_name)
+            continue
 
-    # Merge two existing entities, declare one as "same_as"
-    if canonical is not None and alias is not None:
-        merge(alias, canonical)
-        return log.info("Mapped: %s -> %s", alias.id, canonical.id)
+        if alias is None:
+            data = {
+                'value': alias_name,
+                'schema': schema,
+                'attribute': attribute,
+                'active': False,
+                'name': 'name',
+                'source_url': source_url
+            }
+            properties_logic.save(canonical, data)
+            _entity_changed.delay(canonical.id, 'update')
+            log.info("Added alias: %s -> %s", alias_name, canonical_name)
+            continue
+
+        # Already done, thanks.
+        if canonical.id == alias.id:
+            log.info("Already aliased: %s -> %s", alias_name, canonical_name)
+            continue
+
+        # Merge two existing entities, declare one as "same_as"
+        if canonical is not None and alias is not None:
+            merge(alias, canonical)
+            log.info("Mapped: %s -> %s", alias.id, canonical.id)
+            continue
+

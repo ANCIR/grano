@@ -3,7 +3,7 @@ import colander
 
 from grano.core import db, celery
 from grano.lib.data import CSVImporter
-from grano.model import Pipeline, File, Attribute
+from grano.model import Pipeline, File
 from grano.logic import pipelines, entities, loader
 from grano.logic.references import FileRef, ProjectRef
 from grano.logic.validation import Invalid
