@@ -32,7 +32,9 @@ If you're unfamiliar with virtualenv, be aware that you will need to execute the
 
 Next, you'll need to configure grano. Create a copy of the file
 ``grano/default_settings.py``, e.g. as ``settings.py`` in the repository base.
-Open the file and set up the various account configurations.
+Open the file and set up the various account configurations, especially the database
+connection string. Make sure you provide an empty Postgres database with UTF-8 set 
+as the encoding.
     
 Once the new configuration is set up, you need to an environment variables pointing
 grano to the configuration file you've created:
