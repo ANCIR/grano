@@ -139,24 +139,43 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
     both of them. If so, merge them into a single entity - or, if only the
     entity associated with the alias exists - re-name the entity. """
 
-    canonical_name = canonical_name.strip()
-
     # Don't import meaningless aliases.
     if not len(canonical_name) or not len(alias_name):
         return log.info("Not an alias: %s", canonical_name)
 
-    canonical = Entity.by_name(project, canonical_name)
+    canonical = None
+
+    # de-duplicate existing entities with the same name.
+    for existing in Entity.by_name_many(project, canonical_name):
+        if canonical is not None:
+            canonical = merge(existing, canonical)
+        else:
+            canonical = existing
+
     schema = Schema.by_name(project, 'base')
     attribute = schema.get_attribute('name')
 
-    for alias in Entity.by_name_many(project, alias_name):
+    q = Entity.by_name_many(project, alias_name)
+    if canonical is not None:
+        q = q.filter(Entity.id != canonical.id)
+    aliases = q.all()
 
-        # Don't artificially increase entity counts.
-        if canonical is None and alias is None:
-            return log.info("Neither alias nor canonical exist: %s", canonical_name)
+    if not len(aliases) and canonical is not None:
+        data = {
+            'value': alias_name,
+            'schema': schema,
+            'attribute': attribute,
+            'active': False,
+            'name': 'name',
+            'source_url': source_url
+        }
+        properties_logic.save(canonical, data)
+        _entity_changed.delay(canonical.id, 'update')
+        return log.info("Alias: %s -> %s", alias_name, canonical_name)
 
-        # Rename an alias to its new, canonical name.
+    for alias in aliases:
         if canonical is None:
+            # Rename an alias to its new, canonical name.
             data = {
                 'value': canonical_name,
                 'schema': schema,
@@ -165,33 +184,11 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
                 'name': 'name',
                 'source_url': source_url
             }
-            canonical = properties_logic.save(alias, data)
+            properties_logic.save(alias, data)
             _entity_changed.delay(alias.id, 'update')
             log.info("Renamed: %s -> %s", alias_name, canonical_name)
-            continue
-
-        if alias is None:
-            data = {
-                'value': alias_name,
-                'schema': schema,
-                'attribute': attribute,
-                'active': False,
-                'name': 'name',
-                'source_url': source_url
-            }
-            properties_logic.save(canonical, data)
-            _entity_changed.delay(canonical.id, 'update')
-            log.info("Added alias: %s -> %s", alias_name, canonical_name)
-            continue
-
-        # Already done, thanks.
-        if canonical.id == alias.id:
-            log.info("Already aliased: %s -> %s", alias_name, canonical_name)
-            continue
-
-        # Merge two existing entities, declare one as "same_as"
-        if canonical is not None and alias is not None:
+        else:
+            # Merge two existing entities, declare one as "same_as"
             merge(alias, canonical)
             log.info("Mapped: %s -> %s", alias.id, canonical.id)
             continue
-
