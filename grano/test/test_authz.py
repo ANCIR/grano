@@ -9,6 +9,10 @@ from grano.test.fixtures import create_fixtures
 
 
 def make_test_app(use_cookies=False):
+    """For some reason this does not work when imported from util.
+    Error is:
+        AttributeError: 'FlaskClient' object has no attribute 'test_request_context'
+    """
     app.config['TESTING'] = True
     app.config['CACHE'] = False
     app.config['PLUGINS'] = []
