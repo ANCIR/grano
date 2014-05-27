@@ -3,6 +3,8 @@ from flask import request
 from grano.model import Permission
 from grano.lib.exc import Forbidden
 
+PUBLISHED_THRESHOLD = 5 # minimum status value for publication
+
 
 def _find_permission(project):
     q = Permission.all()
@@ -42,6 +44,35 @@ def project_manage(project):
 
 def project_delete(project):
     return project_manage(project)
+
+# Entity
+
+def entity_create():
+    return logged_in()
+
+
+def entity_read(entity):
+    if not entity.project.private and entity.status >= PUBLISHED_THRESHOLD:
+        return True
+    q = _find_permission(entity.project).first()
+    if q:
+        if q.editor or q.admin:
+            return True
+        elif q.reader and entity.status >= PUBLISHED_THRESHOLD:
+            return True
+    return False
+
+
+def entity_edit(entity):
+    return project_edit(entity.project)
+
+
+def entity_manage(entity):
+    return project_manage(entity.project)
+
+
+def entity_delete(entity):
+    return entity_manage(entity)
 
 
 def require(pred):

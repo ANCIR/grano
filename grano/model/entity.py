@@ -35,6 +35,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
                                  cascade='all, delete, delete-orphan',
                                  lazy='joined')
 
+    status = db.Column(db.Integer, default=0)
+
     @property
     def names(self):
         return [p for p in self.properties if p.name == 'name']
