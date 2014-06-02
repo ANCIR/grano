@@ -2,17 +2,17 @@ from StringIO import StringIO
 from hashlib import sha1
 
 from flask import request
-from sqlalchemy import func, select, and_, not_
+from sqlalchemy import select, and_, not_
 import networkx as nx
 
 from grano.lib.exc import BadRequest
 from grano.lib.args import arg_int
 from grano.core import db
-from grano.model import Entity, Relation, Schema, Property
+from grano.model import Entity, Relation, Schema, EntityProperty
 
 
 # TODO: Make the set of properties retrieved for entities
-#       and relations configurable. 
+#       and relations configurable.
 # TODO: Does it make sense to do a count first?
 # TODO: Check what the last-modified entity/relation is.
 # TODO: Possibly aggregate relations with the same props
@@ -21,19 +21,18 @@ from grano.model import Entity, Relation, Schema, Property
 
 class GraphExtractor(object):
 
-    def __init__(self, project_id=None, root_id=None):
+    def __init__(self, project_id=None, root_id=None, entity_properties=None):
         self.root_id = root_id
         self.project_id = project_id
-        self._rows = []
+        self.entity_properties = []
+        if entity_properties is not None:
+            self.entity_properties = entity_properties
+
+        self._rows = None
         self._seen = set()
+        self._entities = set()
         self._rel_ids = set()
         self._G = None
-
-        for i in range(self.depth):
-            ids = self.sweep_ids()
-            self.query_adjacency(sources=ids)
-            self.query_adjacency(targets=ids)
-
 
     @property
     def depth(self):
@@ -42,7 +41,6 @@ class GraphExtractor(object):
         depth = arg_int('depth', 1)
         return max(1, min(depth, 3))
 
-
     @property
     def format(self):
         fmt = request.args.get('format', 'json').lower().strip()
@@ -50,56 +48,75 @@ class GraphExtractor(object):
             raise BadRequest('Invalid format name: %s' % fmt)
         return fmt
 
+    def query(self):
+        self._rows = []
+        for i in range(self.depth):
+            ids = self.sweep_ids()
+            self.query_adjacency(sources=ids)
+            self.query_adjacency(targets=ids)
+        return self._rows
 
     def query_adjacency(self, sources=None, targets=None):
         filters, fields = [], []
 
         relation = Relation.__table__.alias('relation')
         schema = Schema.__table__.alias('relation_schema')
-        filters.append(relation.c.schema_id==schema.c.id)
+        filters.append(relation.c.schema_id == schema.c.id)
 
         if len(self._rel_ids):
             filters.append(not_(relation.c.id.in_(self._rel_ids)))
         if self.project_id is not None:
-            filters.append(relation.c.project_id==self.project_id)
-        
+            filters.append(relation.c.project_id == self.project_id)
+
         fields.append(relation.c.id.label('relation.id'))
+        fields.append(relation.c.source_id.label('source.id'))
+        fields.append(relation.c.target_id.label('target.id'))
         fields.append(schema.c.name.label('relation.schema.name'))
         fields.append(schema.c.label.label('relation.schema.label'))
 
-        source_fields, source_filters, source_tables = \
-            self.query_entity('source', sources)
-        target_fields, target_filters, target_tables = \
-            self.query_entity('target', targets)
+        if sources is not None:
+            filters.append(relation.c.source_id.in_(sources))
 
-        filters.append(relation.c.source_id==source_tables[0].c.id)
-        filters.append(relation.c.target_id==target_tables[0].c.id)
+        if targets is not None:
+            filters.append(relation.c.target_id.in_(targets))
 
-        fields = fields + source_fields + target_fields
-        filters = filters + source_filters + target_filters
-        tables = [relation, schema] + source_tables + target_tables
+        tables = [relation, schema]
 
-        #print select(fields,  and_(*filters), tables)
-        rp = db.session.execute(select(fields,  and_(*filters), tables))
+        rp = db.session.execute(select(fields, and_(*filters), tables))
         for row in rp.fetchall():
-            self._rel_ids.add(row['relation.id'])
             self._rows.append(dict(row.items()))
+            self._entities.add(row['source.id'])
+            self._entities.add(row['target.id'])
+            self._rel_ids.add(row['relation.id'])
 
+    def query_entities(self, entity_ids=None):
+        if entity_ids is None:
+            entity_ids = self._entities
+        q = db.session.query(Entity.id)
+        q = q.filter(Entity.id.in_(entity_ids))
+        q = q.join(Schema, Entity.schemata)
+        q = q.join(EntityProperty, Entity.properties)
+        q = q.filter(EntityProperty.name == 'name')
+        q = q.filter(EntityProperty.active == True) # noqa
 
-    def query_entity(self, name, include):
-        filters, fields = [], []
-        table = Entity.__table__.alias(name)
-        fields.append(table.c.id.label(name + '.id'))
-        if include is not None:
-            filters.append(table.c.id.in_(include))
+        q = q.add_columns(
+            EntityProperty.value_string.label('name'),
+            Schema.name.label('schema')
+        )
+        entities = {}
+        for id_, name, schema in q.all():
+            entities.setdefault(id_, {'property.name': name, 'schemata': []})
+            entities[id_]['schemata'].append(schema)
 
-        property_name = Property.__table__.alias(name + '_property_name')    
-        filters.append(table.c.id==property_name.c.entity_id)
-        filters.append(property_name.c.active==True)
-        filters.append(property_name.c.name=='name')
-        fields.append(property_name.c.value_string.label(name + '.property.name'))
-        return (fields, filters, [table, property_name])
+        if self.entity_properties:
+            q = db.session.query(EntityProperty)
+            q = q.filter(EntityProperty.entity_id.in_(entity_ids))
+            q = q.filter(EntityProperty.name.in_(self.entity_properties))
+            q = q.filter(EntityProperty.active == True) # noqa
+            for row in q.all():
+                entities[row.entity_id]['property.' + row.name] = row.value
 
+        return entities
 
     def sweep_ids(self):
         if self.root_id is None:
@@ -115,8 +132,9 @@ class GraphExtractor(object):
         self.seen = self._seen.union(ids)
         return ids
 
-
     def to_hash(self):
+        if self._rows is None:
+            self.query()
         hasch = sha1()
         for row in self._rows:
             hasch.update(row.get('source.id'))
@@ -124,21 +142,30 @@ class GraphExtractor(object):
             hasch.update(row.get('relation.id'))
         return hasch.hexdigest()
 
-
     def to_networkx(self):
         if self._G is None:
+            if self._rows is None:
+                self.query()
+                entities = self.query_entities()
             G = nx.MultiDiGraph()
             for row in self._rows:
                 if row.get('source.id') not in G:
-                    G.add_node(row.get('source.id'), label=row.get('source.property.name'))
+                    entity = entities[row.get('source.id')]
+                    G.add_node(row.get('source.id'),
+                        attr_dict={'schemata': ','.join(entity['schemata'])},
+                        label=entity['property.name'])
                 if row.get('target.id') not in G:
-                    G.add_node(row.get('target.id'), label=row.get('target.property.name'))
-                G.add_edge(row.get('source.id'), row.get('target.id'), key=row.get('relation.id'),
-                    schema_name=row.get('relation.schema.name'),
-                    schema_label=row.get('relation.schema.label'))
+                    entity = entities[row.get('target.id')]
+                    G.add_node(row.get('target.id'),
+                        attr_dict={'schemata': ','.join(entity['schemata'])},
+                        label=entity['property.name'])
+                G.add_edge(row.get('source.id'), row.get('target.id'),
+                           key=row.get('relation.id'),
+                           schema_name=row.get('relation.schema.name'),
+                           schema_label=row.get('relation.schema.label')
+                )
             self._G = G
         return self._G
-
 
     def to_gexf(self):
         G = self.to_networkx()
@@ -146,9 +173,11 @@ class GraphExtractor(object):
         nx.write_gexf(G, sio)
         return sio.getvalue()
 
-
     def to_dict(self):
-        relations, entities = [], {}
+        if self._rows is None:
+            self.query()
+        entities = self.query_entities()
+        relations = []
         for row in self._rows:
             relations.append({
                 'id': row.get('relation.id'),
@@ -157,21 +186,10 @@ class GraphExtractor(object):
                 'schema.name': row.get('relation.schema.name'),
                 'schema.label': row.get('relation.schema.label'),
             })
-            for ent in ['source', 'target']:
-                if row.get(ent + '.id') not in entities:
-                    entities[row.get(ent + '.id')] = {
-                        #'id': row.get(ent + '.id'),
-                        'property.name': row.get(ent + '.property.name')
-                    }
+
         return {
             'relations': relations,
             'entities': entities,
             'root': self.root_id,
             'depth': self.depth
-            }
-
-
-if __name__ == '__main__':
-    G = extract('783a709133447710b')
-    nx.write_gexf(G, "graph.gexf")
-
+        }
