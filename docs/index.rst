@@ -8,4 +8,5 @@ Contents
 
    rest_client
    bulk_api
+   interfaces
 
