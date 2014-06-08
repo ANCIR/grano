@@ -1,16 +1,22 @@
-import re
 import colander
 from colander import Invalid
 
-from grano.logic.references import ProjectRef
-from grano.core import db
-from grano.model import Schema, Attribute
 
+class All(object):
+    """ Composite validator which succeeds if none of its
+    subvalidators raises an :class:`colander.Invalid` exception"""
+    def __init__(self, *validators):
+        self.validators = validators
 
-FORBIDDEN = ['project', 'source', 'target', 'id', 'created_at', 'updated_at', 'author', 'author_id']
-database_forbidden = colander.Function(lambda v: v not in FORBIDDEN, message="Reserved name")
+    def __call__(self, node, value):
+        for validator in self.validators:
+            validator(node, value)
+            
+
 database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
-database_name = colander.All(database_format, database_forbidden)
+database_forbidden = colander.Regex('^(project|source|target|id|created_at" \
+    + "|updated_at|author|author_id)$')
+database_name = All(database_format, database_forbidden)
 
 
 class FixedValue(object):
