@@ -9,7 +9,7 @@ from grano.lib.args import arg_bool
 @app.before_request
 def check_auth():
     api_key = request.headers.get('X-Grano-API-Key') \
-              or request.args.get('api_key')
+        or request.args.get('api_key')
     if session.get('id'):
         request.account = Account.by_id(session.get('id'))
         if request.account is None:
@@ -21,5 +21,5 @@ def check_auth():
             raise Unauthorized()
         if arg_bool('api_key_cookie'):
             session['id'] = request.account.id
-    else: 
+    else:
         request.account = None

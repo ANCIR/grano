@@ -42,7 +42,7 @@ def handle_exceptions(exc):
         }
         headers = {}
     return jsonify(body, status=body.get('status'),
-        headers=headers)
+                   headers=headers)
 
 
 @app.errorhandler(Invalid)

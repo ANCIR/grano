@@ -7,8 +7,7 @@ from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
 from grano.model import Account
 from grano.logic import accounts
-from grano.core import app, db, url_for
-from grano.lib.exc import BadRequest
+from grano.core import db
 from grano.lib.pager import Pager
 from grano.views.cache import validate_cache
 from grano import authz
@@ -49,8 +48,8 @@ def view(id):
 @blueprint.route('/api/1/accounts/<id>', methods=['POST', 'PUT'])
 def update(id):
     account = object_or_404(Account.by_id(id))
-    authz.require(account.id==request.account.id)
+    authz.require(account.id == request.account.id)
     data = request_data()
-    entity = accounts.save(data, account=account)
+    account = accounts.save(data, account=account)
     db.session.commit()
     return jsonify(account)
