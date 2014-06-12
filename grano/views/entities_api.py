@@ -60,14 +60,14 @@ def create():
 @blueprint.route('/api/1/entities/<id>', methods=['GET'])
 def view(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
+    authz.require(authz.entity_read(entity))
     return jsonify(entity)
 
 
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
 def graph(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
+    authz.require(authz.entity_read(entity))
     extractor = GraphExtractor(root_id=entity.id)
     validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
@@ -115,7 +115,7 @@ def suggest():
 @blueprint.route('/api/1/entities/<id>', methods=['POST', 'PUT'])
 def update(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_edit(entity.project))
+    authz.require(authz.entity_edit(entity))
     data = request_data({'author': request.account})
     entity = entities.save(data, entity=entity)
     db.session.commit()
@@ -142,7 +142,7 @@ def merge():
 @blueprint.route('/api/1/entities/<id>', methods=['DELETE'])
 def delete(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_edit(entity.project))
+    authz.require(authz.entity_edit(entity))
     entities.delete(entity)
     db.session.commit()
     raise Gone()
