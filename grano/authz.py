@@ -1,6 +1,7 @@
 from flask import request
+from sqlalchemy import or_, and_
 
-from grano.model import Permission
+from grano.model import Permission, Entity, Project, Attribute
 from grano.lib.exc import Forbidden
 
 PUBLISHED_THRESHOLD = 5 # minimum status value for publication

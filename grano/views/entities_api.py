@@ -16,6 +16,7 @@ from grano.core import app, db, url_for
 from grano.views.util import filter_query
 from grano.views.cache import validate_cache
 from grano import authz
+from .util import all_entities
 
 
 blueprint = Blueprint('entities_api', __name__)
@@ -23,7 +24,7 @@ blueprint = Blueprint('entities_api', __name__)
 
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
-    query = filter_query(Entity, Entity.all(), request.args)
+    query = all_entities()
 
     if 'q' in request.args and len(request.args.get('q').strip()):
         q = '%%%s%%' % request.args.get('q').strip()
