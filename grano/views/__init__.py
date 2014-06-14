@@ -7,6 +7,7 @@ from grano.lib.serialisation import jsonify
 from grano.views.base_api import blueprint as base_api
 from grano.views.entities_api import blueprint as entities_api
 from grano.views.relations_api import blueprint as relations_api
+from grano.views.properties_api import blueprint as properties_api
 from grano.views.schemata_api import blueprint as schemata_api
 from grano.views.sessions_api import blueprint as sessions_api
 from grano.views.projects_api import blueprint as projects_api
@@ -59,6 +60,7 @@ def handle_invalid(exc):
 app.register_blueprint(base_api)
 app.register_blueprint(entities_api)
 app.register_blueprint(relations_api)
+app.register_blueprint(properties_api)
 app.register_blueprint(schemata_api)
 app.register_blueprint(sessions_api)
 app.register_blueprint(projects_api)
