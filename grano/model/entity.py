@@ -95,39 +95,31 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     def degree(self):
         return self.inbound.count() + self.outbound.count()
 
-    def to_dict_base(self):
+    def to_dict_index(self):
+        """ Convert an entity to the REST API form. """
         data = {
             'id': self.id,
             'project': self.project.to_dict_index(),
             'api_url': url_for('entities_api.view', id=self.id),
+            'properties': {}
         }
 
         data['schemata'] = [s.to_dict_index() for s in self.schemata]
+
+        for prop in self.active_properties:
+            name, prop = prop.to_dict_index()
+            data['properties'][name] = prop
 
         if self.same_as:
             data['same_as'] = self.same_as
             data['same_as_url'] = url_for('entities_api.view', id=self.same_as)
         return data
 
-    def to_dict_index(self):
-        """ Convert an entity to the REST API form. """
-        data = self.to_dict_base()
-        data['properties'] = {}
-        for prop in self.active_properties:
-            name, prop = prop.to_dict_index()
-            data['properties'][name] = prop
-        return data
-
     def to_dict(self):
         """ Full serialization of the entity. """
-        data = self.to_dict_base()
+        data = self.to_dict_index()
         data['created_at'] = self.created_at
         data['updated_at'] = self.updated_at
-
-        data['properties'] = {}
-        for prop in self.active_properties:
-            name, prop = prop.to_dict()
-            data['properties'][name] = prop
 
         data['inbound_relations'] = self.inbound.count()
         if data['inbound_relations'] > 0:

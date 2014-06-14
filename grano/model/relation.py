@@ -22,7 +22,6 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     def schemata(self):
         return [self.schema]
 
-
     def to_dict_base(self):
         return {
             'id': self.id,
@@ -34,14 +33,12 @@ class Relation(db.Model, UUIDBase, PropertyBase):
             'target': self.target.to_dict_index()
         }
 
-
     def to_dict(self):
         data = self.to_dict_base()
         for prop in self.active_properties:
-            name, prop = prop.to_dict()
+            name, prop = prop.to_dict_index()
             data['properties'][name] = prop
         return data
-
 
     def to_dict_index(self):
         data = self.to_dict_base()
