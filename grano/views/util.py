@@ -3,21 +3,11 @@ from sqlalchemy import or_, and_
 
 from grano.model import Project, Permission, Attribute, Entity
 from grano.authz import PUBLISHED_THRESHOLD
-from werkzeug.exceptions import BadRequest
+from grano.lib.args import single_arg
 
 
 PROPERTY = 'property-'
 ALIASES = 'aliases-'
-
-
-def single_arg(args, name, default=None):
-    vals = [v for v in args.getlist(name) if v.strip()]
-    if len(vals) == 0:
-        return default
-    elif len(vals) > 1:
-        raise BadRequest('Too many values given for: %s' % name)
-    else:
-        return vals[0]
 
 
 def property_filters(args):
