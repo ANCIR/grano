@@ -65,7 +65,6 @@ def _entity_changed(entity_id, operation):
 
 def save(data, entity=None):
     """ Save or update an entity. """
-
     data = validate(data, entity)
     
     operation = 'create' if entity is None else 'update'
@@ -75,7 +74,7 @@ def save(data, entity=None):
         entity.author = data.get('author')
         db.session.add(entity)
 
-    entity.schemata = list(set(data.get('schemata')))
+    entity.schemata = data.get('schemata')
 
     prop_names = set()
     for name, prop in data.get('properties').items():
