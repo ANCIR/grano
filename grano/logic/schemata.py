@@ -6,7 +6,7 @@ from datetime import datetime
 
 from grano.core import db, url_for
 from grano.lib.exc import NotImplemented
-from grano.model import Schema, Attribute
+from grano.model import Schema, Attribute, Project
 from grano.logic.validation import Invalid, database_name
 from grano.logic.references import ProjectRef
 from grano.logic import projects as projects_logic
@@ -110,15 +110,15 @@ def export_schema(project, path):
             continue
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
-            dumped = yaml.safe_dump(to_dict(schema),
-                canonical=False,
-                default_flow_style=False,
-                indent=4)
+            dumped = yaml.safe_dump(schema.to_dict(schema),
+                                    canonical=False,
+                                    default_flow_style=False,
+                                    indent=4)
             fh.write(dumped)
 
 
 def check_attributes(form, value):
-    """ Form validator to check that the all attribute names used 
+    """ Form validator to check that the all attribute names used
     by this schema are unused. """
 
     if value.get('obj') == 'relation':
@@ -126,12 +126,13 @@ def check_attributes(form, value):
 
     for attr in value.get('attributes', []):
         q = db.session.query(Attribute)
-        q = q.filter(Attribute.name==attr.get('name'))
+        q = q.filter(Attribute.name == attr.get('name'))
         q = q.join(Schema)
-        q = q.filter(Schema.obj==value.get('obj'))
-        q = q.filter(Schema.name!=value.get('name'))
+        q = q.filter(Schema.obj == value.get('obj'))
+        q = q.filter(Schema.name != value.get('name'))
+        q = q.filter(Schema.project == value.get('project'))
         attrib = q.first()
         if attrib is not None:
             raise Invalid(form,
-                "Attribute '%s' already declared in schema '%s'" \
-                 % (attr.get('name'), attrib.schema.name))
+                          "Attribute '%s' already declared in schema '%s'"
+                          % (attr.get('name'), attrib.schema.name))

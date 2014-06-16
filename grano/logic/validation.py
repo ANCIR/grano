@@ -11,11 +11,12 @@ class All(object):
     def __call__(self, node, value):
         for validator in self.validators:
             validator(node, value)
-            
 
-database_format = colander.Regex('^[a-zA-Z][a-zA-Z0-9_]+[a-zA-Z0-9]$')
-database_forbidden = colander.Regex('^(project|source|target|id|created_at" \
-    + "|updated_at|author|author_id)$')
+
+FORBIDDEN = ['project', 'source', 'target', 'id', 'created_at', 'updated_at',
+             'author', 'author_id']
+database_format = colander.Regex(r'^[a-zA-Z][a-zA-Z0-9_-]+[a-zA-Z0-9]$')
+database_forbidden = colander.Function(lambda t: t not in FORBIDDEN)
 database_name = All(database_format, database_forbidden)
 
 
