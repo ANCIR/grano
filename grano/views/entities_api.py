@@ -16,6 +16,7 @@ from grano.core import app, db, url_for
 from grano.views.util import filter_query
 from grano.views.cache import validate_cache
 from grano import authz
+from .util import all_entities
 
 
 blueprint = Blueprint('entities_api', __name__)
@@ -23,7 +24,7 @@ blueprint = Blueprint('entities_api', __name__)
 
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
-    query = filter_query(Entity, Entity.all(), request.args)
+    query = all_entities()
 
     if 'q' in request.args and len(request.args.get('q').strip()):
         q = '%%%s%%' % request.args.get('q').strip()
@@ -59,16 +60,17 @@ def create():
 @blueprint.route('/api/1/entities/<id>', methods=['GET'])
 def view(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
+    authz.require(authz.entity_read(entity))
     return jsonify(entity)
 
 
 @blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
 def graph(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_read(entity.project))
+    authz.require(authz.entity_read(entity))
+    entity_properties = request.args.getlist('entity_property')
     extractor = GraphExtractor(root_id=entity.id,
-        entity_properties=request.args.getlist('entity_property'))
+                               entity_properties=entity_properties)
     validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
@@ -115,7 +117,7 @@ def suggest():
 @blueprint.route('/api/1/entities/<id>', methods=['POST', 'PUT'])
 def update(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_edit(entity.project))
+    authz.require(authz.entity_edit(entity))
     data = request_data({'author': request.account})
     entity = entities.save(data, entity=entity)
     db.session.commit()
@@ -142,7 +144,7 @@ def merge():
 @blueprint.route('/api/1/entities/<id>', methods=['DELETE'])
 def delete(id):
     entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.project_edit(entity.project))
+    authz.require(authz.entity_edit(entity))
     entities.delete(entity)
     db.session.commit()
     raise Gone()

@@ -45,3 +45,13 @@ def object_or_404(obj):
     if obj is None:
         raise NotFound()
     return obj
+
+
+def single_arg(args, name, default=None):
+    vals = [v for v in args.getlist(name) if v.strip()]
+    if len(vals) == 0:
+        return default
+    elif len(vals) > 1:
+        raise BadRequest('Too many values given for: %s' % name)
+    else:
+        return vals[0]
