@@ -109,7 +109,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         data['schemata'] = [s.to_dict_index() for s in self.schemata]
 
         for prop in self.active_properties:
-            name, prop = prop.to_dict_index()
+            name, prop = prop.to_dict_kv()
             data['properties'][name] = prop
 
         if self.same_as:
