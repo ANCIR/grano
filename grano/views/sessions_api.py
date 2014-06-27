@@ -41,26 +41,15 @@ def status():
     })
 
 
-def provider_not_enabled(name):
-    return jsonify({
-        'status': 501, 
-        'name': 'Provider not configured: %s' % name,
-        'message': 'There are no OAuth credentials given for %s' % name,
-        }, status=501)
-
-
 @blueprint.route('/api/1/sessions/logout', methods=['GET'])
 def logout():
-    #authz.require(authz.logged_in())
     session.clear()
     return redirect(request.args.get('next_url', '/'))
 
 
 @blueprint.route('/api/1/sessions/login/github', methods=['GET'])
 def github_login():
-    if not app.config.get('GITHUB_CLIENT_ID'):
-        return provider_not_enabled('github')
-    callback=url_for('sessions_api.github_authorized')
+    callback = url_for('sessions_api.github_authorized')
     session.clear()
     if not request.args.get('next_url'):
         raise BadRequest("No 'next_url' is specified.")
@@ -94,8 +83,6 @@ def github_authorized(resp):
 
 @blueprint.route('/api/1/sessions/login/twitter', methods=['GET'])
 def twitter_login():
-    if not app.config.get('TWITTER_API_KEY'):
-        return provider_not_enabled('twitter')
     callback=url_for('sessions_api.twitter_authorized')
     session.clear()
     if not request.args.get('next_url'):
@@ -110,7 +97,6 @@ def twitter_authorized(resp):
     next_url = session.get('next_url', '/')
     if resp is None or not 'oauth_token' in resp:
         return redirect(next_url)
-    
     session['twitter_token'] = (resp['oauth_token'],
         resp['oauth_token_secret'])
     res = twitter.get('users/show.json?user_id=%s' % resp.get('user_id'))
@@ -128,8 +114,6 @@ def twitter_authorized(resp):
 
 @blueprint.route('/api/1/sessions/login/facebook', methods=['GET'])
 def facebook_login():
-    if not app.config.get('FACEBOOK_APP_ID'):
-        return provider_not_enabled('facebook')
     callback=url_for('sessions_api.facebook_authorized')
     session.clear()
     if not request.args.get('next_url'):

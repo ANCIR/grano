@@ -18,7 +18,7 @@ PLUGINS = {'LOADED': False, 'MANAGERS': {}}
 def _get_manager(namespace):
     enabled_plugins = app.config.get('PLUGINS', [])
     available_plugins = set()
-    
+
     assert namespace in NAMESPACES, \
         '%s not one of %r' % (namespace, NAMESPACES)
 
@@ -28,7 +28,7 @@ def _get_manager(namespace):
             def check_func(ext):
                 available_plugins.add(ext.name)
                 return ext.name in enabled_plugins
-            
+
             mgr = EnabledExtensionManager(
                 namespace=namespace_,
                 check_func=check_func,
@@ -59,7 +59,7 @@ def notify_plugins(namespace, callback):
 def list_plugins():
     """ List all available plugins, grouped by the namespace in which
     they're made available. """
-    
+
     plugins = {}
 
     for namespace in NAMESPACES:
