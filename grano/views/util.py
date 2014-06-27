@@ -11,6 +11,9 @@ ALIASES = 'aliases-'
 
 
 def property_filters(cls, q):
+    """ Parse the query arguments and apply any specified property
+    filters to the given query ``q``. The property-holding object
+    (a relation or entity) is given as ``cls``. """
     for key in request.args.keys():
         if not key.startswith(PROPERTY):
             continue
@@ -71,7 +74,6 @@ def all_entities():
         q = q.filter(Project.slug==single_arg('project'))
 
     q = property_filters(Entity, q)
-    q = q.distinct()
     return q
 
 

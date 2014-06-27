@@ -4,16 +4,15 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
-from grano.lib.exc import BadRequest
+from grano.lib.exc import BadRequest, Gone
 from grano.lib.args import object_or_404, request_data
 from grano.model import Entity, Schema, EntityProperty, Project, Permission
-from grano.logic import entities, relations
+from grano.logic import entities
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
-from grano.lib.exc import Gone, BadRequest
-from grano.core import app, db, url_for
-from grano.views.util import filter_query, all_entities
+from grano.core import db, url_for
+from grano.views.util import all_entities
 from grano.views.util import generate_facets
 from grano.views.cache import validate_cache
 from grano import authz
