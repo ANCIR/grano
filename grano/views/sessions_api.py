@@ -43,7 +43,7 @@ def status():
         'api_key': request.account.api_key if authz.logged_in() else None,
         'account': request.account if request.account else None,
         'permissions': permissions,
-        'oauth_providers': oauth_providers
+        'oauth': oauth_providers
     })
 
 
