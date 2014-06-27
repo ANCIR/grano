@@ -34,28 +34,33 @@ def property_filters(cls, q):
     return q
 
 
-def relations_query(cls, q, args):
-    q = q.join(Project)
-    q = q.outerjoin(Permission)
-    q = q.filter(or_(Project.private == False,
-        and_(Permission.reader == True, Permission.account == request.account)))
+def relations_query(q, Rel):
+    Proj = aliased(Project)
+    Perm = aliased(Permission)
+    q = q.join(Proj, Rel.project)
+    q = q.outerjoin(Perm, Proj.permissions)
+
+    # TODO: Entity status checks
+    q = q.filter(or_(Proj.private == False,
+                 and_(Perm.reader == True, Perm.account == request.account)))
 
     project = single_arg('project')
     if project:
-        q = q.filter(Project.slug == project)
+        q = q.filter(Proj.slug == project)
 
-    q = property_filters(cls, q)
+    q = property_filters(Relation, q)
 
     if 'source' in request.args:
-        q = q.filter(Relation.source_id == single_arg('source'))
+        q = q.filter(Rel.source_id == single_arg('source'))
 
     if 'target' in request.args:
-        q = q.filter(Relation.target_id == single_arg('target'))
+        q = q.filter(Rel.target_id == single_arg('target'))
 
     if 'schema' in request.args:
         schemata = request.args.get('schema').split(',')
-        q = q.join(Schema)
-        q = q.filter(Schema.name.in_(schemata))
+        alias = aliased(Schema)
+        q = q.join(alias, Rel.schema)
+        q = q.filter(alias.name.in_(schemata))
 
     return q
 

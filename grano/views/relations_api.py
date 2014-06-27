@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
@@ -18,7 +19,9 @@ blueprint = Blueprint('relations_api', __name__)
 
 @blueprint.route('/api/1/relations', methods=['GET'])
 def index():
-    query = relations_query(Relation, Relation.all(), request.args)
+    alias = aliased(Relation)
+    q = db.session.query(alias)
+    query = relations_query(q, alias)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())

@@ -1,19 +1,17 @@
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import Blueprint, request, Response
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.exc import BadRequest, Gone
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, Schema, EntityProperty, Project, Permission
+from grano.model import Entity, EntityProperty, Project, Permission
 from grano.logic import entities
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.core import db, url_for
-from grano.views.util import entities_query
-from grano.views.util import generate_facets
+from grano.views.util import entities_query, generate_facets
 from grano.views.cache import validate_cache
 from grano import authz
 
