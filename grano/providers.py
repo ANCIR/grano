@@ -13,7 +13,6 @@ class Stub():
 
     def __init__(self, name):
         self.name = name
-        self.stub = True
 
     def authorize(self, **kwargs):
         return jsonify({
@@ -29,17 +28,22 @@ class Stub():
         return inner
 
 
-github, twitter, facebook = Stub('github'), Stub('twitter'), Stub('facebook')
+PROVIDERS = {
+    'github': Stub('github'),
+    'twitter': Stub('twitter'),
+    'facebook': Stub('facebook')
+}
+
 
 if app.config.get('GITHUB_CLIENT_ID') is not None:
-    github = oauth.remote_app('github',
-            base_url='https://github.com/login/oauth/',
-            authorize_url='https://github.com/login/oauth/authorize',
-            request_token_url=None,
-            access_token_url='https://github.com/login/oauth/access_token',
-            consumer_key=app.config.get('GITHUB_CLIENT_ID'),
-            consumer_secret=app.config.get('GITHUB_CLIENT_SECRET'))
-    github._client.ca_certs = certifi.where()
+    PROVIDERS['github'] = oauth.remote_app('github',
+        base_url='https://github.com/login/oauth/',
+        authorize_url='https://github.com/login/oauth/authorize',
+        request_token_url=None,
+        access_token_url='https://github.com/login/oauth/access_token',
+        consumer_key=app.config.get('GITHUB_CLIENT_ID'),
+        consumer_secret=app.config.get('GITHUB_CLIENT_SECRET'))
+    PROVIDERS['github']._client.ca_certs = certifi.where()
 
 if app.config.get('TWITTER_API_KEY') is not None:
     twitter = oauth.remote_app('twitter',
@@ -54,6 +58,8 @@ if app.config.get('TWITTER_API_KEY') is not None:
     def get_twitter_token(token=None):
         return session.get('twitter_token')
 
+    PROVIDERS['twitter'] = twitter
+
 if app.config.get('FACEBOOK_APP_ID') is not None:
     facebook = oauth.remote_app('facebook',
         base_url='https://graph.facebook.com/',
@@ -67,3 +73,6 @@ if app.config.get('FACEBOOK_APP_ID') is not None:
     @facebook.tokengetter
     def get_facebook_token(token=None):
         return session.get('facebook_token')
+
+    PROVIDERS['facebook'] = facebook
+

@@ -7,8 +7,8 @@ from grano import authz
 from grano.lib.exc import BadRequest
 from grano.lib.serialisation import jsonify
 from grano.views.cache import validate_cache
-from grano.core import db, url_for, app
-from grano.providers import github, twitter, facebook
+from grano.core import db, url_for
+from grano.providers import PROVIDERS, Stub
 from grano.model import Account
 from grano.logic import accounts
 
@@ -33,11 +33,17 @@ def status():
     }
     validate_cache(keys=keys)
 
+    oauth_providers = {}
+    for name, provider in PROVIDERS.items():
+        if not isinstance(provider, Stub):
+            oauth_providers[name] = url_for('.login', provider=name)
+
     return jsonify({
         'logged_in': authz.logged_in(),
         'api_key': request.account.api_key if authz.logged_in() else None,
         'account': request.account if request.account else None,
-        'permissions': permissions
+        'permissions': permissions,
+        'oauth_providers': oauth_providers
     })
 
 
@@ -47,26 +53,31 @@ def logout():
     return redirect(request.args.get('next_url', '/'))
 
 
-@blueprint.route('/api/1/sessions/login/github', methods=['GET'])
-def github_login():
-    callback = url_for('sessions_api.github_authorized')
+@blueprint.route('/api/1/sessions/login/<provider>', methods=['GET'])
+def login(provider):
+    if provider not in PROVIDERS:
+        raise BadRequest('Unknown provider: %s' % provider)
+    callback = url_for('sessions_api.%s_authorized' % provider)
     session.clear()
     if not request.args.get('next_url'):
         raise BadRequest("No 'next_url' is specified.")
     session['next_url'] = request.args.get('next_url')
-    return github.authorize(callback=callback)
+    return PROVIDERS[provider].authorize(callback=callback)
+
+
+handler = PROVIDERS.get('github')
 
 
 @blueprint.route('/api/1/sessions/callback/github', methods=['GET'])
-@github.authorized_handler
+@handler.authorized_handler
 def github_authorized(resp):
     next_url = session.get('next_url', '/')
-    if resp is None or not 'access_token' in resp:
+    if resp is None or 'access_token' not in resp:
         return redirect(next_url)
     access_token = resp['access_token']
     session['access_token'] = access_token, ''
-    res = requests.get('https://api.github.com/user?access_token=%s' % access_token,
-            verify=False)
+    url = 'https://api.github.com/user?access_token=%s'
+    res = requests.get(url % access_token, verify=False)
     data = res.json()
     account = Account.by_github_id(data.get('id'))
     data_ = {
@@ -81,25 +92,19 @@ def github_authorized(resp):
     return redirect(next_url)
 
 
-@blueprint.route('/api/1/sessions/login/twitter', methods=['GET'])
-def twitter_login():
-    callback=url_for('sessions_api.twitter_authorized')
-    session.clear()
-    if not request.args.get('next_url'):
-        raise BadRequest("No 'next_url' is specified.")
-    session['next_url'] = request.args.get('next_url')
-    return twitter.authorize(callback=callback)
+handler = PROVIDERS.get('twitter')
 
 
 @blueprint.route('/api/1/sessions/callback/twitter', methods=['GET'])
-@twitter.authorized_handler
+@handler.authorized_handler
 def twitter_authorized(resp):
     next_url = session.get('next_url', '/')
-    if resp is None or not 'oauth_token' in resp:
+    if resp is None or 'oauth_token' not in resp:
         return redirect(next_url)
     session['twitter_token'] = (resp['oauth_token'],
-        resp['oauth_token_secret'])
-    res = twitter.get('users/show.json?user_id=%s' % resp.get('user_id'))
+                                resp['oauth_token_secret'])
+    provider = PROVIDERS.get('twitter')
+    res = provider.get('users/show.json?user_id=%s' % resp.get('user_id'))
     account = Account.by_twitter_id(res.data.get('id'))
     data_ = {
         'full_name': res.data.get('name'),
@@ -112,24 +117,17 @@ def twitter_authorized(resp):
     return redirect(next_url)
 
 
-@blueprint.route('/api/1/sessions/login/facebook', methods=['GET'])
-def facebook_login():
-    callback=url_for('sessions_api.facebook_authorized')
-    session.clear()
-    if not request.args.get('next_url'):
-        raise BadRequest("No 'next_url' is specified.")
-    session['next_url'] = request.args.get('next_url')
-    return facebook.authorize(callback=callback)
+handler = PROVIDERS.get('facebook')
 
 
 @blueprint.route('/api/1/sessions/callback/facebook', methods=['GET'])
-@facebook.authorized_handler
+@handler.authorized_handler
 def facebook_authorized(resp):
     next_url = session.get('next_url', '/')
-    if resp is None or not 'access_token' in resp:
+    if resp is None or 'access_token' not in resp:
         return redirect(next_url)
     session['facebook_token'] = (resp.get('access_token'), '')
-    data = facebook.get('/me').data
+    data = PROVIDERS.get('facebook').get('/me').data
     account = Account.by_facebook_id(data.get('id'))
     data_ = {
         'full_name': data.get('name'),
