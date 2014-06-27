@@ -17,7 +17,7 @@ class Pager(object):
         self.offset = arg_int(self.arg_name('offset'), default=0)
         self.limit = get_limit(default=limit, field=self.arg_name('limit'))
         self._results = None
-        
+
     def arg_name(self, arg):
         if self.name is None:
             return arg
@@ -75,7 +75,7 @@ class Pager(object):
         if low < 1:
             low = 1
             high = min((2*self.pager_range)+1, self.pages)
-        
+
         if high > self.pages:
             high = self.pages
             low = max(1, self.pages - (2*self.pager_range)+1)
@@ -91,8 +91,8 @@ class Pager(object):
         return self.url(query_args)
 
     def remove_url_state(self, arg, value):
-        query_args = [t for t in self.query_args if \
-                t != (arg, value.encode('utf-8'))]
+        query_args = [t for t in self.query_args if
+                      t != (arg, value.encode('utf-8'))]
         return self.url(query_args)
 
     def page_url(self, page):
@@ -127,7 +127,7 @@ class Pager(object):
         return keys
 
     def to_dict(self, results_converter=lambda r: r):
-        format_args = [(k,v) for (k,v) in self.query_args if k != 'limit']
+        format_args = [(k, v) for (k, v) in self.query_args if k != 'limit']
         format_args.extend([('limit', 'LIMIT'), ('offset', 'OFFSET')])
         return {
             'next_url': self.next_url,
