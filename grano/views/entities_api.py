@@ -40,9 +40,10 @@ def index():
 
     query = query.distinct()
     pager = Pager(query)
-    print generate_facets(request.args)
     validate_cache(keys=pager.cache_keys())
-    return jsonify(pager, index=True)
+    result = pager.to_dict()
+    result['facets'] = generate_facets()
+    return jsonify(result, index=True)
 
 
 @blueprint.route('/api/1/entities', methods=['POST', 'PUT'])

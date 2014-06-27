@@ -77,9 +77,9 @@ def all_entities():
     return q
 
 
-def generate_facets(args):
+def generate_facets():
     facets = {}
-    for facet in args.getlist('facet'):
+    for facet in request.args.getlist('facet'):
         facets[facet] = facet_by(facet)
     return facets
 
@@ -90,9 +90,10 @@ from sqlalchemy.sql import func
 def facet_by(field):
     facet_obj = aliased(Schema)
     entity_obj = aliased(Entity)
-    q = db.session.query(facet_obj)
+    q = db.session.query()
     q = q.join(entity_obj, facet_obj.entities)
     facet_count = func.count(entity_obj.id)
+    q = q.add_entity(facet_obj)
     q = q.add_columns(facet_count)
     q = q.order_by(facet_count.desc())
     q = q.group_by(facet_obj)
