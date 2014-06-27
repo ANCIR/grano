@@ -11,7 +11,7 @@ from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.core import db, url_for
-from grano.views.util import entities_query, generate_facets
+from grano.views.util import entities_query, entities_facets
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -28,7 +28,7 @@ def index():
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     result = pager.to_dict()
-    result['facets'] = generate_facets()
+    result['facets'] = entities_facets()
     return jsonify(result, index=True)
 
 

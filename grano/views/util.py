@@ -3,8 +3,10 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 
+from grano.lib.exc import BadRequest
 from grano.model import Project, Permission, Attribute, Relation
 from grano.model import Entity, EntityProperty, Schema, db
+from grano.model import RelationProperty
 from grano.authz import PUBLISHED_THRESHOLD
 from grano.lib.args import single_arg
 
@@ -114,24 +116,63 @@ def entities_query(q, Ent):
     return q
 
 
-def generate_facets():
+def entity_facet_obj(entity_obj, facet, q):
+    if facet == 'project':
+        facet_obj = aliased(Project)
+        q = q.join(entity_obj, facet_obj.entities)
+    elif facet == 'schema':
+        facet_obj = aliased(Schema)
+        q = q.join(entity_obj, facet_obj.entities)
+    elif facet.startswith('properties.'):
+        _, name = facet.split('.', 1)
+        facet_obj = aliased(EntityProperty)
+        q = q.join(entity_obj, facet_obj.entity)
+        q = q.filter(facet_obj.active == True)
+        q = q.filter(facet_obj.name == name)
+    elif facet.startswith('incoming.'):
+        _, subfacet = facet.split('.', 1)
+        rel_obj = aliased(Relation)
+        q = q.join(entity_obj, rel_obj.target)
+        return relation_facet_obj(rel_obj, subfacet, q)
+    elif facet.startswith('outgoing.'):
+        _, subfacet = facet.split('.', 1)
+        rel_obj = aliased(Relation)
+        q = q.join(entity_obj, rel_obj.source)
+        return relation_facet_obj(rel_obj, subfacet, q)
+    else:
+        raise BadRequest("Unknown facet: %s" % facet)
+    return q, facet_obj
+
+
+def relation_facet_obj(relation_obj, facet, q):
+    if facet == 'project':
+        facet_obj = aliased(Project)
+        q = q.join(relation_obj, facet_obj.entities)
+    elif facet == 'schema':
+        facet_obj = aliased(Schema)
+        q = q.join(relation_obj, facet_obj.relations)
+    elif facet.startswith('properties.'):
+        _, name = facet.split('.', 1)
+        facet_obj = aliased(RelationProperty)
+        q = q.join(relation_obj, facet_obj.relation)
+        q = q.filter(facet_obj.active == True)
+        q = q.filter(facet_obj.name == name)
+    else:
+        raise BadRequest("Unknown facet: %s" % facet)
+    return q, facet_obj
+
+
+def entities_facets():
     facets = {}
     for facet in request.args.getlist('facet'):
-        facets[facet] = facet_by(facet)
+        entity_obj = aliased(Entity)
+        q = db.session.query()
+        q, facet_obj = entity_facet_obj(entity_obj, facet, q)
+        facet_count = func.count(entity_obj.id)
+        q = q.add_entity(facet_obj)
+        q = q.add_columns(facet_count)
+        q = entities_query(q, entity_obj)
+        q = q.order_by(facet_count.desc())
+        q = q.group_by(facet_obj)
+        facets[facet] = q.all()
     return facets
-
-
-def facet_by(field):
-    facet_obj = aliased(Schema)
-    entity_obj = aliased(Entity)
-    q = db.session.query()
-    q = q.join(entity_obj, facet_obj.entities)
-    facet_count = func.count(entity_obj.id)
-    q = q.add_entity(facet_obj)
-    q = q.add_columns(facet_count)
-    q = entities_query(q, entity_obj)
-    q = q.order_by(facet_count.desc())
-    q = q.group_by(facet_obj)
-    print q
-    return q.all()
-
