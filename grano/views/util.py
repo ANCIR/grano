@@ -119,25 +119,25 @@ def entities_query(q, Ent):
 def entity_facet_obj(entity_obj, facet, q):
     if facet == 'project':
         facet_obj = aliased(Project)
-        q = q.join(entity_obj, facet_obj.entities)
+        q = q.join(facet_obj, entity_obj.project)
     elif facet == 'schema':
         facet_obj = aliased(Schema)
-        q = q.join(entity_obj, facet_obj.entities)
+        q = q.join(facet_obj, entity_obj.schemata)
     elif facet.startswith('properties.'):
         _, name = facet.split('.', 1)
         facet_obj = aliased(EntityProperty)
-        q = q.join(entity_obj, facet_obj.entity)
+        q = q.join(facet_obj, entity_obj.properties)
         q = q.filter(facet_obj.active == True)
         q = q.filter(facet_obj.name == name)
-    elif facet.startswith('incoming.'):
+    elif facet.startswith('inbound.'):
         _, subfacet = facet.split('.', 1)
         rel_obj = aliased(Relation)
-        q = q.join(entity_obj, rel_obj.target)
+        q = q.join(rel_obj, entity_obj.inbound)
         return relation_facet_obj(rel_obj, subfacet, q)
-    elif facet.startswith('outgoing.'):
+    elif facet.startswith('outbound.'):
         _, subfacet = facet.split('.', 1)
         rel_obj = aliased(Relation)
-        q = q.join(entity_obj, rel_obj.source)
+        q = q.join(rel_obj, entity_obj.outbound)
         return relation_facet_obj(rel_obj, subfacet, q)
     else:
         raise BadRequest("Unknown facet: %s" % facet)
@@ -147,16 +147,26 @@ def entity_facet_obj(entity_obj, facet, q):
 def relation_facet_obj(relation_obj, facet, q):
     if facet == 'project':
         facet_obj = aliased(Project)
-        q = q.join(relation_obj, facet_obj.entities)
+        q = q.join(facet_obj, relation_obj.project)
     elif facet == 'schema':
         facet_obj = aliased(Schema)
-        q = q.join(relation_obj, facet_obj.relations)
+        q = q.join(facet_obj, relation_obj.schema)
     elif facet.startswith('properties.'):
         _, name = facet.split('.', 1)
         facet_obj = aliased(RelationProperty)
-        q = q.join(relation_obj, facet_obj.relation)
+        q = q.join(facet_obj, relation_obj.properties)
         q = q.filter(facet_obj.active == True)
         q = q.filter(facet_obj.name == name)
+    elif facet.startswith('source.'):
+        _, subfacet = facet.split('.', 1)
+        ent_obj = aliased(Entity)
+        q = q.join(ent_obj, relation_obj.source)
+        return entity_facet_obj(ent_obj, subfacet, q)
+    elif facet.startswith('target.'):
+        _, subfacet = facet.split('.', 1)
+        ent_obj = aliased(Entity)
+        q = q.join(ent_obj, relation_obj.target)
+        return entity_facet_obj(ent_obj, subfacet, q)
     else:
         raise BadRequest("Unknown facet: %s" % facet)
     return q, facet_obj
