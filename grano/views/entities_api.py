@@ -38,7 +38,6 @@ def index():
         query = query.join(alias, Entity.schemata)
         query = query.filter(alias.name.in_(schema.split(',')))
 
-    query = query.filter(Entity.same_as == None)
     query = query.distinct()
     pager = Pager(query)
     print generate_facets(request.args)

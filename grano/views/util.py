@@ -54,24 +54,24 @@ def all_entities():
     q = Entity.all().\
         join(Project).\
         outerjoin(Permission)
-    q = q.filter(Entity.same_as==None)
+    q = q.filter(Entity.same_as == None)
     q = q.filter(or_(
         and_(
-            Project.private==False,
-            Entity.status>=PUBLISHED_THRESHOLD,
+            Project.private == False,
+            Entity.status >= PUBLISHED_THRESHOLD,
         ),
         and_(
-            Permission.reader==True,
-            Entity.status>=PUBLISHED_THRESHOLD,
-            Permission.account==request.account
+            Permission.reader == True,
+            Entity.status >= PUBLISHED_THRESHOLD,
+            Permission.account == request.account
         ),
         and_(
-            Permission.editor==True,
-            Permission.account==request.account
+            Permission.editor == True,
+            Permission.account == request.account
         )
     ))
     if 'project' in request.args:
-        q = q.filter(Project.slug==single_arg('project'))
+        q = q.filter(Project.slug == single_arg('project'))
 
     q = property_filters(Entity, q)
     return q
