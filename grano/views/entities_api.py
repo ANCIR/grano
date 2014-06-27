@@ -13,10 +13,10 @@ from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone, BadRequest
 from grano.core import app, db, url_for
-from grano.views.util import filter_query
+from grano.views.util import filter_query, all_entities
+from grano.views.util import generate_facets
 from grano.views.cache import validate_cache
 from grano import authz
-from .util import all_entities
 
 
 blueprint = Blueprint('entities_api', __name__)
@@ -42,6 +42,7 @@ def index():
     query = query.filter(Entity.same_as == None)
     query = query.distinct()
     pager = Pager(query)
+    print generate_facets(request.args)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)
 
