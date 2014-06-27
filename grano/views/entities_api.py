@@ -29,7 +29,7 @@ def index():
     if 'q' in request.args and len(request.args.get('q').strip()):
         q = '%%%s%%' % request.args.get('q').strip()
         query = query.join(EntityProperty)
-        query = query.filter(EntityProperty.name=='name')
+        query = query.filter(EntityProperty.name == 'name')
         query = query.filter(EntityProperty.value_string.ilike(q))
 
     for schema in request.args.getlist('schema'):
@@ -39,7 +39,7 @@ def index():
         query = query.join(alias, Entity.schemata)
         query = query.filter(alias.name.in_(schema.split(',')))
 
-    query = query.filter(Entity.same_as==None)
+    query = query.filter(Entity.same_as == None)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
