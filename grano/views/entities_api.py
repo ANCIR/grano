@@ -12,7 +12,7 @@ from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.core import db, url_for
-from grano.views.util import all_entities
+from grano.views.util import entities_query
 from grano.views.util import generate_facets
 from grano.views.cache import validate_cache
 from grano import authz
@@ -23,21 +23,9 @@ blueprint = Blueprint('entities_api', __name__)
 
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
-    query = all_entities()
-
-    if 'q' in request.args and len(request.args.get('q').strip()):
-        q = '%%%s%%' % request.args.get('q').strip()
-        query = query.join(EntityProperty)
-        query = query.filter(EntityProperty.name == 'name')
-        query = query.filter(EntityProperty.value_string.ilike(q))
-
-    for schema in request.args.getlist('schema'):
-        if not len(schema.strip()):
-            continue
-        alias = aliased(Schema)
-        query = query.join(alias, Entity.schemata)
-        query = query.filter(alias.name.in_(schema.split(',')))
-
+    alias = aliased(Entity)
+    q = db.session.query(alias)
+    query = entities_query(q, alias)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())

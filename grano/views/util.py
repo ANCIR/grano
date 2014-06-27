@@ -1,7 +1,10 @@
 from flask import request
 from sqlalchemy import or_, and_
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql import func
 
-from grano.model import Project, Permission, Attribute, Entity
+from grano.model import Project, Permission, Attribute, Relation
+from grano.model import Entity, EntityProperty, Schema, db
 from grano.authz import PUBLISHED_THRESHOLD
 from grano.lib.args import single_arg
 
@@ -31,49 +34,78 @@ def property_filters(cls, q):
     return q
 
 
-
-def filter_query(cls, q, args):
+def relations_query(cls, q, args):
     q = q.join(Project)
     q = q.outerjoin(Permission)
-    q = q.filter(or_(Project.private==False,
-        and_(Permission.reader==True, Permission.account==request.account)))
+    q = q.filter(or_(Project.private == False,
+        and_(Permission.reader == True, Permission.account == request.account)))
 
-    project = single_arg(args, 'project')
+    project = single_arg('project')
     if project:
-        q = q.filter(Project.slug==project)
+        q = q.filter(Project.slug == project)
 
     q = property_filters(cls, q)
 
-    q = q.distinct()
+    if 'source' in request.args:
+        q = q.filter(Relation.source_id == single_arg('source'))
+
+    if 'target' in request.args:
+        q = q.filter(Relation.target_id == single_arg('target'))
+
+    if 'schema' in request.args:
+        schemata = request.args.get('schema').split(',')
+        q = q.join(Schema)
+        q = q.filter(Schema.name.in_(schemata))
+
     return q
 
 
-def all_entities():
-    """Get all entities the current user has access to. Accepts project and
-    additional filter parameters."""
-    q = Entity.all().\
-        join(Project).\
-        outerjoin(Permission)
-    q = q.filter(Entity.same_as == None)
+def entities_query(q, Ent):
+    """ Get all entities the current user has access to. Accepts project and
+    additional filter parameters. """
+    # NOTE: I'm passing in the query and entity alias so that this
+    # function can be re-used from the facetting code to constrain
+    # the results of the facet sub-query.
+    Proj = aliased(Project)
+    Perm = aliased(Permission)
+    q = q.join(Proj, Ent.project).outerjoin(Perm, Proj.permissions)
+    q = q.filter(Ent.same_as == None)
+
     q = q.filter(or_(
         and_(
-            Project.private == False,
-            Entity.status >= PUBLISHED_THRESHOLD,
+            Proj.private == False,
+            Ent.status >= PUBLISHED_THRESHOLD,
         ),
         and_(
-            Permission.reader == True,
-            Entity.status >= PUBLISHED_THRESHOLD,
-            Permission.account == request.account
+            Perm.reader == True,
+            Ent.status >= PUBLISHED_THRESHOLD,
+            Perm.account == request.account
         ),
         and_(
-            Permission.editor == True,
-            Permission.account == request.account
+            Perm.editor == True,
+            Perm.account == request.account
         )
     ))
+
     if 'project' in request.args:
-        q = q.filter(Project.slug == single_arg('project'))
+        q = q.filter(Proj.slug == single_arg('project'))
 
     q = property_filters(Entity, q)
+
+    if 'q' in request.args and single_arg('q'):
+        EntProp = aliased(EntityProperty)
+        q_text = '%%%s%%' % single_arg('q')
+        q = q.join(EntProp)
+        q = q.filter(EntProp.name == 'name')
+        q = q.filter(EntProp.value_string.ilike(q_text))
+
+    for schema in request.args.getlist('schema'):
+        if not len(schema.strip()):
+            continue
+        alias = aliased(Schema)
+        q = q.join(alias, Ent.schemata)
+        q = q.filter(alias.name.in_(schema.split(',')))
+
     return q
 
 
@@ -83,9 +115,6 @@ def generate_facets():
         facets[facet] = facet_by(facet)
     return facets
 
-from grano.model import Schema, db
-from sqlalchemy.orm import aliased
-from sqlalchemy.sql import func
 
 def facet_by(field):
     facet_obj = aliased(Schema)
@@ -95,9 +124,9 @@ def facet_by(field):
     facet_count = func.count(entity_obj.id)
     q = q.add_entity(facet_obj)
     q = q.add_columns(facet_count)
+    q = entities_query(q, entity_obj)
     q = q.order_by(facet_count.desc())
     q = q.group_by(facet_obj)
     print q
     return q.all()
-
 
