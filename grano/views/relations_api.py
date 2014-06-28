@@ -25,7 +25,9 @@ def index():
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    return jsonify(pager, index=True)
+    result = pager.to_dict()
+    result['facets'] = facets.for_relations()
+    return jsonify(result, index=True)
 
 
 @blueprint.route('/api/1/relations', methods=['POST', 'PUT'])

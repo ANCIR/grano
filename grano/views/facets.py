@@ -97,18 +97,30 @@ def results_process(q):
 
 
 def for_entities():
+    return make_facets(lambda: aliased(Entity),
+                       filters.for_entities,
+                       parse_entity_facets)
+
+
+def for_relations():
+    return make_facets(lambda: aliased(Relation),
+                       filters.for_relations,
+                       parse_relation_facets)
+
+
+def make_facets(parent_alias, filter_func, parser_func):
     """ Return a set of facets based on the current query string. This
     will also consider filters set for the query, i.e. only show facets
     that match the current set of filters. """
     facets = {}
     for facet in request.args.getlist('facet'):
-        entity_obj = aliased(Entity)
+        parent_obj = parent_alias()
         q = db.session.query()
-        facet_count = func.count(entity_obj.id)
+        facet_count = func.count(parent_obj.id)
         q = q.add_columns(facet_count)
         q = q.order_by(facet_count.desc())
-        q = filters.for_entities(q, entity_obj)
-        q = parse_entity_facets(entity_obj, facet, q)
+        q = filter_func(q, parent_obj)
+        q = parser_func(parent_obj, facet, q)
         facets[facet] = Pager(q, name='facet_%s' % facet,
                               results_converter=results_process)
     return facets

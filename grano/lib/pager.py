@@ -135,7 +135,6 @@ class Pager(object):
             (self.arg_name('offset'), 'OFFSET')
         ])
         results_converter = results_converter or self.results_converter
-        print results_converter
         return {
             'next_url': self.next_url,
             'prev_url': self.prev_url,
