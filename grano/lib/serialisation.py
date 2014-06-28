@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
+from inspect import isgenerator
 
 from flask import Response, request
 
@@ -25,6 +26,8 @@ class JSONEncoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, Decimal):
             return float(obj)
+        if isgenerator(obj):
+            return [o for o in obj]
         return json.JSONEncoder.default(self, obj)
 
 
