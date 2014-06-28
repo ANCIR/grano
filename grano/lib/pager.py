@@ -8,8 +8,10 @@ from grano.lib.args import arg_int, get_limit
 
 class Pager(object):
 
-    def __init__(self, query, name=None, limit=25, pager_range=4, **kwargs):
+    def __init__(self, query, name=None, limit=25, pager_range=4,
+                 results_converter=lambda x: x, **kwargs):
         self.args = request.args
+        self.results_converter = results_converter
         self.name = name
         self.query = query
         self.kwargs = kwargs
@@ -103,8 +105,8 @@ class Pager(object):
         if len(query):
             qs = urlencode(query)
             url = url + '?' + qs
-        if self.name is not None:
-            url = url + '#' + self.name
+        #if self.name is not None:
+        #    url = url + '#' + self.name
         return url
 
     def __iter__(self):
@@ -126,9 +128,14 @@ class Pager(object):
             keys[str(i)] = k
         return keys
 
-    def to_dict(self, results_converter=lambda r: r):
+    def to_dict(self, results_converter=None):
         format_args = [(k, v) for (k, v) in self.query_args if k != 'limit']
-        format_args.extend([('limit', 'LIMIT'), ('offset', 'OFFSET')])
+        format_args.extend([
+            (self.arg_name('limit'), 'LIMIT'),
+            (self.arg_name('offset'), 'OFFSET')
+        ])
+        results_converter = results_converter or self.results_converter
+        print results_converter
         return {
             'next_url': self.next_url,
             'prev_url': self.prev_url,
