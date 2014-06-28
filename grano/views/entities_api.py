@@ -11,7 +11,7 @@ from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.core import db, url_for
-from grano.views.util import entities_query, entities_facets
+from grano.views import filters, facets
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -23,12 +23,12 @@ blueprint = Blueprint('entities_api', __name__)
 def index():
     alias = aliased(Entity)
     q = db.session.query(alias)
-    query = entities_query(q, alias)
+    query = filters.for_entities(q, alias)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     result = pager.to_dict()
-    result['facets'] = entities_facets()
+    result['facets'] = facets.for_entities()
     return jsonify(result, index=True)
 
 

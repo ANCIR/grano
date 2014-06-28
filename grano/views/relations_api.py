@@ -10,7 +10,7 @@ from grano.views.cache import validate_cache
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import db
-from grano.views.util import relations_query
+from grano.views import filters, facets
 from grano import authz
 
 
@@ -21,7 +21,7 @@ blueprint = Blueprint('relations_api', __name__)
 def index():
     alias = aliased(Relation)
     q = db.session.query(alias)
-    query = relations_query(q, alias)
+    query = filters.for_relations(q, alias)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
