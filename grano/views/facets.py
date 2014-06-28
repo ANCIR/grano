@@ -14,9 +14,26 @@ def apply_facet_obj(q, facet_obj):
     return q.group_by(facet_obj)
 
 
+def apply_property_facet(q, facet, cls, parent_obj):
+    """ Property facets are complicated because we don't want
+    to facet over the whole property object, but merely it's
+    value - which can be in one of any number of fields. """
+    _, name = facet.split('.', 1)
+    facet_obj = aliased(cls)
+    q = q.join(facet_obj, parent_obj.properties)
+    q = q.filter(facet_obj.active == True)
+    q = q.filter(facet_obj.name == name)
+    columns = (facet_obj.value_string, facet_obj.value_integer,
+               facet_obj.value_float, facet_obj.value_datetime,
+               facet_obj.value_boolean)
+    q = q.add_columns(*columns)
+    return q.group_by(*columns)
+
+
 def parse_entity_facets(entity_obj, facet, q):
     """ Parse a facet related to a relation object and return a
     modified query. """
+    # TODO: Status facet.
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, entity_obj.project)
@@ -26,12 +43,8 @@ def parse_entity_facets(entity_obj, facet, q):
         q = q.join(facet_obj, entity_obj.schemata)
         return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
-        _, name = facet.split('.', 1)
-        facet_obj = aliased(EntityProperty)
-        q = q.join(facet_obj, entity_obj.properties)
-        q = q.filter(facet_obj.active == True)
-        q = q.filter(facet_obj.name == name)
-        return apply_facet_obj(q, facet_obj)
+        return apply_property_facet(q, facet, EntityProperty,
+                                    entity_obj)
     elif facet.startswith('inbound.'):
         _, subfacet = facet.split('.', 1)
         rel_obj = aliased(Relation)
@@ -58,12 +71,8 @@ def parse_relation_facets(relation_obj, facet, q):
         q = q.join(facet_obj, relation_obj.schema)
         return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
-        _, name = facet.split('.', 1)
-        facet_obj = aliased(RelationProperty)
-        q = q.join(facet_obj, relation_obj.properties)
-        q = q.filter(facet_obj.active == True)
-        q = q.filter(facet_obj.name == name)
-        return apply_facet_obj(q, facet_obj)
+        return apply_property_facet(q, facet, RelationProperty,
+                                    relation_obj)
     elif facet.startswith('source.'):
         _, subfacet = facet.split('.', 1)
         ent_obj = aliased(Entity)
@@ -76,6 +85,14 @@ def parse_relation_facets(relation_obj, facet, q):
         return parse_entity_facets(ent_obj, subfacet, q)
     else:
         raise BadRequest("Unknown facet: %s" % facet)
+
+
+def results_process(q):
+    for res in q:
+        # pick the field that has a value, see the way properties
+        # are queried. slight hack.
+        count, value = res[0], max(res[1:])
+        yield value, count
 
 
 def for_entities():
@@ -91,5 +108,5 @@ def for_entities():
         q = q.order_by(facet_count.desc())
         q = filters.for_entities(q, entity_obj)
         q = parse_entity_facets(entity_obj, facet, q)
-        facets[facet] = q.all()
+        facets[facet] = list(results_process(q))
     return facets
