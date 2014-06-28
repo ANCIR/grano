@@ -9,21 +9,29 @@ from grano.model import RelationProperty
 from grano.views import filters
 
 
+def apply_facet_obj(q, facet_obj):
+    q = q.add_entity(facet_obj)
+    return q.group_by(facet_obj)
+
+
 def parse_entity_facets(entity_obj, facet, q):
-    """ Parse a facet related to a relation object and return a 
+    """ Parse a facet related to a relation object and return a
     modified query. """
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, entity_obj.project)
+        return apply_facet_obj(q, facet_obj)
     elif facet == 'schema':
         facet_obj = aliased(Schema)
         q = q.join(facet_obj, entity_obj.schemata)
+        return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
         _, name = facet.split('.', 1)
         facet_obj = aliased(EntityProperty)
         q = q.join(facet_obj, entity_obj.properties)
         q = q.filter(facet_obj.active == True)
         q = q.filter(facet_obj.name == name)
+        return apply_facet_obj(q, facet_obj)
     elif facet.startswith('inbound.'):
         _, subfacet = facet.split('.', 1)
         rel_obj = aliased(Relation)
@@ -36,7 +44,6 @@ def parse_entity_facets(entity_obj, facet, q):
         return parse_relation_facets(rel_obj, subfacet, q)
     else:
         raise BadRequest("Unknown facet: %s" % facet)
-    return q, facet_obj
 
 
 def parse_relation_facets(relation_obj, facet, q):
@@ -45,15 +52,18 @@ def parse_relation_facets(relation_obj, facet, q):
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, relation_obj.project)
+        return apply_facet_obj(q, facet_obj)
     elif facet == 'schema':
         facet_obj = aliased(Schema)
         q = q.join(facet_obj, relation_obj.schema)
+        return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
         _, name = facet.split('.', 1)
         facet_obj = aliased(RelationProperty)
         q = q.join(facet_obj, relation_obj.properties)
         q = q.filter(facet_obj.active == True)
         q = q.filter(facet_obj.name == name)
+        return apply_facet_obj(q, facet_obj)
     elif facet.startswith('source.'):
         _, subfacet = facet.split('.', 1)
         ent_obj = aliased(Entity)
@@ -66,7 +76,6 @@ def parse_relation_facets(relation_obj, facet, q):
         return parse_entity_facets(ent_obj, subfacet, q)
     else:
         raise BadRequest("Unknown facet: %s" % facet)
-    return q, facet_obj
 
 
 def for_entities():
@@ -79,10 +88,8 @@ def for_entities():
         q = db.session.query()
         facet_count = func.count(entity_obj.id)
         q = q.add_columns(facet_count)
-        q, facet_obj = parse_entity_facets(entity_obj, facet, q)
-        q = q.add_entity(facet_obj)
-        q = filters.for_entities(q, entity_obj)
         q = q.order_by(facet_count.desc())
-        q = q.group_by(facet_obj)
+        q = filters.for_entities(q, entity_obj)
+        q = parse_entity_facets(entity_obj, facet, q)
         facets[facet] = q.all()
     return facets
