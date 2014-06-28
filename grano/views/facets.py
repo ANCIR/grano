@@ -10,6 +10,8 @@ from grano.views import filters
 
 
 def parse_entity_facets(entity_obj, facet, q):
+    """ Parse a facet related to a relation object and return a 
+    modified query. """
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, entity_obj.project)
@@ -38,6 +40,8 @@ def parse_entity_facets(entity_obj, facet, q):
 
 
 def parse_relation_facets(relation_obj, facet, q):
+    """ Parse a facet related to an entity and return a modified
+    query. """
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, relation_obj.project)
