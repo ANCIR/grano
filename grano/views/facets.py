@@ -3,6 +3,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 
 from grano.lib.exc import BadRequest
+from grano.lib.pager import Pager
 from grano.model import Project, Relation
 from grano.model import Entity, EntityProperty, Schema, db
 from grano.model import RelationProperty
@@ -108,5 +109,6 @@ def for_entities():
         q = q.order_by(facet_count.desc())
         q = filters.for_entities(q, entity_obj)
         q = parse_entity_facets(entity_obj, facet, q)
-        facets[facet] = list(results_process(q))
+        facets[facet] = Pager(q, name='facet_%s' % facet,
+                              results_converter=results_process)
     return facets
