@@ -36,13 +36,13 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     def to_dict(self):
         data = self.to_dict_base()
         for prop in self.active_properties:
-            name, prop = prop.to_dict_index()
+            name, prop = prop.to_dict_kv()
             data['properties'][name] = prop
         return data
 
     def to_dict_index(self):
         data = self.to_dict_base()
         for prop in self.active_properties:
-            name, prop = prop.to_dict_index()
+            name, prop = prop.to_dict_kv()
             data['properties'][name] = prop
         return data

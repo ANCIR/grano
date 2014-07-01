@@ -1,22 +1,19 @@
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import Blueprint, request, Response
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
-from grano.lib.exc import BadRequest
+from grano.lib.exc import BadRequest, Gone
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, Schema, EntityProperty, Project, Permission
-from grano.logic import entities, relations
+from grano.model import Entity, EntityProperty, Project, Permission
+from grano.logic import entities
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
-from grano.lib.exc import Gone, BadRequest
-from grano.core import app, db, url_for
-from grano.views.util import filter_query
+from grano.core import db, url_for
+from grano.views import filters, facets
 from grano.views.cache import validate_cache
 from grano import authz
-from .util import all_entities
 
 
 blueprint = Blueprint('entities_api', __name__)
@@ -24,26 +21,15 @@ blueprint = Blueprint('entities_api', __name__)
 
 @blueprint.route('/api/1/entities', methods=['GET'])
 def index():
-    query = all_entities()
-
-    if 'q' in request.args and len(request.args.get('q').strip()):
-        q = '%%%s%%' % request.args.get('q').strip()
-        query = query.join(EntityProperty)
-        query = query.filter(EntityProperty.name == 'name')
-        query = query.filter(EntityProperty.value_string.ilike(q))
-
-    for schema in request.args.getlist('schema'):
-        if not len(schema.strip()):
-            continue
-        alias = aliased(Schema)
-        query = query.join(alias, Entity.schemata)
-        query = query.filter(alias.name.in_(schema.split(',')))
-
-    query = query.filter(Entity.same_as == None)
+    alias = aliased(Entity)
+    q = db.session.query(alias)
+    query = filters.for_entities(q, alias)
     query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    return jsonify(pager, index=True)
+    result = pager.to_dict()
+    result['facets'] = facets.for_entities()
+    return jsonify(result, index=True)
 
 
 @blueprint.route('/api/1/entities', methods=['POST', 'PUT'])

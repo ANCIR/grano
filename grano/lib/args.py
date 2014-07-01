@@ -47,8 +47,8 @@ def object_or_404(obj):
     return obj
 
 
-def single_arg(args, name, default=None):
-    vals = [v for v in args.getlist(name) if v.strip()]
+def single_arg(name, default=None):
+    vals = [v for v in request.args.getlist(name) if v.strip()]
     if len(vals) == 0:
         return default
     elif len(vals) > 1:

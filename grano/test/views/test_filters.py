@@ -1,7 +1,8 @@
 import unittest
 import flask
 from grano import authz
-from grano.views import util
+from grano.lib.args import single_arg
+from grano.views import filters
 from grano.core import db
 from grano.model import Entity
 from grano.test.test_authz import make_test_app, BaseAuthTestCase
@@ -29,7 +30,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 0)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 0)
 
     def test_all_entities__private_reader_published(self):
         project, permission = _project_and_permission(
@@ -40,7 +42,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 1)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 1)
 
     def test_all_entities__private_reader_draft(self):
         project, permission = _project_and_permission(
@@ -51,7 +54,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 0)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 0)
 
     def test_all_entities__private_editor_published(self):
         project, permission = _project_and_permission(
@@ -62,7 +66,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 1)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 1)
 
     def test_all_entities__private_editor_draft(self):
         project, permission = _project_and_permission(
@@ -73,7 +78,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 1)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 1)
 
     def test_all_entities__not_private_published(self):
         project, permission = _project_and_permission(private=False)
@@ -83,7 +89,8 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            self.assertEqual(util.all_entities().count(), 1)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 1)
 
     def test_all_entities__not_private_draft(self):
         project, permission = _project_and_permission(
@@ -94,25 +101,30 @@ class AllEntitiesTestCase(BaseAuthTestCase):
         with self.app.test_request_context():
             flask.session['id'] = 1
             self.app.preprocess_request()
-            query = util.all_entities()
-            self.assertEqual(util.all_entities().count(), 0)
+            q = db.session.query(Entity)
+            self.assertEqual(filters.for_entities(q, Entity).count(), 0)
 
 
 class SingleArgTestCase(BaseAuthTestCase):
 
+    def setUp(self):
+        self.app = make_test_app()
+
     def test_single_arg(self):
-        d = MultiDict([('a', 'b')])
-        self.assertEqual(util.single_arg(d, 'a'), 'b')
+        with self.app.test_request_context('/?a=b'):
+            self.assertEqual(single_arg('a'), 'b')
 
     def test_single_arg__bad_request(self):
-        d = MultiDict([('a', 'b'), ('a', 'c')])
-        with self.assertRaises(BadRequest):
-            util.single_arg(d, 'a')
+        with self.app.test_request_context('/?a=b&a=c'):
+            with self.assertRaises(BadRequest):
+                single_arg('a')
 
     def test_single_arg__allow_empty_duplicates(self):
-        d = MultiDict([('a', 'b'), ('a', ' ')])
-        self.assertEqual(util.single_arg(d, 'a'), 'b')
-        
+        with self.app.test_request_context('/?a=b&a='):
+            self.assertEqual(single_arg('a'), 'b')
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

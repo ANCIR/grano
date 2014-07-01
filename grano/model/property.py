@@ -32,11 +32,13 @@ class Property(db.Model, IntBase):
     __mapper_args__ = {'polymorphic_on': obj}
 
     def to_dict_index(self):
-        value = self.value
-        return self.name, {
-            'value': value,
+        return {
+            'value': self.value,
             'source_url': self.source_url
         }
+
+    def to_dict_kv(self):
+        return self.name, self.to_dict_index()
 
     def to_dict(self):
         name, data = self.to_dict_index()

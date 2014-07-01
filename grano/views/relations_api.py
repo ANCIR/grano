@@ -1,16 +1,16 @@
-from flask import Blueprint, render_template, request
-from flask import redirect, make_response, url_for
+from flask import Blueprint, request
+from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Relation, Schema
+from grano.model import Relation
 from grano.logic import relations
 from grano.logic.references import ProjectRef
 from grano.views.cache import validate_cache
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
-from grano.core import app, db
-from grano.views.util import filter_query
+from grano.core import db
+from grano.views import filters, facets
 from grano import authz
 
 
@@ -19,22 +19,15 @@ blueprint = Blueprint('relations_api', __name__)
 
 @blueprint.route('/api/1/relations', methods=['GET'])
 def index():
-    query = filter_query(Relation, Relation.all(), request.args)
-
-    if request.args.get('source'):
-        query = query.filter(Relation.source_id==request.args.getlist('source')[0])
-
-    if request.args.get('target'):
-        query = query.filter(Relation.target_id==request.args.getlist('target')[0])
-    
-    if request.args.get('schema'):
-        schemata = request.args.get('schema').split(',')
-        query = query.join(Schema)
-        query = query.filter(Schema.name.in_(schemata))
-
+    alias = aliased(Relation)
+    q = db.session.query(alias)
+    query = filters.for_relations(q, alias)
+    query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
-    return jsonify(pager, index=True)
+    result = pager.to_dict()
+    result['facets'] = facets.for_relations()
+    return jsonify(result, index=True)
 
 
 @blueprint.route('/api/1/relations', methods=['POST', 'PUT'])

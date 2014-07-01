@@ -8,8 +8,10 @@ from grano.lib.args import arg_int, get_limit
 
 class Pager(object):
 
-    def __init__(self, query, name=None, limit=25, pager_range=4, **kwargs):
+    def __init__(self, query, name=None, limit=25, pager_range=4,
+                 results_converter=lambda x: x, **kwargs):
         self.args = request.args
+        self.results_converter = results_converter
         self.name = name
         self.query = query
         self.kwargs = kwargs
@@ -17,7 +19,7 @@ class Pager(object):
         self.offset = arg_int(self.arg_name('offset'), default=0)
         self.limit = get_limit(default=limit, field=self.arg_name('limit'))
         self._results = None
-        
+
     def arg_name(self, arg):
         if self.name is None:
             return arg
@@ -75,7 +77,7 @@ class Pager(object):
         if low < 1:
             low = 1
             high = min((2*self.pager_range)+1, self.pages)
-        
+
         if high > self.pages:
             high = self.pages
             low = max(1, self.pages - (2*self.pager_range)+1)
@@ -91,8 +93,8 @@ class Pager(object):
         return self.url(query_args)
 
     def remove_url_state(self, arg, value):
-        query_args = [t for t in self.query_args if \
-                t != (arg, value.encode('utf-8'))]
+        query_args = [t for t in self.query_args if
+                      t != (arg, value.encode('utf-8'))]
         return self.url(query_args)
 
     def page_url(self, page):
@@ -103,8 +105,8 @@ class Pager(object):
         if len(query):
             qs = urlencode(query)
             url = url + '?' + qs
-        if self.name is not None:
-            url = url + '#' + self.name
+        #if self.name is not None:
+        #    url = url + '#' + self.name
         return url
 
     def __iter__(self):
@@ -126,9 +128,13 @@ class Pager(object):
             keys[str(i)] = k
         return keys
 
-    def to_dict(self, results_converter=lambda r: r):
-        format_args = [(k,v) for (k,v) in self.query_args if k != 'limit']
-        format_args.extend([('limit', 'LIMIT'), ('offset', 'OFFSET')])
+    def to_dict(self, results_converter=None):
+        format_args = [(k, v) for (k, v) in self.query_args if k != 'limit']
+        format_args.extend([
+            (self.arg_name('limit'), 'LIMIT'),
+            (self.arg_name('offset'), 'OFFSET')
+        ])
+        results_converter = results_converter or self.results_converter
         return {
             'next_url': self.next_url,
             'prev_url': self.prev_url,
