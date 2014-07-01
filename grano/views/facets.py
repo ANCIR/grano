@@ -35,6 +35,7 @@ def parse_entity_facets(entity_obj, facet, q):
     """ Parse a facet related to a relation object and return a
     modified query. """
     # TODO: Status facet.
+    # TODO: Author facet.
     if facet == 'project':
         facet_obj = aliased(Project)
         q = q.join(facet_obj, entity_obj.project)
