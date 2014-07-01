@@ -19,6 +19,8 @@ def apply_property_facet(q, facet, cls, parent_obj):
     """ Property facets are complicated because we don't want
     to facet over the whole property object, but merely it's
     value - which can be in one of any number of fields. """
+    if '.' not in facet:
+        raise BadRequest("Invalud facet: %s" % facet)
     _, name = facet.split('.', 1)
     facet_obj = aliased(cls)
     q = q.join(facet_obj, parent_obj.properties)
