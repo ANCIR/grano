@@ -22,7 +22,7 @@ setup(
     url='http://docs.grano.cc',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-    namespace_packages=[],
+    namespace_packages = ['grano'],
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,

@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from flask import Blueprint, render_template, request
-from flask import redirect, make_response, url_for
+from flask import Blueprint, request
+from flask import redirect, make_response
 
-from grano import __version__
 from grano.lib.serialisation import jsonify
-from grano.core import app, url_for, app_name
+from grano.core import app, url_for, app_name, app_version
 from grano.views.cache import validate_cache, disable_cache
 from grano.background import ping
 
@@ -44,7 +43,7 @@ def status():
     return jsonify({
         'service': app_name,
         'status': 'ok',
-        'version': __version__,
+        'version': app_version,
         'docs': 'http://docs.grano.cc/rest_api.html',
         'api_url': url_for('base_api.status'),
         'services': {
