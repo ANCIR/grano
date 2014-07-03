@@ -101,6 +101,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         """ Convert an entity to the REST API form. """
         data = {
             'id': self.id,
+            'status': self.status,
             'project': self.project.to_dict_index(),
             'api_url': url_for('entities_api.view', id=self.id),
             'properties': {}

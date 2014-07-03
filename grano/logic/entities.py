@@ -1,12 +1,9 @@
 import logging
 import colander
 
-from grano.core import db, url_for, celery
-from grano.model import Entity, Schema, EntityProperty
-from grano.logic import relations, schemata as schemata_logic
+from grano.core import db, celery
+from grano.model import Entity, Schema
 from grano.logic import properties as properties_logic
-from grano.logic import relations as relations_logic
-from grano.logic import projects as projects_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
 from grano.plugins import notify_plugins
@@ -18,12 +15,16 @@ log = logging.getLogger(__name__)
 class EntityBaseValidator(colander.MappingSchema):
     author = colander.SchemaNode(AccountRef())
     project = colander.SchemaNode(ProjectRef())
+    status = colander.SchemaNode(colander.Integer(),
+                                 default=20,
+                                 missing=20,
+                                 validator=colander.Range(0, 100))
 
 
 class MergeValidator(colander.MappingSchema):
     orig = colander.SchemaNode(EntityRef())
     dest = colander.SchemaNode(EntityRef())
-    
+
 
 def validate(data, entity):
     """ Due to some fairly weird interdependencies between the different
@@ -35,7 +36,7 @@ def validate(data, entity):
 
     validator = EntityBaseValidator()
     sane = validator.deserialize(data)
-    
+
     schemata_validator = colander.SchemaNode(colander.Mapping())
     schemata_node = colander.SchemaNode(SchemaRef(sane.get('project')))
     schemata_validator.add(colander.SchemaNode(colander.Sequence(),
@@ -66,7 +67,7 @@ def _entity_changed(entity_id, operation):
 def save(data, entity=None):
     """ Save or update an entity. """
     data = validate(data, entity)
-    
+
     operation = 'create' if entity is None else 'update'
     if entity is None:
         entity = Entity()
@@ -74,6 +75,7 @@ def save(data, entity=None):
         entity.author = data.get('author')
         db.session.add(entity)
 
+    entity.status = data.get('status')
     entity.schemata = data.get('schemata')
 
     prop_names = set()
@@ -97,7 +99,7 @@ def delete(entity):
     relations. """
     db.session.delete(entity)
     _entity_changed.delay(entity.id, 'delete')
-    
+
 
 def merge(orig, dest):
     """ Copy all properties and relations from one entity onto another, then
@@ -107,7 +109,7 @@ def merge(orig, dest):
 
     if dest.same_as == orig.id:
         return orig
-    
+
     if orig.same_as == dest.id:
         return dest
 
@@ -116,7 +118,7 @@ def merge(orig, dest):
         resolved_dest = Entity.by_id(dest.same_as)
         if resolved_dest is not None:
             return merge(orig, resolved_dest)
-    
+
     schemata, seen_schemata = list(), set()
     for schema in dest.schemata + orig.schemata:
         if schema.id in seen_schemata:
@@ -131,13 +133,13 @@ def merge(orig, dest):
         if prop.name in dest_active:
             prop.active = False
         prop.entity = dest
-    
+
     for rel in orig.inbound:
         rel.target = dest
-    
+
     for rel in orig.outbound:
         rel.source = dest
-    
+
     orig.same_as = dest.id
     dest.same_as = None
     db.session.flush()
