@@ -1,4 +1,5 @@
 import os
+import pkg_resources
 
 from flask import Flask, url_for as _url_for
 from flask.ext.oauth import OAuth
@@ -15,6 +16,7 @@ app.config.from_object(default_settings)
 app.config.from_object(constants)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
 app_name = app.config.get('APP_NAME', 'grano')
+app_version = pkg_resources.require("grano")[0].version
 
 db = SQLAlchemy(app)
 
