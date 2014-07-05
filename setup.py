@@ -7,7 +7,7 @@ REQUIREMENTS = open(REQUIREMENTS, 'r').read().splitlines()
 
 setup(
     name='grano',
-    version='0.3.2',
+    version=os.environ.get('GRANO_RELEASE', '0.3.2'),
     description="An investigative toolkit for influence influence mapping",
     long_description=open('README.rst').read(),
     classifiers=[
