@@ -39,9 +39,25 @@ def for_relations(q, Rel):
     q = q.join(Proj, Rel.project)
     q = q.outerjoin(Perm, Proj.permissions)
 
-    # TODO: Entity status checks
     q = q.filter(or_(Proj.private == False,
-                 and_(Perm.reader == True, Perm.account == request.account)))
+        and_(Perm.reader == True, Perm.account == request.account)))
+    q = q.filter(or_(
+        and_(
+            Proj.private == False,
+            Rel.source.status >= PUBLISHED_THRESHOLD,
+            Rel.target.status >= PUBLISHED_THRESHOLD,
+        ),
+        and_(
+            Perm.reader == True,
+            Rel.source.status >= PUBLISHED_THRESHOLD,
+            Rel.target.status >= PUBLISHED_THRESHOLD,
+            Perm.account == request.account
+        ),
+        and_(
+            Perm.editor == True,
+            Perm.account == request.account
+        )
+    ))
 
     project = single_arg('project')
     if project:
