@@ -36,7 +36,11 @@ def property_filters(cls, q):
 def for_relations(q, Rel):
     Proj = aliased(Project)
     Perm = aliased(Permission)
+    Source = aliased(Entity)
+    Target = aliased(Entity)
     q = q.join(Proj, Rel.project)
+    q = q.join(Source, Rel.source)
+    q = q.join(Target, Rel.target)
     q = q.outerjoin(Perm, Proj.permissions)
 
     q = q.filter(or_(Proj.private == False,
@@ -44,13 +48,13 @@ def for_relations(q, Rel):
     q = q.filter(or_(
         and_(
             Proj.private == False,
-            Rel.source.status >= PUBLISHED_THRESHOLD,
-            Rel.target.status >= PUBLISHED_THRESHOLD,
+            Source.status >= PUBLISHED_THRESHOLD,
+            Target.status >= PUBLISHED_THRESHOLD,
         ),
         and_(
             Perm.reader == True,
-            Rel.source.status >= PUBLISHED_THRESHOLD,
-            Rel.target.status >= PUBLISHED_THRESHOLD,
+            Source.status >= PUBLISHED_THRESHOLD,
+            Target.status >= PUBLISHED_THRESHOLD,
             Perm.account == request.account
         ),
         and_(
