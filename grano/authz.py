@@ -76,6 +76,18 @@ def entity_delete(entity):
     return entity_manage(entity)
 
 
+def relation_read(relation):
+    return entity_read(relation.source) and entity_read(relation.target)
+
+
+def relation_edit(relation):
+    return entity_edit(relation.source) and entity_edit(relation.target)
+
+
+def relation_manage(relation):
+    return entity_manage(relation.source) and entity_manage(relation.target)
+
+
 def require(pred):
     if not pred:
         raise Forbidden("Sorry, you're not permitted to do this!")

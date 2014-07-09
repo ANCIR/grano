@@ -4,7 +4,7 @@ from grano import authz
 from grano import core
 from grano.core import db
 from grano.manage import app
-from grano.model import Project, Permission, Entity
+from grano.model import Project, Permission, Entity, Relation
 from grano.test.fixtures import create_fixtures
 
 
@@ -173,6 +173,107 @@ class EntityAuthTestCase(BaseAuthTestCase):
             flask.session['id'] = 1
             self.app.preprocess_request()
             self.assertTrue(authz.entity_read(entity))
+
+class RelationAuthTestCase(BaseAuthTestCase):
+
+    def setUp(self):
+        self.app = make_test_app()
+
+    def test_entity_read__unreadable(self):
+        project, permission = _project_and_permission()
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD-1)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD-1)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertFalse(authz.relation_read(rel))
+
+    def test_entity_read__readable(self):
+        project, permission = _project_and_permission()
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertTrue(authz.relation_read(rel))
+
+    def test_entity_edit__editable(self):
+        project, permission = _project_and_permission(editor=True)
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertTrue(authz.relation_edit(rel))
+
+    def test_entity_edit__uneditable(self):
+        project, permission = _project_and_permission(editor=False)
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertFalse(authz.relation_edit(rel))
+
+    def test_entity_manage__manageable(self):
+        project, permission = _project_and_permission(admin=True)
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertTrue(authz.relation_manage(rel))
+
+    def test_entity_manage__unmanageable(self):
+        project, permission = _project_and_permission(admin=False)
+        entity_source = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        entity_target = \
+            Entity(project=project, status=authz.PUBLISHED_THRESHOLD)
+        db.session.add(entity_source)
+        db.session.add(entity_target)
+        rel = Relation(source=entity_source, target=entity_target)
+        db.session.add(rel)
+        db.session.commit()
+        with self.app.test_request_context():
+            flask.session['id'] = 1
+            self.app.preprocess_request()
+            self.assertFalse(authz.relation_manage(rel))
 
 
 if __name__ == '__main__':
