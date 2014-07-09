@@ -38,14 +38,12 @@ class SchemaValidator(colander.MappingSchema):
                       validator=database_name)
     label = SchemaNode(colander.String(),
                        validator=colander.Length(min=3))
-    label_in = SchemaNode(colander.String(),
-                          missing=None, validator=colander.Length(min=3))
-    label_out = SchemaNode(colander.String(),
-                           missing=None, validator=colander.Length(min=3))
     hidden = SchemaNode(colander.Boolean(),
                         missing=False)
     obj = SchemaNode(colander.String(),
                      validator=colander.OneOf(['entity', 'relation']))
+    meta = SchemaNode(colander.Mapping(unknown='preserve'),
+                      missing={})
     attributes = Attributes()
 
 
@@ -61,11 +59,9 @@ def save(data, schema=None):
         schema.project = data.get('project')
 
     schema.label = data.get('label')
-    schema.label_in = data.get('label_in') or schema.label
-    schema.label_out = data.get('label_out') or schema.label
-
     schema.obj = data.get('obj')
     schema.hidden = data.get('hidden')
+    schema.meta = data.get('meta')
     schema.project.updated_at = datetime.utcnow()
     db.session.add(schema)
 
