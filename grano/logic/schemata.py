@@ -1,30 +1,31 @@
 import os
 import yaml
 import colander
+from colander import SchemaNode
 from pprint import pprint
 from datetime import datetime
 
-from grano.core import db, url_for
-from grano.lib.exc import NotImplemented
-from grano.model import Schema, Attribute, Project
+from grano.core import db
+from grano.model import Schema, Attribute
 from grano.logic.validation import Invalid, database_name
 from grano.logic.references import ProjectRef
-from grano.logic import projects as projects_logic
 from grano.logic import attributes
 
+TYPES_VALIDATOR = colander.OneOf(Attribute.DATATYPES.keys())
 
 
 class AttributeValidator(colander.MappingSchema):
-    name = colander.SchemaNode(colander.String(),
-        validator=database_name)
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3))
-    description = colander.SchemaNode(colander.String(),
-        missing='', default='')
-    datatype = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(Attribute.DATATYPES.keys()), missing='string')
-    hidden = colander.SchemaNode(colander.Boolean(),
-        missing=False)
+    name = SchemaNode(colander.String(),
+                      validator=database_name)
+    label = SchemaNode(colander.String(),
+                       validator=colander.Length(min=3))
+    description = SchemaNode(colander.String(),
+                             missing='', default='')
+    datatype = SchemaNode(colander.String(),
+                          validator=TYPES_VALIDATOR,
+                          missing='string')
+    hidden = SchemaNode(colander.Boolean(),
+                        missing=False)
 
 
 class Attributes(colander.SequenceSchema):
@@ -32,19 +33,19 @@ class Attributes(colander.SequenceSchema):
 
 
 class SchemaValidator(colander.MappingSchema):
-    project = colander.SchemaNode(ProjectRef())
-    name = colander.SchemaNode(colander.String(),
-        validator=database_name)
-    label = colander.SchemaNode(colander.String(),
-        validator=colander.Length(min=3))
-    label_in = colander.SchemaNode(colander.String(),
-        missing=None, validator=colander.Length(min=3))
-    label_out = colander.SchemaNode(colander.String(),
-        missing=None, validator=colander.Length(min=3))
-    hidden = colander.SchemaNode(colander.Boolean(),
-        missing=False)
-    obj = colander.SchemaNode(colander.String(),
-        validator=colander.OneOf(['entity', 'relation']))
+    project = SchemaNode(ProjectRef())
+    name = SchemaNode(colander.String(),
+                      validator=database_name)
+    label = SchemaNode(colander.String(),
+                       validator=colander.Length(min=3))
+    label_in = SchemaNode(colander.String(),
+                          missing=None, validator=colander.Length(min=3))
+    label_out = SchemaNode(colander.String(),
+                           missing=None, validator=colander.Length(min=3))
+    hidden = SchemaNode(colander.Boolean(),
+                        missing=False)
+    obj = SchemaNode(colander.String(),
+                     validator=colander.OneOf(['entity', 'relation']))
     attributes = Attributes()
 
 
@@ -67,7 +68,7 @@ def save(data, schema=None):
     schema.hidden = data.get('hidden')
     schema.project.updated_at = datetime.utcnow()
     db.session.add(schema)
-    
+
     names = []
     for attribute in data.get('attributes', []):
         attribute['schema'] = schema
