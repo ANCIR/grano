@@ -1,10 +1,12 @@
 from datetime import datetime
 
 import colander
+from flask import url_for
 
 from grano.core import db
+from grano.logic import files as files_logic
 from grano.logic.validation import FixedValue
-from grano.model import Entity, Attribute
+from grano.model import Entity, Attribute, File
 
 
 DATATYPE_TYPES = {
@@ -12,7 +14,8 @@ DATATYPE_TYPES = {
     'float': colander.Float(),
     'boolean': colander.Boolean(),
     'string': colander.String(),
-    'datetime': colander.DateTime(default_tzinfo=None)
+    'datetime': colander.DateTime(default_tzinfo=None),
+    'file': colander.String()
 }
 
 
@@ -66,7 +69,7 @@ def validate(obj_type, obj, schemata, project, properties):
     return out
 
 
-def save(obj, data):
+def save(obj, data, files=None):
     """ Set a property on the given object (entity or relation). This will
     either create a new property object or re-activate an existing object
     from the same source, if one exists. If the property is defined as 
@@ -89,9 +92,28 @@ def save(obj, data):
         db.session.add(prop)
 
     prop._set_obj(obj)
-    
-    setattr(prop, data.get('attribute').value_column,
-        data.get('value'))
+
+    if data.get('attribute').datatype == 'file':
+        # this is either a file id or the key
+        # for the file data in `files`
+        file_key = data.get('value')
+        file = None
+        file_data = None
+        # TODO: validate int/string correctly with colander
+        if type(file_key) in (int, long):
+            file = db.session.query(File).get(file_key)
+        if file is None:
+            if file_key in files:
+                # creates a new file
+                file_data = files.get(file_key)
+                file = files_logic.save(data, file_data)
+            else:
+                raise TypeError("File for property '%s' is required" % data.get('name'))
+        prop.value_file_id = file.id
+        prop.value_string = url_for('files_api.serve', id=file.id)
+    else:
+        setattr(prop, data.get('attribute').value_column,
+            data.get('value'))
 
     prop.name = data.get('name')
     prop.author = data.get('author')

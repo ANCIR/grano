@@ -12,7 +12,7 @@ class Attribute(db.Model, IntBase):
         'float': 'value_float',
         'datetime': 'value_datetime',
         'boolean': 'value_boolean',
-        'file': 'value_file'
+        'file': 'value_file_id'
         }
 
     name = db.Column(db.Unicode())

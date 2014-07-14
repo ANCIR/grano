@@ -1,3 +1,5 @@
+import json
+
 from flask import request
 from grano.lib.exc import BadRequest, NotFound
 
@@ -36,7 +38,7 @@ def request_data(overlay={}):
     """ Decode a JSON-formatted POST body. """
     data = request.json
     if data is None:
-        data = dict(request.form.items())
+        data = json.loads(request.form.get('data'))
     data.update(overlay)
     return data
 

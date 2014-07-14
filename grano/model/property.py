@@ -24,6 +24,7 @@ class Property(db.Model, IntBase):
 
     @property
     def value(self):
+        # TODO: figure out what we want to return for files
         for column in Attribute.DATATYPES.values():
             value = getattr(self, column)
             if value is not None:
