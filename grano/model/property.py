@@ -17,6 +17,7 @@ class Property(db.Model, IntBase):
     value_float = db.Column(db.Float())
     value_datetime = db.Column(db.DateTime())
     value_boolean = db.Column(db.Boolean())
+    value_file_id = db.Column(db.Integer(), db.ForeignKey('grano_file.id'))
 
     source_url = db.Column(db.Unicode())
     active = db.Column(db.Boolean())
