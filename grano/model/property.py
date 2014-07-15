@@ -37,10 +37,13 @@ class Property(db.Model, IntBase):
     __mapper_args__ = {'polymorphic_on': obj}
 
     def to_dict_index(self):
-        return {
+        data = {
             'value': self.value,
             'source_url': self.source_url
         }
+        if self.value_file_id is not None:
+            data['file_url'] = self.value_string
+        return data
 
     def to_dict_kv(self):
         return self.name, self.to_dict_index()
