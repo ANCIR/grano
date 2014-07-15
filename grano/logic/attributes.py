@@ -1,5 +1,7 @@
+from sqlalchemy.orm.exc import NoResultFound
+
 from grano.core import db
-from grano.model import Attribute, Property
+from grano.model import Attribute, Property, ImageConfig
 
 
 def save(data):
@@ -15,6 +17,16 @@ def save(data):
         obj.datatype = data.get('datatype')
         obj.schema = schema
 
+    if obj.datatype == 'file' and 'image_config' in data:
+        try:
+            obj.image_config = ImageConfig.by_project_and_name(
+                project=obj.schema.project,
+                name=data.get('image_config')
+            )
+        except NoResultFound:
+            raise ValueError("Image config with name '%s' does not exist"
+                             % data.get('image_config'))
+        # TODO: updates files related to this attribute with new config
     obj.label = data.get('label')
     obj.hidden = data.get('hidden')
     obj.description = data.get('description')

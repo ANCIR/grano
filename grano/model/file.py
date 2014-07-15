@@ -10,7 +10,7 @@ class File(db.Model, IntBase):
     file_name = db.Column(db.Unicode)
     mime_type = db.Column(db.Unicode)
     # only applicable if it is a configured image file
-    #image_config_id = db.Column(db.Integer(), db.ForeignKey('grano_imageconfig.id'))
+    image_config_id = db.Column(db.Integer(), db.ForeignKey('grano_imageconfig.id'))
 
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))

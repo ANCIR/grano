@@ -18,6 +18,7 @@ class ImageConfig(db.Model, IntBase):
     crop_origin_y = db.Column(db.Integer())
 
     files = db.relationship('File', backref='image_config', lazy='dynamic')
+    attributes = db.relationship('Attribute', backref='image_config', lazy='dynamic')
 
     @classmethod
     def by_project_and_name(cls, project, name):

@@ -25,6 +25,8 @@ class AttributeValidator(colander.MappingSchema):
         validator=colander.OneOf(Attribute.DATATYPES.keys()), missing='string')
     hidden = colander.SchemaNode(colander.Boolean(),
         missing=False)
+    image_config = colander.SchemaNode(colander.String(),
+        missing=None)
 
 
 class Attributes(colander.SequenceSchema):

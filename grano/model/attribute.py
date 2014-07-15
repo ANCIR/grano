@@ -22,6 +22,8 @@ class Attribute(db.Model, IntBase):
     datatype = db.Column(db.Unicode())
     
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
+    # only applicable if it is a configured image file
+    image_config_id = db.Column(db.Integer(), db.ForeignKey('grano_imageconfig.id'))
     properties = db.relationship('Property', backref='attribute',
         cascade='all, delete, delete-orphan', lazy='dynamic')
 
