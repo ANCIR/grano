@@ -15,7 +15,7 @@ DATATYPE_TYPES = {
     'boolean': colander.Boolean(),
     'string': colander.String(),
     'datetime': colander.DateTime(default_tzinfo=None),
-    'file': colander.String()
+    'file': colander.Integer()
 }
 
 
@@ -94,21 +94,14 @@ def save(obj, data, files=None):
     prop._set_obj(obj)
 
     if data.get('attribute').datatype == 'file':
-        # this is either a file id or the key
-        # for the file data in `files`
-        file_key = data.get('value')
-        file = None
-        file_data = None
-        # TODO: validate int/string correctly with colander
-        if type(file_key) in (int, long):
-            file = db.session.query(File).get(file_key)
-        if file is None:
-            if file_key in files:
-                # creates a new file
-                file_data = files.get(file_key)
-                file = files_logic.save(data, file_data)
-            else:
-                raise TypeError("File for property '%s' is required" % data.get('name'))
+        # if there is a file with the property name in `files`
+        # a new file is created and the property updated
+        file_key = data.get('name')
+        if file_key in files:
+            file_data = files.get(file_key)
+            file = files_logic.save(data, file_data)
+        else:
+            raise TypeError("File for property '%s' is required" % file_key)
         prop.value_file_id = file.id
         prop.value_string = url_for('files_api.serve', id=file.id)
     else:

@@ -24,7 +24,10 @@ class Property(db.Model, IntBase):
 
     @property
     def value(self):
-        # TODO: figure out what we want to return for files
+        # check file column first since file uses both
+        # value_string and value_file_id
+        if self.value_file_id is not None:
+            return self.value_file_id
         for column in Attribute.DATATYPES.values():
             value = getattr(self, column)
             if value is not None:
