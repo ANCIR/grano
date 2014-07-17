@@ -27,6 +27,28 @@ class ImageConfig(db.Model, IntBase):
         q = q.filter_by(name=name)
         return q.one()
 
+    @property
+    def ratio(self):
+        return float(self.width) / float(self.height)
+
+    def crop_box(self, (w, h)):
+        """ Returns the largest crop box such that w / h == self.ratio.
+            The crop origin is the center. """
+        other_ratio = float(w) / float(h)
+        self_ratio = self.ratio
+        if self_ratio == other_ratio:
+            return (0, 0, w, h)
+        elif self_ratio > other_ratio:
+            # need to decrease height
+            new_h = other_ratio / self_ratio * h
+            origin_y = (h - new_h) / 2.0
+            return (0, int(round(origin_y)), w, int(round(origin_y + new_h)))
+        else:
+            # need to decrease width
+            new_w = self_ratio / other_ratio * w
+            origin_x = (w - new_w) / 2.0
+            return (int(round(origin_x)), 0, int(round(origin_x + new_w)), h)
+
     def to_dict_index(self):
         return {
             'id': self.id,

@@ -45,6 +45,8 @@ def save(data, file_data, file=None):
         file = File()
         file.project = sane.get('project')
         file.author = sane.get('author')
+        if 'attribute' in sane:
+            file.image_config = sane.get('attribute').image_config
         db.session.add(file)
 
     file.file_name = sane.get('file_name')
@@ -75,3 +77,7 @@ def as_table(file, limit=None):
         return data
     except CSVError, e:
         return {'status': 'error', 'error': unicode(e)}
+
+
+def upload(file, new_file_data, url):
+    file.properties.update({'value_string': url})

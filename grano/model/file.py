@@ -17,6 +17,9 @@ class File(db.Model, IntBase):
 
     data = db.Column(db.LargeBinary)
 
+    properties = db.relationship('Property', backref='value_file',
+        cascade='all, delete, delete-orphan', lazy='dynamic')
+
     @property
     def fh(self):
         return StringIO(self.data)
