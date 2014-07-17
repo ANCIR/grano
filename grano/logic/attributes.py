@@ -1,7 +1,7 @@
 from sqlalchemy.orm.exc import NoResultFound
 
 from grano.core import db
-from grano.logic import image as image_logic
+from grano.logic import images as images_logic
 from grano.model import Attribute, Property, ImageConfig
 
 
@@ -25,7 +25,7 @@ def save(data):
                 name=data.get('image_config')
             )
             # TODO: update files once obj is flushed to db
-            #image_logic.update_by_attribute(obj.id)
+            #images_logic.update_by_attribute(obj.id)
         except NoResultFound:
             raise ValueError("Image config with name '%s' does not exist"
                              % data.get('image_config'))
