@@ -24,7 +24,10 @@ def validate(file):
 
 
 def transform(file):
-    image = Image.open(StringIO(file.data))
+    sio = StringIO(file.data)
+    image = Image.open(sio)
+    image.load()
+    sio.close()
     if file.image_config is not None:
         config = file.image_config
         # crop and scale ourselves since Image.thumbnail
@@ -48,8 +51,8 @@ def update_by_attribute(attr_id):
 
 # TODO: convert to celery task
 def update(file_id, image_config_id=None):
+    file = db.session.query(File).get(file_id)
     if image_config_id is not None:
-        file = db.session.query(File).get(file_id)
         file.image_config_id = image_config_id
         db.session.commit()
     try:
@@ -60,7 +63,8 @@ def update(file_id, image_config_id=None):
     new_file = transform(file)
     url = make_url(file)
     # TODO: cleanup old files?
-    files_logic.upload_file(file, new_file, url)
+    files_logic.upload(file, new_file, url)
+    new_file.close()
 
 
 def make_url(file):
