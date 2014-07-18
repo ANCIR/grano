@@ -32,13 +32,11 @@ class Pipeline(db.Model, IntBase):
     ended_at = db.Column(db.DateTime)
 
     entries = db.relationship('LogEntry', backref='pipeline', lazy='dynamic',
-        cascade='all, delete, delete-orphan')
-
+                              cascade='all, delete, delete-orphan')
 
     def has_errors(self):
         q = self.entries.filter_by(level=logging.ERROR)
         return q.count() > 0
-
 
     def to_dict_index(self):
         return {
@@ -49,7 +47,7 @@ class Pipeline(db.Model, IntBase):
             'api_url': url_for('pipelines_api.view', id=self.id),
             'operation': self.operation,
             'status': self.status,
-            'created_at': self.created_at, 
+            'created_at': self.created_at,
             'updated_at': self.updated_at,
             'started_at': self.started_at,
             'ended_at': self.ended_at,
@@ -57,11 +55,9 @@ class Pipeline(db.Model, IntBase):
             'percent_complete': self.percent_complete
         }
 
-
     def to_dict(self):
         """ Full serialization of the file metadata. """
         data = self.to_dict_index()
-        #data['config'] = self.config
         return data
 
 
@@ -69,13 +65,12 @@ class LogEntry(db.Model, IntBase):
     __tablename__ = 'grano_log_entry'
 
     pipeline_id = db.Column(db.Integer, db.ForeignKey('grano_pipeline.id'))
-    
+
     level = db.Column(db.Integer)
     message = db.Column(db.Unicode)
     error = db.Column(db.Unicode)
 
     details = db.Column(MutableDict.as_mutable(JSONEncodedDict))
-
 
     def to_dict_index(self):
         return {
@@ -83,13 +78,11 @@ class LogEntry(db.Model, IntBase):
             'level': self.level,
             'message': self.message,
             'error': self.error,
-            #'details': self.details,
             'api_url': url_for('log_entries_api.view_entry',
-                pipeline_id=self.pipeline.id, id=self.id),
-            'created_at': self.created_at, 
+                               pipeline_id=self.pipeline.id, id=self.id),
+            'created_at': self.created_at,
             'updated_at': self.updated_at
         }
-
 
     def to_dict(self):
         """ Full serialization of the file metadata. """

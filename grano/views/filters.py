@@ -36,12 +36,32 @@ def property_filters(cls, q):
 def for_relations(q, Rel):
     Proj = aliased(Project)
     Perm = aliased(Permission)
+    Source = aliased(Entity)
+    Target = aliased(Entity)
     q = q.join(Proj, Rel.project)
+    q = q.join(Source, Rel.source)
+    q = q.join(Target, Rel.target)
     q = q.outerjoin(Perm, Proj.permissions)
 
-    # TODO: Entity status checks
     q = q.filter(or_(Proj.private == False,
-                 and_(Perm.reader == True, Perm.account == request.account)))
+        and_(Perm.reader == True, Perm.account == request.account)))
+    q = q.filter(or_(
+        and_(
+            Proj.private == False,
+            Source.status >= PUBLISHED_THRESHOLD,
+            Target.status >= PUBLISHED_THRESHOLD,
+        ),
+        and_(
+            Perm.reader == True,
+            Source.status >= PUBLISHED_THRESHOLD,
+            Target.status >= PUBLISHED_THRESHOLD,
+            Perm.account == request.account
+        ),
+        and_(
+            Perm.editor == True,
+            Perm.account == request.account
+        )
+    ))
 
     project = single_arg('project')
     if project:

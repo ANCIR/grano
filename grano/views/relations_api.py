@@ -44,14 +44,14 @@ def create():
 @blueprint.route('/api/1/relations/<id>', methods=['GET'])
 def view(id):
     relation = object_or_404(Relation.by_id(id))
-    authz.require(authz.project_read(relation.project))
+    authz.require(authz.relation_read(relation))
     return jsonify(relation)
 
 
 @blueprint.route('/api/1/relations/<id>', methods=['POST', 'PUT'])
 def update(id):
     relation = object_or_404(Relation.by_id(id))
-    authz.require(authz.project_edit(relation.project))
+    authz.require(authz.relation_edit(relation))
     data = request_data({'author': request.account})
     relation = relations.save(data, relation=relation)
     db.session.commit()
@@ -61,7 +61,7 @@ def update(id):
 @blueprint.route('/api/1/relations/<id>', methods=['DELETE'])
 def delete(id):
     relation = object_or_404(Relation.by_id(id))
-    authz.require(authz.project_edit(relation.project))
+    authz.require(authz.relation_edit(relation))
     relations.delete(relation)
     db.session.commit()
     raise Gone()
