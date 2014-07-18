@@ -25,15 +25,15 @@ def upgrade():
     sa.Column('project_id', sa.Integer(), nullable=True),
     sa.Column('height', sa.Integer(), nullable=True),
     sa.Column('width', sa.Integer(), nullable=True),
-    sa.Column('crop_origin_x', sa.Integer(), nullable=True),
-    sa.Column('crop_origin_y', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['project_id'], ['grano_project.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name', 'project_id')
     )
     op.add_column('grano_file', sa.Column('image_config_id', sa.Integer(), sa.ForeignKey('grano_imageconfig.id'), nullable=True))
+    op.add_column('grano_attribute', sa.Column('image_config_id', sa.Integer(), sa.ForeignKey('grano_imageconfig.id'), nullable=True))
 
 
 def downgrade():
     op.drop_column('grano_file', 'image_config_id')
+    op.drop_column('grano_attribute', 'image_config_id')
     op.drop_table('grano_imageconfig')
