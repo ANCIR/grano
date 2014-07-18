@@ -89,7 +89,8 @@ def transform(file):
 # TODO: convert to celery task
 def update_by_attribute(attr_id):
     attr = db.session.query(Attribute).get(attr_id)
-    q = attr.properties.values(Property.value_file_id)
+    q = attr.properties.filter(Property.value_file_id != None)
+    q = q.values(Property.value_file_id)
     for file_id, in q:
         update(file_id, attr.image_config_id)
 

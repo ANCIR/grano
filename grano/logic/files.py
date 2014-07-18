@@ -49,7 +49,6 @@ def save(data, file_data, file=None):
         db.session.add(file)
 
     file.file_name = sane.get('file_name')
-    # TODO: make sure mime type is set correctly here
     file.mime_type = sane.get('mime_type')
     file.data = file_data.read()
 
