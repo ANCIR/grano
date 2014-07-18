@@ -18,21 +18,25 @@ def save(data):
         obj.datatype = data.get('datatype')
         obj.schema = schema
 
-    if obj.datatype == 'file' and 'image_config' in data:
-        try:
-            obj.image_config = ImageConfig.by_project_and_name(
-                project=obj.schema.project,
-                name=data.get('image_config')
-            )
-            # TODO: update files once obj is flushed to db
-            #images_logic.update_by_attribute(obj.id)
-        except NoResultFound:
-            raise ValueError("Image config with name '%s' does not exist"
-                             % data.get('image_config'))
     obj.label = data.get('label')
     obj.hidden = data.get('hidden')
     obj.description = data.get('description')
     db.session.add(obj)
+
+    if obj.datatype == 'file' and 'image_config' in data:
+        try:
+            image_config = ImageConfig.by_project_and_name(
+                project=obj.schema.project,
+                name=data.get('image_config')
+            )
+            if obj.image_config != image_config:
+                obj.image_config = image_config
+                db.session.flush()
+                images_logic.update_by_attribute(obj.id)
+        except NoResultFound:
+            raise ValueError("Image config with name '%s' does not exist"
+                             % data.get('image_config'))
+
     return obj
 
 

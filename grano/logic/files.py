@@ -46,11 +46,10 @@ def save(data, file_data, file=None):
         file = File()
         file.project = sane.get('project')
         file.author = sane.get('author')
-        if 'attribute' in sane:
-            file.image_config = sane.get('attribute').image_config
         db.session.add(file)
 
     file.file_name = sane.get('file_name')
+    # TODO: make sure mime type is set correctly here
     file.mime_type = sane.get('mime_type')
     file.data = file_data.read()
 
@@ -80,7 +79,7 @@ def as_table(file, limit=None):
         return {'status': 'error', 'error': unicode(e)}
 
 
-def upload(file, new_file, url):
+def upload(file, url):
     import os, shutil
     result = urlparse(url)
     if result.scheme == 'file':
@@ -89,9 +88,7 @@ def upload(file, new_file, url):
         if not os.path.exists(dir):
             os.makedirs(dir)
         with open(result.path, 'wb') as f:
-            new_file.seek(0)
-            shutil.copyfileobj(new_file, f)
+            file.seek(0)
+            shutil.copyfileobj(file, f)
     else:
         raise ValueError("Only 'file' protocol supported at the moment")
-
-    file.properties.update({'value_string': url})

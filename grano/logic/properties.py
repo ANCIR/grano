@@ -4,7 +4,7 @@ import colander
 from flask import url_for
 
 from grano.core import db
-from grano.logic import files as files_logic
+from grano.logic import files as files_logic, images as images_logic
 from grano.logic.validation import FixedValue
 from grano.model import Entity, Attribute, File
 
@@ -116,6 +116,11 @@ def save(obj, data, files=None):
     prop.source_url = data.get('source_url')
     prop.updated_at = datetime.utcnow()
     obj.updated_at = datetime.utcnow()
+
+    if data.get('attribute').image_config_id is not None:
+        db.session.flush()
+        images_logic.update(file.id, data.get('attribute').image_config_id)
+
     return prop
 
 

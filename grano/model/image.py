@@ -14,8 +14,6 @@ class ImageConfig(db.Model, IntBase):
 
     height = db.Column(db.Integer())
     width = db.Column(db.Integer())
-    crop_origin_x = db.Column(db.Integer())
-    crop_origin_y = db.Column(db.Integer())
 
     files = db.relationship('File', backref='image_config', lazy='dynamic')
     attributes = db.relationship('Attribute', backref='image_config', lazy='dynamic')
@@ -25,7 +23,7 @@ class ImageConfig(db.Model, IntBase):
         q = db.session.query(cls)
         q = q.filter_by(project=project)
         q = q.filter_by(name=name)
-        return q.one()
+        return q.first()
 
     @property
     def ratio(self):
@@ -58,8 +56,6 @@ class ImageConfig(db.Model, IntBase):
             'description': self.description,
             'height': self.height,
             'width': self.width,
-            'crop_origin_x': self.crop_origin_x,
-            'crop_origin_y': self.crop_origin_y
         }
 
     def to_dict(self):
