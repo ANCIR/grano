@@ -13,7 +13,7 @@ setup(
     name='grano',
     version=VERSION,
     description="An investigative toolkit for influence influence mapping",
-    long_description=open('README.rst').read(),
+    long_description=open(README, 'r').read(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
