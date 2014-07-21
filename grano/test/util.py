@@ -10,7 +10,6 @@ def make_test_app(use_cookies=False):
     app.config['CELERY_ALWAYS_EAGER'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     db.create_all()
-    create_fixtures()
 
     return app.test_client(use_cookies=use_cookies)
 

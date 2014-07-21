@@ -87,3 +87,10 @@ def create_fixtures():
         fellowship.save()
 
     loader.persist()
+
+
+def create_loader(project_slug, source_url=None, project_label=None):
+    return Loader(project_slug,
+                  project_label=project_label or project_slug,
+                  project_settings={},
+                  source_url=source_url or DEFAULT_SOURCE_URL)

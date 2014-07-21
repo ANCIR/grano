@@ -3,7 +3,6 @@ from unicodecsv import DictReader, DictWriter
 from unicodecsv import Error as CSVError
 import logging
 import colander
-from urlparse import urlparse
 
 from grano.core import db, url_for, celery
 from grano.model import File
@@ -76,18 +75,3 @@ def as_table(file, limit=None):
         return data
     except CSVError, e:
         return {'status': 'error', 'error': unicode(e)}
-
-
-def upload(file, url):
-    import os, shutil
-    result = urlparse(url)
-    if result.scheme == 'file':
-        assert result.netloc == ''
-        dir = os.path.dirname(result.path)
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        with open(result.path, 'wb') as f:
-            file.seek(0)
-            shutil.copyfileobj(file, f)
-    else:
-        raise ValueError("Only 'file' protocol supported at the moment")

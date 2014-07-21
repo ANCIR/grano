@@ -25,8 +25,6 @@ class Project(db.Model, IntBase):
         cascade='all, delete, delete-orphan')
     files = db.relationship('File', backref='project', lazy='dynamic',
         cascade='all, delete, delete-orphan')
-    image_configs = db.relationship('ImageConfig', backref='project', lazy='dynamic',
-        cascade='all, delete, delete-orphan')
     
 
     def get_attribute(self, obj, name):
