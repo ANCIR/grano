@@ -51,7 +51,7 @@ class ObjectLoader(object):
 
 
 class EntityLoader(ObjectLoader):
-    """ A factory object for entities, used to set the schemata and 
+    """ A factory object for entities, used to set the schemata and
     properties for an entity. """
 
     def __init__(self, loader, schemata, source_url=None):

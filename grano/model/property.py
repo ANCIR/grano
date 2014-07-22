@@ -11,7 +11,7 @@ class Property(db.Model, IntBase):
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     name = db.Column(db.Unicode(), index=True)
-    
+
     value_string = db.Column(db.Unicode())
     value_integer = db.Column(db.Integer())
     value_float = db.Column(db.Float())
@@ -54,7 +54,8 @@ class Property(db.Model, IntBase):
 class EntityProperty(Property):
     __mapper_args__ = {'polymorphic_identity': 'entity'}
 
-    entity_id = db.Column(db.Unicode(), db.ForeignKey('grano_entity.id'), index=True)
+    entity_id = db.Column(db.Unicode(), db.ForeignKey('grano_entity.id'),
+                          index=True)
 
     def _set_obj(self, obj):
         self.entity = obj
