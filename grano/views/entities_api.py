@@ -5,7 +5,7 @@ from sqlalchemy.orm import aliased
 from grano.lib.serialisation import jsonify
 from grano.lib.exc import BadRequest, Gone
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, EntityProperty, Project, Permission
+from grano.model import Entity, Property, Project, Permission
 from grano.logic import entities
 from grano.logic.references import ProjectRef
 from grano.logic.graph import GraphExtractor
@@ -69,20 +69,19 @@ def suggest():
     if not 'q' in request.args or not len(request.args.get('q').strip()):
         raise BadRequest("Missing the query ('q' parameter).")
 
-    q = db.session.query(EntityProperty)
+    q = db.session.query(Property)
     q = q.join(Entity)
     q = q.join(Project)
     q = q.outerjoin(Permission)
-    q = q.filter(or_(Project.private==False,
-        and_(Permission.reader==True, Permission.account==request.account)))
-    
-    q = q.filter(EntityProperty.name=='name')
-    q = q.filter(EntityProperty.active==True)
-    q = q.filter(EntityProperty.entity_id!=None)
-    q = q.filter(EntityProperty.value_string.ilike(request.args.get('q') + '%'))
+    q = q.filter(or_(Project.private == False,
+                 and_(Permission.reader == True,
+                      Permission.account == request.account)))
+    q = q.filter(Property.name == 'name')
+    q = q.filter(Property.active == True)
+    q = q.filter(Property.entity_id != None)
+    q = q.filter(Property.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
-        q = q.filter(Project.slug==request.args.get('project'))
-
+        q = q.filter(Project.slug == request.args.get('project'))
     q = q.distinct()
     pager = Pager(q)
 

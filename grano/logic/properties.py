@@ -4,7 +4,7 @@ import colander
 
 from grano.core import db
 from grano.logic.validation import FixedValue
-from grano.model import Entity, Attribute
+from grano.model import Entity, Property
 
 
 DATATYPE_TYPES = {
@@ -17,7 +17,7 @@ DATATYPE_TYPES = {
 
 
 def validate_name(project, obj):
-    """ Make sure that an entity's `name` attribute is unique 
+    """ Make sure that an entity's `name` attribute is unique
     within the scope of the project. """
     def check(name):
         entity = Entity.by_name(project, name)
@@ -26,36 +26,37 @@ def validate_name(project, obj):
                 return False
         return True
     name_unique = colander.Function(check,
-        message="An entity with this name exists")
+                                    message="An entity with this name exists")
     return colander.All(name_unique, colander.Length(min=1))
 
 
 def validate(obj_type, obj, schemata, project, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
-    
+
     validator = colander.SchemaNode(colander.Mapping(), name='properties')
     for schema in schemata:
         for attr in schema.attributes:
             attrib = colander.SchemaNode(colander.Mapping(),
-                name=attr.name, missing=colander.null)
+                                         name=attr.name,
+                                         missing=colander.null)
 
             if attr.name == 'name' and obj_type == 'entity':
                 attrib.add(colander.SchemaNode(colander.String(),
-                    missing=colander.required, name='value',
-                    validator=validate_name(project, obj)))
+                           missing=colander.required, name='value',
+                           validator=validate_name(project, obj)))
             else:
                 T = DATATYPE_TYPES.get(attr.datatype)
                 attrib.add(colander.SchemaNode(T, missing=None, name='value'))
-            
+
             attrib.add(colander.SchemaNode(colander.Boolean(),
-                default=True, missing=True, name='active'))
+                                           default=True, missing=True,
+                                           name='active'))
             attrib.add(colander.SchemaNode(FixedValue(schema), name='schema'))
             attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
 
             attrib.add(colander.SchemaNode(colander.String(),
-                missing=None, name='source_url'))
-
+                                           missing=None, name='source_url'))
             validator.add(attrib)
 
     properties = validator.deserialize(properties)
@@ -69,13 +70,13 @@ def validate(obj_type, obj, schemata, project, properties):
 def save(obj, data):
     """ Set a property on the given object (entity or relation). This will
     either create a new property object or re-activate an existing object
-    from the same source, if one exists. If the property is defined as 
+    from the same source, if one exists. If the property is defined as
     ``active``, existing properties with the same name will be de-activated.
 
     WARNING: This does not, on its own, perform any validation.
     """
     prop = None
-    
+
     for cand in obj.properties:
         if cand.name != data.get('name'):
             continue
@@ -85,13 +86,15 @@ def save(obj, data):
             cand.active = False
 
     if prop is None:
-        prop = obj.PropertyClass()
+        prop = Property()
         db.session.add(prop)
+        if isinstance(obj, Entity):
+            prop.entity = obj
+        else:
+            prop.relation = obj
 
-    prop._set_obj(obj)
-    
     setattr(prop, data.get('attribute').value_column,
-        data.get('value'))
+            data.get('value'))
 
     prop.name = data.get('name')
     prop.author = data.get('author')
@@ -107,4 +110,3 @@ def save(obj, data):
 def delete(prop):
     """ Delete a property. """
     db.session.delete(prop)
-

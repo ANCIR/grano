@@ -3,7 +3,7 @@ import colander
 
 from grano.core import db, url_for, celery
 from grano.lib.exc import NotImplemented
-from grano.model import Relation, RelationProperty
+from grano.model import Relation, Property
 from grano.logic import properties as properties_logic
 from grano.logic import schemata as schemata_logic
 from grano.logic import projects as projects_logic
@@ -30,11 +30,11 @@ def validate(data, relation):
 
     schema_validator = colander.SchemaNode(colander.Mapping())
     schema_validator.add(colander.SchemaNode(SchemaRef(project),
-        name='schema'))
+                         name='schema'))
     schema_validator.add(colander.SchemaNode(EntityRef(project=project),
-        name='source'))
+                         name='source'))
     schema_validator.add(colander.SchemaNode(EntityRef(project=project),
-        name='target'))
+                         name='target'))
 
     sane.update(schema_validator.deserialize(data))
 
@@ -54,7 +54,6 @@ def _relation_changed(relation_id, operation):
 
 def save(data, relation=None):
     """ Save or update a relation with the given properties. """
-
     data = validate(data, relation)
 
     operation = 'create' if relation is None else 'update'
@@ -68,7 +67,6 @@ def save(data, relation=None):
     relation.target = data.get('target')
     relation.schema = data.get('schema')
 
-
     prop_names = set()
     for name, prop in data.get('properties').items():
         prop_names.add(name)
@@ -80,7 +78,7 @@ def save(data, relation=None):
         if prop.name not in prop_names:
             prop.active = False
 
-    db.session.flush()    
+    db.session.flush()
     _relation_changed.delay(relation.id, operation)
     return relation
 

@@ -6,8 +6,7 @@ from grano.lib.exc import BadRequest
 from grano.lib.args import arg_bool
 from grano.lib.pager import Pager
 from grano.model import Project, Relation
-from grano.model import Entity, EntityProperty, Schema, db
-from grano.model import RelationProperty
+from grano.model import Entity, Property, Schema, db
 from grano.views import filters
 
 
@@ -50,7 +49,7 @@ def parse_entity_facets(entity_obj, full_facet, facet, q):
         q = q.join(facet_obj, entity_obj.schemata)
         return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
-        return apply_property_facet(q, facet, EntityProperty,
+        return apply_property_facet(q, facet, Property,
                                     entity_obj)
     elif facet.startswith('inbound.'):
         _, subfacet = facet.split('.', 1)
@@ -80,7 +79,7 @@ def parse_relation_facets(relation_obj, full_facet, facet, q):
         q = q.join(facet_obj, relation_obj.schema)
         return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
-        return apply_property_facet(q, facet, RelationProperty,
+        return apply_property_facet(q, facet, Property,
                                     relation_obj)
     elif facet.startswith('source.'):
         _, subfacet = facet.split('.', 1)

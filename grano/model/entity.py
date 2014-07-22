@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 from grano.core import db, url_for
 from grano.model.common import UUIDBase, PropertyBase
 from grano.model.schema import Schema
-from grano.model.property import EntityProperty
+from grano.model.property import Property
 
 
 entity_schema = db.Table('grano_entity_schema',
@@ -14,7 +14,6 @@ entity_schema = db.Table('grano_entity_schema',
 
 class Entity(db.Model, UUIDBase, PropertyBase):
     __tablename__ = 'grano_entity'
-    PropertyClass = EntityProperty
 
     same_as = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'),
                         nullable=True)
@@ -30,8 +29,8 @@ class Entity(db.Model, UUIDBase, PropertyBase):
                                primaryjoin='Entity.id==Relation.source_id',
                                cascade='all, delete, delete-orphan')
 
-    properties = db.relationship(EntityProperty, backref='entity',
-                                 order_by=EntityProperty.created_at.desc(),
+    properties = db.relationship(Property, backref='entity',
+                                 order_by=Property.created_at.desc(),
                                  cascade='all, delete, delete-orphan',
                                  lazy='joined')
 

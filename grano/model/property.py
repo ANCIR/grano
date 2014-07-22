@@ -10,6 +10,11 @@ class Property(db.Model, IntBase):
     attribute_id = db.Column(db.Integer, db.ForeignKey('grano_attribute.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
+    entity_id = db.Column(db.Unicode(), db.ForeignKey('grano_entity.id'),
+                          index=True, nullable=True)
+    relation_id = db.Column(db.Unicode(), db.ForeignKey('grano_relation.id'),
+                            index=True, nullable=True)
+
     name = db.Column(db.Unicode(), index=True)
 
     value_string = db.Column(db.Unicode())
@@ -28,9 +33,6 @@ class Property(db.Model, IntBase):
             if value is not None:
                 return value
 
-    obj = db.Column(db.String(20))
-    __mapper_args__ = {'polymorphic_on': obj}
-
     def to_dict_index(self):
         return {
             'value': self.value,
@@ -43,29 +45,8 @@ class Property(db.Model, IntBase):
     def to_dict(self):
         name, data = self.to_dict_index()
         data['id'] = self.id
-        data['obj'] = self.obj
         data['name'] = name
         data['created_at'] = self.created_at
         data['updated_at'] = self.updated_at
         data['active'] = self.active
         return data
-
-
-class EntityProperty(Property):
-    __mapper_args__ = {'polymorphic_identity': 'entity'}
-
-    entity_id = db.Column(db.Unicode(), db.ForeignKey('grano_entity.id'),
-                          index=True)
-
-    def _set_obj(self, obj):
-        self.entity = obj
-
-
-class RelationProperty(Property):
-    __mapper_args__ = {'polymorphic_identity': 'relation'}
-
-    relation_id = db.Column(db.Unicode(), db.ForeignKey('grano_relation.id'),
-                            index=True)
-
-    def _set_obj(self, obj):
-        self.relation = obj
