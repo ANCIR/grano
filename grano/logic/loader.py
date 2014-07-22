@@ -18,7 +18,6 @@ class ObjectLoader(object):
         self.properties = {}
         self.update_criteria = set()
 
-
     def unique(self, name, only_active=True):
         """ Define a unique field for this entity or relation. Each unique 
         key will be used to decide whether a record already exists and can 
@@ -29,7 +28,6 @@ class ObjectLoader(object):
             historic values of the property as well as the current value. 
         """
         self.update_criteria.add((name, only_active))
-
 
     def set(self, name, value, source_url=None):
         """ Set the value of a given property, optionally by attributing a 
@@ -57,9 +55,9 @@ class ObjectLoader(object):
 class EntityLoader(ObjectLoader):
     """ A factory object for entities, used to set the schemata and 
     properties for an entity. """
-    
+
     def __init__(self, loader, schemata, source_url=None):
-        self._setup(loader, schemata + ['base'])
+        self._setup(loader, schemata)
         self.unique('name', only_active=False)
         self.source_url = source_url
         self._entity = None

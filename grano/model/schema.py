@@ -5,6 +5,9 @@ from grano.model.attribute import Attribute
 from grano.model.property import Property
 
 
+ENTITY_DEFAULT_SCHEMA = 'base'
+
+
 class Schema(db.Model, IntBase):
     __tablename__ = 'grano_schema'
 
