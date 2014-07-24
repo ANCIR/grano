@@ -5,6 +5,9 @@ from grano.model.attribute import Attribute
 from grano.model.property import Property
 
 
+ENTITY_DEFAULT_SCHEMA = 'base'
+
+
 class Schema(db.Model, IntBase):
     __tablename__ = 'grano_schema'
 
@@ -44,6 +47,7 @@ class Schema(db.Model, IntBase):
     def to_dict_index(self):
         return {
             'name': self.name,
+            'default': self.name == ENTITY_DEFAULT_SCHEMA,
             'label': self.label,
             'hidden': self.hidden,
             'meta': self.meta,

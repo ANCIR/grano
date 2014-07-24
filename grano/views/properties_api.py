@@ -1,12 +1,10 @@
 from flask import Blueprint, request
 
 from grano.lib.serialisation import jsonify
-from grano.model import RelationProperty, EntityProperty
 from grano.model import Property, Relation, Entity
 from grano.views.cache import validate_cache
 from grano.lib.pager import Pager
 from grano.lib.args import arg_bool
-from grano.lib.exc import NotFound
 from grano import authz
 
 
@@ -15,7 +13,8 @@ blueprint = Blueprint('properties_api', __name__)
 
 @blueprint.route('/api/1/relations/<obj_id>/properties', methods=['GET'])
 def relations_index(obj_id):
-    query = RelationProperty.all()
+    query = Property.all()
+    query = query.filter(Property.relation_id != None)
     obj = Relation.by_id(obj_id)
     query = query.filter_by(relation_id=obj_id)
     return _index(query, obj)
@@ -23,7 +22,8 @@ def relations_index(obj_id):
 
 @blueprint.route('/api/1/entities/<obj_id>/properties', methods=['GET'])
 def entities_index(obj_id):
-    query = EntityProperty.all()
+    query = Property.all()
+    query = query.filter(Property.relation_id != None)
     obj = Entity.by_id(obj_id)
     query = query.filter_by(entity_id=obj_id)
     return _index(query, obj)

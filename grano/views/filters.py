@@ -3,7 +3,7 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.model import Project, Permission, Attribute, Relation
-from grano.model import Entity, EntityProperty, Schema
+from grano.model import Entity, Property, Schema
 from grano.authz import PUBLISHED_THRESHOLD
 from grano.lib.args import single_arg
 
@@ -117,7 +117,7 @@ def for_entities(q, Ent):
     q = property_filters(Entity, q)
 
     if 'q' in request.args and single_arg('q'):
-        EntProp = aliased(EntityProperty)
+        EntProp = aliased(Property)
         q_text = '%%%s%%' % single_arg('q')
         q = q.join(EntProp)
         q = q.filter(EntProp.name == 'name')

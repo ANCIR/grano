@@ -1,11 +1,11 @@
 from grano.core import db, url_for
 from grano.model.common import UUIDBase, PropertyBase
-from grano.model.property import RelationProperty
+from grano.model.property import Property
 
 
 class Relation(db.Model, UUIDBase, PropertyBase):
     __tablename__ = 'grano_relation'
-    PropertyClass = RelationProperty
+    #PropertyClass = RelationProperty
 
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'), index=True)
     source_id = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'), index=True)
@@ -13,10 +13,10 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
-    properties = db.relationship(RelationProperty,
-    	order_by=RelationProperty.created_at.desc(),
-        cascade='all, delete, delete-orphan',
-    	backref='relation', lazy='dynamic')
+    properties = db.relationship(Property,
+                                 order_by=Property.created_at.desc(),
+                                 cascade='all, delete, delete-orphan',
+                                 backref='relation', lazy='dynamic')
 
     @property
     def schemata(self):

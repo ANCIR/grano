@@ -8,7 +8,7 @@ import networkx as nx
 from grano.lib.exc import BadRequest
 from grano.lib.args import arg_int
 from grano.core import db
-from grano.model import Entity, Relation, Schema, EntityProperty
+from grano.model import Entity, Relation, Schema, Property
 
 
 # TODO: Make the set of properties retrieved for entities
@@ -95,12 +95,12 @@ class GraphExtractor(object):
         q = db.session.query(Entity.id)
         q = q.filter(Entity.id.in_(entity_ids))
         q = q.join(Schema, Entity.schemata)
-        q = q.join(EntityProperty, Entity.properties)
-        q = q.filter(EntityProperty.name == 'name')
-        q = q.filter(EntityProperty.active == True) # noqa
+        q = q.join(Property, Entity.properties)
+        q = q.filter(Property.name == 'name')
+        q = q.filter(Property.active == True)  # noqa
 
         q = q.add_columns(
-            EntityProperty.value_string.label('name'),
+            Property.value_string.label('name'),
             Schema.name.label('schema')
         )
         entities = {}
@@ -109,10 +109,10 @@ class GraphExtractor(object):
             entities[id_]['schemata'].append(schema)
 
         if self.entity_properties:
-            q = db.session.query(EntityProperty)
-            q = q.filter(EntityProperty.entity_id.in_(entity_ids))
-            q = q.filter(EntityProperty.name.in_(self.entity_properties))
-            q = q.filter(EntityProperty.active == True) # noqa
+            q = db.session.query(Property)
+            q = q.filter(Property.entity_id.in_(entity_ids))
+            q = q.filter(Property.name.in_(self.entity_properties))
+            q = q.filter(Property.active == True)  # noqa
             for row in q.all():
                 entities[row.entity_id]['property.' + row.name] = row.value
 

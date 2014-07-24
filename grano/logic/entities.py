@@ -3,6 +3,7 @@ import colander
 
 from grano.core import db, celery
 from grano.model import Entity, Schema
+from grano.model.schema import ENTITY_DEFAULT_SCHEMA
 from grano.logic import properties as properties_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
@@ -32,7 +33,7 @@ def validate(data, entity):
     steps. """
 
     # a bit hacky
-    data['schemata'] = data.get('schemata', []) + ['base']
+    data['schemata'] = data.get('schemata', []) + [ENTITY_DEFAULT_SCHEMA]
 
     validator = EntityBaseValidator()
     sane = validator.deserialize(data)
@@ -181,7 +182,7 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
         else:
             canonical = existing
 
-    schema = Schema.by_name(project, 'base')
+    schema = Schema.by_name(project, ENTITY_DEFAULT_SCHEMA)
     attribute = schema.get_attribute('name')
 
     # Find aliases, i.e. entities with the alias name which are not

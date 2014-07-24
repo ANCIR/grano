@@ -7,6 +7,7 @@ from datetime import datetime
 
 from grano.core import db
 from grano.model import Schema, Attribute
+from grano.model.schema import ENTITY_DEFAULT_SCHEMA
 from grano.logic.validation import Invalid, database_name
 from grano.logic.references import ProjectRef
 from grano.logic import attributes
@@ -103,8 +104,6 @@ def export_schema(project, path):
     if not os.path.exists(path):
         os.makedirs(path)
     for schema in Schema.all().filter_by(project=project):
-        if schema.name == 'base':
-            continue
         fn = os.path.join(path, schema.name + '.yaml')
         with open(fn, 'w') as fh:
             dumped = yaml.safe_dump(schema.to_dict(schema),

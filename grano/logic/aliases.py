@@ -5,7 +5,7 @@ from sqlalchemy.orm import aliased
 
 from grano.core import db
 from grano.logic import entities, pipelines, imports
-from grano.model import Entity, EntityProperty, Schema
+from grano.model import Entity, Property, Schema
 
 log = logging.getLogger(__name__)
 
@@ -34,20 +34,18 @@ def export_aliases(project, fh):
     writer = DictWriter(fh, ['entity_id', 'alias', 'canonical'])
     writer.writeheader()
 
-    alias = aliased(EntityProperty)
-    canonical = aliased(EntityProperty)
+    alias = aliased(Property)
+    canonical = aliased(Property)
     q = db.session.query(alias.value_string.label('alias'), alias.entity_id)
     q = q.join(Entity)
     q = q.join(canonical)
-    q = q.filter(Entity.project_id==project.id)
-    q = q.filter(alias.entity_id!=None)
-    q = q.filter(alias.name=='name')
-    q = q.filter(canonical.name=='name')
-    q = q.filter(canonical.active==True)
+    q = q.filter(Entity.project_id == project.id)
+    q = q.filter(alias.entity_id != None)
+    q = q.filter(alias.name == 'name')
+    q = q.filter(canonical.name == 'name')
+    q = q.filter(canonical.active == True)
     q = q.add_columns(canonical.value_string.label('canonical'))
     for row in q.all():
-        #if row.alias == row.canonical:
-        #    continue
         writer.writerow({
             'entity_id': str(row.entity_id),
             'alias': row.alias,

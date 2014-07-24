@@ -2,14 +2,18 @@ import os
 from setuptools import setup, find_packages
 
 README = os.path.join(os.path.dirname(__file__), 'README.rst')
+
 REQUIREMENTS = os.path.join(os.path.dirname(__file__), 'requirements.txt')
 REQUIREMENTS = open(REQUIREMENTS, 'r').read().splitlines()
 
+VERSION = os.path.join(os.path.dirname(__file__), 'VERSION')
+VERSION = open(VERSION, 'r').read().strip()
+
 setup(
     name='grano',
-    version=os.environ.get('GRANO_RELEASE', '0.3.2'),
+    version=VERSION,
     description="An investigative toolkit for influence influence mapping",
-    long_description=open('README.rst').read(),
+    long_description=open(README, 'r').read(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
