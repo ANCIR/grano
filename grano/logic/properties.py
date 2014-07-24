@@ -6,11 +6,7 @@ from flask import url_for
 from grano.core import db
 from grano.logic import files as files_logic
 from grano.logic.validation import FixedValue
-<<<<<<< HEAD
-from grano.model import Entity, Attribute, File
-=======
-from grano.model import Entity, Property
->>>>>>> master
+from grano.model import Entity, Attribute, File, Property
 
 
 DATATYPE_TYPES = {
