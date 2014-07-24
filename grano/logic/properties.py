@@ -103,10 +103,10 @@ def save(obj, data, files=None):
         if file_key in files:
             file_data = files.get(file_key)
             file = files_logic.save(data, file_data)
-        else:
+            prop.value_file_id = file.id
+            prop.value_string = url_for('files_api.serve', id=file.id)
+        elif data.get('value') is None:
             raise TypeError("File for property '%s' is required" % file_key)
-        prop.value_file_id = file.id
-        prop.value_string = url_for('files_api.serve', id=file.id)
     else:
         setattr(prop, data.get('attribute').value_column,
                 data.get('value'))
