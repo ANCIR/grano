@@ -1,6 +1,4 @@
 from datetime import datetime
-from sqlalchemy import or_, and_
-from sqlalchemy.orm import aliased
 
 from grano.core import db
 from grano.model.util import make_token
@@ -33,51 +31,3 @@ class UUIDBase(_CoreBase):
 
     def __repr__(self):
         return '<%s(%s)>' % (self.__class__.__name__, self.id)
-
-
-class PropertyBase(object):
-
-    @property
-    def active_properties(self):
-        #q = self.properties.filter_by(active=True)
-        #q = q.order_by(self.PropertyClass.name.desc())
-        q = [p for p in self.properties if p.active]
-        return q
-
-    def __getitem__(self, name):
-        for prop in self.active_properties:
-            if prop.name == name:
-                return prop
-
-    def has_property(self, name):
-        return self[name] is not None
-
-    def get_attribute(self, prop_name):
-        for schema in self.schemata:
-            for attribute in schema.attributes:
-                if attribute.name == prop_name:
-                    return attribute
-
-    def has_schema(self, name):
-        for schema in self.schemata:
-            if schema.name == name:
-                return True
-        return False
-
-    @classmethod
-    def _filter_property(cls, q, attributes, value, only_active=True):
-        # TODO: this is a steaming pile of shit and needs to be fixed 
-        # at a fundamental level.
-        Prop = aliased(cls.PropertyClass)
-        q = q.join(Prop)
-        
-        nvs = []
-        for attribute in attributes:
-            column = getattr(Prop, attribute.value_column)
-            nvs.append(and_(Prop.attribute==attribute,
-                            column==value))
-
-        q = q.filter(or_(*nvs))
-        if only_active:
-            q = q.filter(Prop.active==True)
-        return q
