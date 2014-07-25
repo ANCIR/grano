@@ -66,6 +66,12 @@ def rebuild():
 
 
 @manager.command
+def adminkey():
+    """ Print the API key for the system account. """
+    print console_account().api_key
+
+
+@manager.command
 def plugins():
     """ List all available plugins. """
     for namespace, plugins in list_plugins().items():
