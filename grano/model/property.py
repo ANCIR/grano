@@ -97,7 +97,7 @@ class PropertyBase(object):
         # TODO: this is a steaming pile of shit and needs to be fixed
         # at a fundamental level.
         Prop = aliased(Property)
-        q = q.join(Prop)
+        q = q.join(Prop, cls.properties)
 
         nvs = []
         for attribute in attributes:
