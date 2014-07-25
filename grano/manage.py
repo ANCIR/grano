@@ -17,7 +17,6 @@ from grano.plugins import list_plugins, notify_plugins
 log = logging.getLogger('grano')
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
-    
 notify_plugins('grano.startup', lambda o: o.configure(manager))
 
 
@@ -70,11 +69,11 @@ def rebuild():
 def plugins():
     """ List all available plugins. """
     for namespace, plugins in list_plugins().items():
-        print "%s: %s" % (namespace, ' '.join(plugins)) 
+        print "%s: %s" % (namespace, ' '.join(plugins))
 
 
 def run():
     manager.run()
 
 if __name__ == "__main__":
-    run()    
+    run()

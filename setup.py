@@ -23,7 +23,7 @@ setup(
     keywords='sql graph sna networks journalism ddj entities',
     author='Friedrich Lindenberg',
     author_email='friedrich@pudo.org',
-    url='http://docs.grano.cc',
+    url='http://granoproject.org',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages = ['grano'],
