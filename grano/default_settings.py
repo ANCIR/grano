@@ -53,3 +53,5 @@ CELERY_QUEUES = (
 # use:
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+PLUGINS = []
