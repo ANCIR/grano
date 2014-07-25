@@ -1,10 +1,12 @@
 from datetime import datetime
 
 import colander
+from flask import url_for
 
 from grano.core import db
+from grano.logic import files as files_logic
 from grano.logic.validation import FixedValue
-from grano.model import Entity, Property
+from grano.model import Entity, Attribute, File, Property
 
 
 DATATYPE_TYPES = {
@@ -12,7 +14,8 @@ DATATYPE_TYPES = {
     'float': colander.Float(),
     'boolean': colander.Boolean(),
     'string': colander.String(),
-    'datetime': colander.DateTime(default_tzinfo=None)
+    'datetime': colander.DateTime(default_tzinfo=None),
+    'file': colander.Integer()
 }
 
 
@@ -67,7 +70,7 @@ def validate(obj_type, obj, schemata, project, properties):
     return out
 
 
-def save(obj, data):
+def save(obj, data, files=None):
     """ Set a property on the given object (entity or relation). This will
     either create a new property object or re-activate an existing object
     from the same source, if one exists. If the property is defined as
@@ -93,8 +96,20 @@ def save(obj, data):
         else:
             prop.relation = obj
 
-    setattr(prop, data.get('attribute').value_column,
-            data.get('value'))
+    if data.get('attribute').datatype == 'file':
+        # if there is a file with the property name in `files`
+        # a new file is created and the property updated
+        file_key = data.get('name')
+        if file_key in files:
+            file_data = files.get(file_key)
+            file = files_logic.save(data, file_data)
+            prop.value_file_id = file.id
+            prop.value_string = url_for('files_api.serve', id=file.id)
+        elif data.get('value') is None:
+            raise TypeError("File for property '%s' is required" % file_key)
+    else:
+        setattr(prop, data.get('attribute').value_column,
+                data.get('value'))
 
     prop.name = data.get('name')
     prop.author = data.get('author')
@@ -104,6 +119,7 @@ def save(obj, data):
     prop.source_url = data.get('source_url')
     prop.updated_at = datetime.utcnow()
     obj.updated_at = datetime.utcnow()
+
     return prop
 
 

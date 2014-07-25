@@ -19,6 +19,7 @@ def save(data):
     obj.hidden = data.get('hidden')
     obj.description = data.get('description')
     db.session.add(obj)
+
     return obj
 
 

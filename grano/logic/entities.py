@@ -65,7 +65,7 @@ def _entity_changed(entity_id, operation):
     notify_plugins('grano.entity.change', _handle)
 
 
-def save(data, entity=None):
+def save(data, files=None, entity=None):
     """ Save or update an entity. """
     data = validate(data, entity)
 
@@ -82,9 +82,10 @@ def save(data, entity=None):
     prop_names = set()
     for name, prop in data.get('properties').items():
         prop_names.add(name)
+        prop['project'] = entity.project
         prop['name'] = name
         prop['author'] = data.get('author')
-        properties_logic.save(entity, prop)
+        properties_logic.save(entity, prop, files=files)
 
     for prop in entity.properties:
         if prop.name not in prop_names:

@@ -4,7 +4,8 @@ DATA_TYPES = {
     'float': 'Real number',
     'datetime': 'Date/Time',
     'boolean': 'Yes or No',
-    'string': 'Text'
+    'string': 'Text',
+    'file': 'File'
 }
 
 SCHEMA_OBJS = {

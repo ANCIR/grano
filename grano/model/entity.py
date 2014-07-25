@@ -1,9 +1,9 @@
 from sqlalchemy import or_, and_
 
 from grano.core import db, url_for
-from grano.model.common import UUIDBase, PropertyBase
+from grano.model.common import UUIDBase
 from grano.model.schema import Schema
-from grano.model.property import Property
+from grano.model.property import Property, PropertyBase
 
 
 entity_schema = db.Table('grano_entity_schema',

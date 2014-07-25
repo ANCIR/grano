@@ -1,6 +1,6 @@
 from grano.core import db, url_for
-from grano.model.common import UUIDBase, PropertyBase
-from grano.model.property import Property
+from grano.model.common import UUIDBase
+from grano.model.property import Property, PropertyBase
 
 
 class Relation(db.Model, UUIDBase, PropertyBase):

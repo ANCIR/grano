@@ -38,7 +38,7 @@ def create():
     project = ProjectRef().get(data.get('project'))
     data['project'] = project
     authz.require(authz.project_edit(project))
-    entity = entities.save(data)
+    entity = entities.save(data, files=request.files)
     db.session.commit()
     return jsonify(entity)
 
@@ -104,7 +104,7 @@ def update(id):
     entity = object_or_404(Entity.by_id(id))
     authz.require(authz.entity_edit(entity))
     data = request_data({'author': request.account})
-    entity = entities.save(data, entity=entity)
+    entity = entities.save(data, files=request.files, entity=entity)
     db.session.commit()
     return jsonify(entity)
 
