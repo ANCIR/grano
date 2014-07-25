@@ -1,3 +1,5 @@
+from kombu import Exchange, Queue
+
 DEBUG = True
 ASSETS_DEBUG = False
 
@@ -11,6 +13,8 @@ CACHE_AGE = 84600
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/grano'
 APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
+
+
 
 
 # You need to create an application on GitHub which can be used
@@ -39,6 +43,11 @@ ENTITY_VIEW_PATTERN = 'http://beta.grano.cc/entities/%s'
 CELERY_ALWAYS_EAGER = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_DEFAULT_QUEUE = CELERY_APP_NAME + '_q'
+CELERY_QUEUES = (
+    Queue(CELERY_DEFAULT_QUEUE, Exchange(CELERY_DEFAULT_QUEUE),
+          routing_key=CELERY_DEFAULT_QUEUE),
+)
 
 # Otherwise, just set the task broker URI which you intend to
 # use:
