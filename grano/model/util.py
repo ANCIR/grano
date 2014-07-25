@@ -6,7 +6,8 @@ from slugify import slugify
 from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.ext.mutable import Mutable
 
-ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits
+#ALPHABET = string.ascii_uppercase + string.ascii_lowercase + string.digits
+ALPHABET = string.ascii_lowercase + string.digits
 BASE = len(ALPHABET)
 
 

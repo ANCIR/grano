@@ -1,4 +1,3 @@
-from kombu import Exchange, Queue
 
 DEBUG = True
 ASSETS_DEBUG = False
@@ -30,11 +29,6 @@ APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
 #FACEBOOK_APP_SECRET = '5cb5c2181d0dc6976e97a55f90330165'
 
 
-# Generate a public URI for an entity, based on its ID.
-
-ENTITY_VIEW_PATTERN = 'http://beta.grano.cc/entities/%s'
-
-
 # Asynchronous task processing: For some tasks, grano will run
 # some processing work in a delayed process, connected via a
 # queue. If you do not wish to use delayed processing, you can
@@ -43,11 +37,6 @@ ENTITY_VIEW_PATTERN = 'http://beta.grano.cc/entities/%s'
 CELERY_ALWAYS_EAGER = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_DEFAULT_QUEUE = CELERY_APP_NAME + '_q'
-CELERY_QUEUES = (
-    Queue(CELERY_DEFAULT_QUEUE, Exchange(CELERY_DEFAULT_QUEUE),
-          routing_key=CELERY_DEFAULT_QUEUE),
-)
 
 # Otherwise, just set the task broker URI which you intend to
 # use:
