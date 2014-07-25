@@ -21,7 +21,7 @@ app_version = pkg_resources.require("grano")[0].version
 db = SQLAlchemy(app)
 
 ALEMBIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                              '../alembic'))
+                              'alembic'))
 migrate = Migrate(app, db, directory=ALEMBIC_DIR)
 
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
