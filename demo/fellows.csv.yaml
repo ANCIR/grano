@@ -1,0 +1,29 @@
+entities:
+  fellow:
+    schemata: ['fellow']
+    columns:
+      - column: 'fellow_name'
+        property: 'name'
+      - column: 'twitter_handle'
+        property: 'twitter_handle'
+        skip_empty: true
+  newsorg:
+    schemata: ['news_organization']
+    columns:
+     - column: 'organization_name'
+       property: 'name'
+     - column: 'organization_url'
+       property: 'url'
+
+relations:
+  fellowship:
+    schema: 'fellowship'
+    source: 'fellow'
+    target: 'newsorg'
+    columns:
+      - column: 'start_date'
+        property: 'start_date'
+        type: 'date'
+      - column: 'end_date'
+        property: 'end_date'
+        type: 'date'

@@ -1,0 +1,27 @@
+- name: fellow
+  label: An OpenNews fellow
+  obj: entity
+  hidden: no
+  attributes:
+    - name: twitter_handle
+      label: Twitter handle
+
+- name: news_organization
+  label: A news organization
+  obj: entity
+  hidden: no
+  attributes:
+    - name: url
+      label: URL
+
+- name: fellowship
+  label: A Fellowship
+  label_in: Was hosted by
+  label_out: Worked for
+  obj: relation
+  attributes:
+    - name: start_date
+      label: Start date
+    - name: end_date
+      label: End date
+
