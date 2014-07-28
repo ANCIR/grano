@@ -2,8 +2,8 @@
 DATA_TYPES = {
     'integer': 'Integer',
     'float': 'Real number',
-    'datetime': 'Date/Time',
-    'boolean': 'Yes or No',
+    'datetime': 'Date',
+    'boolean': 'Boolean',
     'string': 'Text',
     'file': 'File'
 }

@@ -5,6 +5,7 @@ from flask import Flask, url_for as _url_for
 from flask.ext.oauth import OAuth
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate
+from kombu import Exchange, Queue
 from celery import Celery
 
 from grano import default_settings
@@ -23,6 +24,13 @@ db = SQLAlchemy(app)
 ALEMBIC_DIR = os.path.join(os.path.dirname(__file__), 'alembic')
 ALEMBIC_DIR = os.path.abspath(ALEMBIC_DIR)
 migrate = Migrate(app, db, directory=ALEMBIC_DIR)
+
+queue_name = app.config.get('CELERY_APP_NAME') + '_q'
+app.config['CELERY_DEFAULT_QUEUE'] = queue_name
+app.config['CELERY_QUEUES'] = (
+    Queue(queue_name, Exchange(queue_name), routing_key=queue_name),
+)
+
 
 celery = Celery(app.config.get('CELERY_APP_NAME', app_name),
                 broker=app.config['CELERY_BROKER_URL'])
