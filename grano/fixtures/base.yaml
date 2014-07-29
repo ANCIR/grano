@@ -1,8 +1,251 @@
-name: base
-label: Common
-obj: entity
-hidden: yes
-attributes:
-  - name: name
-    label: Name
-    hidden: yes
+#
+# default data model, v. 0.1
+#
+# This is the data model for vanilla Grano.
+#
+
+
+# Overwrite the base model to add some common properties.
+- name: 'base'
+  label: 'Common base schema'
+  obj: 'entity'
+  hidden: true
+  attributes:
+
+    # Core identifier.
+    - name: name
+      label: Name
+
+    # URL-ready form of the name
+    # WARNING: as slugification is a lossy process, this may no longer be
+    # unique, even if the name is.
+    - name: slug
+      label: 'URL Slug'
+      hidden: true
+
+    # A short one-line summary of the entity.
+    - name: tagline
+      label: 'Tagline'
+
+    # A longer, one paragraph summary of the entity.
+    - name: summary
+      label: 'Summary'
+
+    # Contact information
+    - name: contact_url
+      label: 'Web site'
+    - name: contact_email
+      label: 'E-Mail'
+    - name: contact_phone
+      label: 'Telephone number'
+    - name: contact_fax
+      label: 'Fax number'
+    - name: contact_address_physical
+      label: 'Physical address'
+    - name: contact_address_postal
+      label: 'Postal address'
+    # TODO: do we want to unwind addresses into several fields?
+
+    # Country of origin
+    # - For individuals, their nationality at birth
+    # - For companies, the jurisdiction in which they are registered
+    - name: origin_country
+      label: 'Country'
+
+
+#####################################################################
+# Entity: Person
+#####################################################################
+- name: 'Person'
+  label: 'Person'
+  description: 'A natural person'
+  hidden: false
+  obj: entity
+  meta:
+    plural: 'People'
+    see_also: 'http://popoloproject.com/specs/person.html'
+  attributes:
+    - name: given_name
+      label: 'Given name'
+    - name: family_name
+      label: 'Family name'
+    - name: gender
+      label: 'Gender'
+      # TODO: we need enums
+      # https://github.com/granoproject/grano/issues/47
+      values: ['male', 'female', 'other']
+    - name: honorific_prefix
+      label: 'Honorific prefix'
+    - name: date_birth
+      label: 'Date of birth'
+      datatype: datetime
+    - name: birth_town
+      label: 'Birth town'
+    # TODO: do we really want these?
+    - name: display_name
+      label: 'Name used for display'
+      hidden: true
+    - name: full_name
+      label: 'Full name'
+      hidden: true
+
+
+
+#####################################################################
+# Entity: Organization
+#####################################################################
+- name: 'Organization'
+  label: 'Organization'
+  description: 'A legal entity or state institution'
+  hidden: false
+  obj: 'entity'
+  meta:
+    plural: 'Organizations'
+    see_also: 'http://popoloproject.com/specs/organization.html'
+  attributes:
+    # A registration number, e.g. with a company register or non-profit
+    # register.
+    - name: registration_number
+      label: 'Registration number'
+    - name: registration_status
+      label: 'Registration status'
+    - name: classification
+      label: 'Classification'
+    - name: date_founding
+      label: 'Date of founding'
+      datatype: datetime
+    - name: date_dissolution
+      label: 'Date of dissolution'
+      datatype: datetime
+    - name: legal_form
+      label: 'Legal form'
+
+#####################################################################
+# Entity: PublicBody
+#####################################################################
+- name: 'PublicBody'
+  label: 'Public body'
+  description: 'Government statutory corporation or public body'
+  hidden: false
+  obj: 'entity'
+  meta:
+    plural: 'Public bodies'
+  attributes:
+    - name: date_founded
+      label: 'Date founded'
+      datatype: datetime
+    - name: date_dissolutioned
+      label: 'Date of dissolutioned'
+      datatype: datetime
+
+#####################################################################
+# Entity: PublicCompany
+#####################################################################
+- name: 'PublicCompany'
+  label: 'Publicly-traded company'
+  description: 'A company traded on a public stock market'
+  hidden: false
+  obj: 'entity'
+  meta:
+    plural: 'Stock companies'
+  attributes:
+    - name: ticker_symbol
+      label: 'Ticker symbol'
+    - name: listing_status
+      label: 'Status of stock listing'
+    - name: listing_exchange
+      label: 'Stock exchange'
+
+#####################################################################
+# Entity: PoliticalParty
+#####################################################################
+- name: 'PoliticalParty'
+  label: 'Political party'
+  description: 'A political party'
+  hidden: false
+  obj: 'entity'
+  meta:
+    plural: 'Political parties'
+  attributes: []
+
+
+#####################################################################
+# Relation: Membership
+#####################################################################
+- name: 'Membership'
+  label: 'Member'
+  description: 'An entity is a member of an organization'
+  hidden: false
+  obj: relation
+  meta:
+    see_also: 'http://popoloproject.com/specs/membership.html'
+  attributes:
+    - name: date_start
+      label: 'Start date'
+      datatype: datetime
+    - name: date_end
+      label: 'End date'
+      datatype: datetime
+    - name: role
+      label: 'Role'
+
+
+#####################################################################
+# Relation: Partnership
+#####################################################################
+- name: 'Partnership'
+  label: 'Partner'
+  description: 'Two entities are associated by some type of agreement'
+  hidden: false
+  obj: relation
+  attributes:
+    - name: date_start
+      label: 'Start date'
+      datatype: datetime
+    - name: date_end
+      label: 'End date'
+      datatype: datetime
+    - name: extent
+      label: 'Extent'
+
+
+#####################################################################
+# Relation: Personal
+#####################################################################
+- name: 'Personal'
+  label: 'Personal'
+  description: 'Personal relationships, such as friendship or family'
+  hidden: false
+  obj: relation
+  attributes:
+    - name: date_start
+      label: 'Start date'
+      datatype: datetime
+    - name: date_end
+      label: 'End date'
+      datatype: datetime
+    - name: type
+      label: 'Type'
+
+
+#####################################################################
+# Relation: FinancialInterest
+#####################################################################
+- name: 'FinancialInterest'
+  label: 'Financial interest'
+  description: 'An entity has a financial interest (e.g. shares) in another'
+  hidden: false
+  obj: relation
+  attributes:
+    - name: date_start
+      label: 'Start date'
+      datatype: datetime
+    - name: date_end
+      label: 'End date'
+      datatype: datetime
+    - name: nature
+      label: 'Nature of the interest'
+    - name: shares_number
+      label: 'Number of shares'
+    - name: nominal_value
+      label: 'Nominal value'
