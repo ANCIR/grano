@@ -1,3 +1,4 @@
 include LICENSE requirements.txt Procfile VERSION README.md
 recursive-include grano/alembic *
+recursive-include grano/fixtures *
 global-exclude *.pyc
