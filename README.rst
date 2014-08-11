@@ -7,9 +7,9 @@ Grano is currently developed as a backend to `openinterests.eu <http://openinter
 
 Documentation for grano is available at `docs.grano.cc <http://docs.grano.cc>`_, including: 
 
-* `Installation instructions <http://docs.grano.cc/install.html>`_
-* `Technical introduction <http://docs.grano.cc/technical.html>`_
-* `Web (REST) API <http://docs.grano.cc/rest_api.html>`_
+* `Installation instructions <http://granoproject.org/docs/install/>`_
+* `Technical introduction <http://granoproject.org/docs/>`_
+* `Web (REST) API <http://granoproject.org/docs/api/>`_
 
 ``grano`` is also available on cheeseshop, and can be installed with::
 
