@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from grano.core import db, celery
+from grano.core import db
 from grano.model import Pipeline, LogEntry
 from grano.logic.accounts import console_account
 
@@ -61,7 +61,8 @@ def log_info(pipeline, message, error=None, details=None):
 
 
 def log_warn(pipeline, message, error=None, details=None):
-    return log(pipeline, logging.WARNING, message, error=error, details=details)
+    return log(pipeline, logging.WARNING, message, error=error,
+               details=details)
 
 
 def log_error(pipeline, message, error=None, details=None):

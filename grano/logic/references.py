@@ -68,7 +68,7 @@ class EntityRef(Ref):
 
 
 class AccountRef(Ref):
-    
+
     def decode(self, node, cstruct):
         if isinstance(cstruct, Account):
             return cstruct
@@ -81,7 +81,7 @@ class AccountRef(Ref):
 
 
 class FileRef(Ref):
-    
+
     def decode(self, node, cstruct):
         if isinstance(cstruct, File):
             return cstruct
@@ -106,5 +106,5 @@ class SchemaRef(Ref):
         if isinstance(cstruct, dict):
             if cstruct.get('name'):
                 return Schema.by_name(self.project,
-                    cstruct.get('name'))
+                                      cstruct.get('name'))
         return None

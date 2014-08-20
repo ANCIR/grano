@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 def rebuild():
-    """ Execute the change processing handlers for all entities and 
-    relations currently loaded. This can be used as a housekeeping 
+    """ Execute the change processing handlers for all entities and
+    relations currently loaded. This can be used as a housekeeping
     function. """
 
     for i, entity in enumerate(Entity.all().filter_by(same_as=None)):

@@ -1,10 +1,7 @@
 import colander
 
-from grano.core import db, url_for
+from grano.core import db
 from grano.model import Permission
-from grano.logic import accounts as accounts_logic
-from grano.logic import projects as projects_logic
-from grano.logic.validation import Invalid
 from grano.logic.references import ProjectRef, AccountRef
 
 
@@ -22,19 +19,19 @@ def save(data, permission=None):
 
     if permission is None:
         q = Permission.all()
-        q = q.filter(Permission.project==data['project'])
-        q = q.filter(Permission.account==data['account'])
+        q = q.filter(Permission.project == data['project'])
+        q = q.filter(Permission.account == data['account'])
         permission = q.first()
 
     if permission is None:
         permission = Permission()
         permission.project = data.get('project')
         permission.account = data.get('account')
-    
+
     permission.reader = data['reader'] or data['editor'] or data['admin']
     permission.editor = data['editor'] or data['admin']
     permission.admin = data['admin']
-    
+
     db.session.add(permission)
     db.session.flush()
     return permission

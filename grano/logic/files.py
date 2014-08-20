@@ -1,14 +1,12 @@
 from StringIO import StringIO
-from unicodecsv import DictReader, DictWriter
+from unicodecsv import DictReader
 from unicodecsv import Error as CSVError
 import logging
 import colander
 
-from grano.core import db, url_for, celery
+from grano.core import db
 from grano.model import File
-from grano.logic import projects as projects_logic
 from grano.logic.references import ProjectRef, AccountRef
-from grano.plugins import notify_plugins
 from grano.lib.exc import BadRequest
 
 
@@ -19,9 +17,9 @@ class FileValidator(colander.MappingSchema):
     author = colander.SchemaNode(AccountRef())
     project = colander.SchemaNode(ProjectRef())
     file_name = colander.SchemaNode(colander.String(),
-            validator=colander.Length(min=3))
+                                    validator=colander.Length(min=3))
     mime_type = colander.SchemaNode(colander.String(),
-            validator=colander.Length(min=3))
+                                    validator=colander.Length(min=3))
 
 
 def validate(data, file):
@@ -34,13 +32,13 @@ def save(data, file_data, file=None):
     """ Save or update a file. """
     if file_data is None:
         raise BadRequest("No file given!")
-    
+
     data.update({
         'file_name': file_data.filename,
         'mime_type': file_data.mimetype
         })
     sane = validate(data, file)
-    
+
     if file is None:
         file = File()
         file.project = sane.get('project')

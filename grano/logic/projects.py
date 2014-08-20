@@ -1,12 +1,10 @@
 import colander
 from datetime import datetime
 
-from grano.core import app, db, url_for, celery
-from grano.lib.exc import NotImplemented
+from grano.core import app, db, celery
 from grano.logic.validation import database_name
 from grano.logic.references import AccountRef
 from grano.plugins import notify_plugins
-from grano.logic import accounts
 from grano.model import Project
 
 
@@ -16,14 +14,15 @@ def validate(data, project):
 
     class ProjectValidator(colander.MappingSchema):
         slug = colander.SchemaNode(colander.String(),
-            validator=colander.All(database_name, same_project))
+                                   validator=colander.All(database_name,
+                                                          same_project))
         label = colander.SchemaNode(colander.String(),
-            validator=colander.Length(min=3))
+                                    validator=colander.Length(min=3))
         private = colander.SchemaNode(colander.Boolean(),
-            missing=False)
+                                      missing=False)
         author = colander.SchemaNode(AccountRef())
         settings = colander.SchemaNode(colander.Mapping(),
-            missing={})
+                                       missing={})
 
     validator = ProjectValidator()
     return validator.deserialize(data)
@@ -59,10 +58,10 @@ def save(data, project=None):
     project.label = data.get('label')
     project.private = data.get('private')
     project.updated_at = datetime.utcnow()
-    
+
     db.session.add(project)
-    
-    # TODO: make this nicer - separate files? 
+
+    # TODO: make this nicer - separate files?
     from grano.logic.schemata import import_schema
     with app.open_resource('fixtures/base.yaml') as fh:
         import_schema(project, fh)
@@ -79,7 +78,7 @@ def delete(project):
 
 
 def truncate(project):
-    """ Delete all entities and relations from this project, 
+    """ Delete all entities and relations from this project,
     but leave the project, schemata and attributes intact. """
     from grano.logic import relations
     from grano.logic import entities

@@ -97,7 +97,7 @@ def import_aliases(pipeline, fh):
                              row.get(canonical_column),
                              row.get(alias_column),
                              source_url=source_url)
-        
+
         if i % 100 == 0:
             percentage = int((float(i) / max(1, len(importer))) * 100)
             pipeline.percent_complete = percentage
@@ -179,7 +179,7 @@ def import_objects(pipeline, fh):
                 rel.save()
             else:
                 entity.save()
-            
+
             # indicate progress, and commit every now and then.
             if i % 100 == 0:
                 percentage = int((float(i) / max(1, len(importer))) * 100)
@@ -190,4 +190,3 @@ def import_objects(pipeline, fh):
                                inv.as_dict())
         except Exception, exc:
             pipelines.log_error(pipeline, unicode(exc), 'Error', {})
-

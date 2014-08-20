@@ -1,12 +1,9 @@
 import logging
 import colander
 
-from grano.core import db, url_for, celery
-from grano.lib.exc import NotImplemented
-from grano.model import Relation, Property
+from grano.core import db, celery
+from grano.model import Relation
 from grano.logic import properties as properties_logic
-from grano.logic import schemata as schemata_logic
-from grano.logic import projects as projects_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
 from grano.plugins import notify_plugins

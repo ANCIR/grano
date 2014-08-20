@@ -1,9 +1,9 @@
-from unicodecsv import DictReader, DictWriter
+from unicodecsv import DictReader
 
 
 class CSVImporter(object):
-    """ A CSV-backed resource with the datas in it. """ 
-    
+    """ A CSV-backed resource with the datas in it. """
+
     def __init__(self, fh):
         self.reader = DictReader(fh)
         self.data = list(self.reader)

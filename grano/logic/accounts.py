@@ -1,4 +1,4 @@
-from grano.core import db, url_for
+from grano.core import db
 from grano.model import Account
 
 
@@ -9,13 +9,13 @@ def save(data, account=None):
         account.twitter_id = data.get('twitter_id')
         account.facebook_id = data.get('facebook_id')
     account.login = data.get('login')
-    
+
     if data.get('full_name'):
         account.full_name = data.get('full_name')
-    
+
     if data.get('email'):
         account.email = data.get('email')
-    
+
     db.session.add(account)
     db.session.flush()
     return account

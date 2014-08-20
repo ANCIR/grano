@@ -50,14 +50,14 @@ class Pager(object):
         if not self.has_next:
             return None
         return self.page_url(self.page + 1) if self.has_next \
-               else self.page_url(self.page)
+            else self.page_url(self.page)
 
     @property
     def prev_url(self):
         if not self.has_prev:
             return None
         return self.page_url(self.page - 1) if self.has_prev \
-               else self.page_url(self.page)
+            else self.page_url(self.page)
 
     @property
     def query_args(self):
@@ -105,8 +105,6 @@ class Pager(object):
         if len(query):
             qs = urlencode(query)
             url = url + '?' + qs
-        #if self.name is not None:
-        #    url = url + '#' + self.name
         return url
 
     def __iter__(self):
