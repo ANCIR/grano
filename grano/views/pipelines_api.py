@@ -1,12 +1,10 @@
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import Blueprint, request
 from sqlalchemy import or_, and_
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404
 from grano.model import Project, Permission, Pipeline
 from grano.lib.pager import Pager
-from grano.core import app, db, url_for
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -26,11 +24,11 @@ def index():
         query = query.filter(Project.slug==request.args.get('project'))
 
     if request.args.get('operation'):
-        query = query.filter(Pipeline.operation==request.args.get('operation'))
-    
+        query = query.filter(Pipeline.operation == request.args.get('operation'))
+
     query = query.order_by(Pipeline.updated_at.desc())
     query = query.distinct()
-    
+
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)

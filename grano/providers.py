@@ -75,4 +75,3 @@ if app.config.get('FACEBOOK_APP_ID') is not None:
         return session.get('facebook_token')
 
     PROVIDERS['facebook'] = facebook
-

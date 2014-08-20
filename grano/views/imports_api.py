@@ -1,14 +1,9 @@
-import colander
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import Blueprint, request
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Project, Permission, Pipeline
-from grano.lib.pager import Pager
+from grano.model import Project
 from grano.logic import imports
-from grano.core import app, db, url_for
-from grano.views.cache import validate_cache
 from grano import authz
 
 

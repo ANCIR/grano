@@ -1,10 +1,9 @@
 from flask import request
-from sqlalchemy import or_, and_
 
-from grano.model import Permission, Entity, Project, Attribute
+from grano.model import Permission
 from grano.lib.exc import Forbidden
 
-PUBLISHED_THRESHOLD = 5 # minimum status value for publication
+PUBLISHED_THRESHOLD = 5  # minimum status value for publication
 
 
 def _find_permission(project):
@@ -47,6 +46,7 @@ def project_delete(project):
     return project_manage(project)
 
 # Entity
+
 
 def entity_create():
     return logged_in()
@@ -91,4 +91,3 @@ def relation_manage(relation):
 def require(pred):
     if not pred:
         raise Forbidden("Sorry, you're not permitted to do this!")
-

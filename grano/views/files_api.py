@@ -1,19 +1,17 @@
 from StringIO import StringIO
 
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response, send_file
+from flask import Blueprint, request
+from flask import send_file
 from sqlalchemy import or_, and_
-from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
-from grano.lib.exc import BadRequest
 from grano.lib.args import object_or_404, request_data, get_limit
 from grano.model import Project, File, Permission
-from grano.logic import files
+from grano.logic import files, entities
 from grano.logic.references import ProjectRef
 from grano.lib.pager import Pager
-from grano.lib.exc import Gone, BadRequest
-from grano.core import app, db, url_for
+from grano.lib.exc import Gone
+from grano.core import db
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -26,12 +24,11 @@ def index():
     query = File.all()
     query = query.join(Project)
     query = query.outerjoin(Permission)
-    query = query.filter(or_(Project.private==False,
-        and_(Permission.reader==True, Permission.account==request.account)))
+    query = query.filter(or_(Project.private == False,
+        and_(Permission.reader == True, Permission.account==request.account)))
 
     if request.args.get('project'):
-        query = query.filter(Project.slug==request.args.get('project'))
-    
+        query = query.filter(Project.slug == request.args.get('project'))
 
     query = query.distinct()
     pager = Pager(query)

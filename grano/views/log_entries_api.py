@@ -1,11 +1,9 @@
-from flask import Blueprint, render_template, request, Response
-from flask import redirect, make_response
+from flask import Blueprint, request
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404
-from grano.model import Project, Permission, Pipeline, LogEntry
+from grano.model import Pipeline, LogEntry
 from grano.lib.pager import Pager
-from grano.core import app, db, url_for
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -19,10 +17,10 @@ def index(pipeline_id):
     authz.require(authz.project_read(pipeline.project))
 
     query = LogEntry.all()
-    query = query.filter(LogEntry.pipeline==pipeline)
+    query = query.filter(LogEntry.pipeline == pipeline)
 
     if request.args.get('level'):
-        query = query.filter(LogEntry.level==request.args.get('level'))
+        query = query.filter(LogEntry.level == request.args.get('level'))
 
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())

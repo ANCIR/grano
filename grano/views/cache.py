@@ -17,7 +17,8 @@ def handle_not_modified(exc):
 
 def generate_etag(keys):
     args = sorted(set(request.args.items() + keys.items()))
-    args = filter(lambda (k,v): k != '_', args) # jquery where is your god now?!?
+    # jquery where is your god now?!?
+    args = filter(lambda (k, v): k != '_', args)
     args = [k + ':' + repr(v) for k, v in args]
     return sha1('|'.join(args)).hexdigest()
 
@@ -31,8 +32,8 @@ def validate_cache(keys=None, last_modified=None):
     request._grano_etag = generate_etag(keys)
     request._grano_modified = last_modified
     if not is_resource_modified(request.environ,
-        etag=request._grano_etag,
-        last_modified=last_modified):
+                                etag=request._grano_etag,
+                                last_modified=last_modified):
         raise NotModified()
     if request.if_none_match == request._grano_etag:
         raise NotModified()
@@ -55,10 +56,10 @@ def configure_cache_headers(response_class):
     if (not app.config.get('CACHE')) or request.no_cache:
         return response_class
     if request.method in ['GET', 'HEAD', 'OPTIONS'] \
-        and response_class.status_code < 400 \
-        and not response_class.is_streamed:
-        #response_class.cache_control.max_age = app.config.get('CACHE_AGE')
-        
+            and response_class.status_code < 400 \
+            and not response_class.is_streamed:
+
+        response_class.cache_control.max_age = app.config.get('CACHE_AGE')
         response_class.cache_control.must_revalidate = True
         if request.account is not None:
             response_class.cache_control.private = True
@@ -67,7 +68,7 @@ def configure_cache_headers(response_class):
         if request._grano_modified:
             response_class.last_modified = request._grano_modified
         if request._grano_etag:
-            response_class.add_etag(request._grano_etag)    
+            response_class.add_etag(request._grano_etag)
     return response_class
 
 

@@ -1,9 +1,8 @@
-import logging 
+import logging
 
 from flask.ext.script import Manager
 from flask.ext.migrate import MigrateCommand
 
-from grano.core import db, migrate
 from grano.views import app
 from grano.model import Project
 from grano.logic import import_schema, export_schema

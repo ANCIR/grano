@@ -1,7 +1,7 @@
 
 DATA_TYPES = {
     'integer': 'Integer',
-    'float': 'Real number',
+    'float': 'Float',
     'datetime': 'Date',
     'boolean': 'Boolean',
     'string': 'Text',

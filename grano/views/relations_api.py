@@ -65,4 +65,3 @@ def delete(id):
     relations.delete(relation)
     db.session.commit()
     raise Gone()
-

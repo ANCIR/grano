@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template
-from flask import redirect, make_response, url_for
+from flask import Blueprint
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data, arg_bool
@@ -7,7 +6,7 @@ from grano.model import Schema, Project
 from grano.logic import schemata
 from grano.lib.pager import Pager
 from grano.lib.exc import Gone
-from grano.core import app, db
+from grano.core import db
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -47,7 +46,8 @@ def view(slug, name):
     return jsonify(schema)
 
 
-@blueprint.route('/api/1/projects/<slug>/schemata/<name>', methods=['POST', 'PUT'])
+@blueprint.route('/api/1/projects/<slug>/schemata/<name>',
+                 methods=['POST', 'PUT'])
 def update(slug, name):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))

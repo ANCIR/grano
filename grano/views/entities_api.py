@@ -60,13 +60,13 @@ def graph(id):
     validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
-                mimetype='text/xml')
+                        mimetype='text/xml')
     return jsonify(extractor)
 
 
 @blueprint.route('/api/1/entities/_suggest', methods=['GET'])
 def suggest():
-    if not 'q' in request.args or not len(request.args.get('q').strip()):
+    if 'q' not in request.args or not len(request.args.get('q').strip()):
         raise BadRequest("Missing the query ('q' parameter).")
 
     q = db.session.query(Property)
@@ -86,6 +86,7 @@ def suggest():
     pager = Pager(q)
 
     data = []
+
     def convert(props):
         for prop in props:
             data.append({
@@ -120,7 +121,7 @@ def merge():
 
     if data['orig'].project_id != data['dest'].project_id:
         raise BadRequest('Entities belong to different projects.')
-    
+
     dest = entities.merge(data['orig'], data['dest'])
     db.session.commit()
     return jsonify(dest)

@@ -13,21 +13,17 @@ CACHE_AGE = 84600
 SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/grano'
 APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
 
-
-
-
 # You need to create an application on GitHub which can be used
 # for OAuth sign-in.
 
-#GITHUB_CLIENT_ID = 'da79a6b5868e690ab984'
-#GITHUB_CLIENT_SECRET = '1701d3bd20bbb29012592fd3a9c64b827e0682d6'
+# GITHUB_CLIENT_ID = 'da79a6b5868e690ab984'
+# GITHUB_CLIENT_SECRET = '1701d3bd20bbb29012592fd3a9c64b827e0682d6'
 
-#TWITTER_API_KEY = 'UZYoBAfBzNluBlmBwPOGYw'
-#TWITTER_API_SECRET = 'ngHaeaRPKA5BDQNXhPFmLWA1PvTA1kBGDaAJmc517E'
+# TWITTER_API_KEY = 'UZYoBAfBzNluBlmBwPOGYw'
+# TWITTER_API_SECRET = 'ngHaeaRPKA5BDQNXhPFmLWA1PvTA1kBGDaAJmc517E'
 
-#FACEBOOK_APP_ID = '647877358607044'
-#FACEBOOK_APP_SECRET = '5cb5c2181d0dc6976e97a55f90330165'
-
+# FACEBOOK_APP_ID = '647877358607044'
+# FACEBOOK_APP_SECRET = '5cb5c2181d0dc6976e97a55f90330165'
 
 # Asynchronous task processing: For some tasks, grano will run
 # some processing work in a delayed process, connected via a
