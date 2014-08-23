@@ -10,6 +10,7 @@ NAMESPACES = [
     'grano.startup',
     'grano.entity.change',
     'grano.relation.change',
+    'grano.schema.change',
     'grano.project.change'
 ]
 PLUGINS = {'LOADED': False, 'MANAGERS': {}}

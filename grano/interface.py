@@ -43,6 +43,20 @@ class ProjectChangeProcessor(object):
         will only receive the ID and must query for the object itself. """
 
 
+class SchemaChangeProcessor(object):
+    """ A schema change processor gets notified whenever there is a
+    change to a schema definition so that it can perform related actions.
+
+    This may happen out of band (ie. on a queue or batch job), thus
+    changes may not be applied immediately.
+    """
+
+    @abc.abstractmethod
+    def schema_changed(self, project_slug, schema_name, operation):
+        """ Notify the plugin that a project has changed. The plugin
+        will only receive the ID and must query for the object itself. """
+
+
 class Startup(object):
     """ This interface will be called when grano is started and allows
     plugins to register additional functionality such as flask views.

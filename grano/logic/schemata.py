@@ -5,10 +5,11 @@ from colander import SchemaNode
 from pprint import pprint
 from datetime import datetime
 
-from grano.core import db
+from grano.core import db, celery
 from grano.model import Schema, Attribute
 from grano.logic.validation import Invalid, database_name
 from grano.logic.references import ProjectRef
+from grano.plugins import notify_plugins
 from grano.logic import attributes
 
 TYPES_VALIDATOR = colander.OneOf(Attribute.DATATYPES.keys())
@@ -53,6 +54,7 @@ def save(data, schema=None):
     schema_val = SchemaValidator(validator=check_attributes)
     data = schema_val.deserialize(data)
 
+    operation = 'create' if schema is None else 'update'
     if schema is None:
         schema = Schema()
         schema.name = data.get('name')
@@ -76,13 +78,23 @@ def save(data, schema=None):
         if attr.name not in names:
             attributes.delete(attr)
 
+    _schema_changed(schema.project.slug, schema.name, operation)
     return schema
 
 
 def delete(schema):
+    _schema_changed(schema.project.slug, schema.name, 'delete')
     for attr in schema.attributes:
         attributes.delete(attr)
     db.session.delete(schema)
+
+
+@celery.task
+def _schema_changed(project_slug, schema_name, operation):
+    """ Notify plugins about changes to a schema. """
+    def _handle(obj):
+        obj.schema_changed(project_slug, schema_name, operation)
+    notify_plugins('grano.schema.change', _handle)
 
 
 def import_schema(project, fh):

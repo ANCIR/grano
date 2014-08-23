@@ -34,6 +34,8 @@ setup(
     entry_points={
         'grano.entity.change': [],
         'grano.relation.change': [],
+        'grano.project.change': [],
+        'grano.schema.change': [],
         'grano.startup': [],
         'console_scripts': [
             'grano = grano.manage:run',
