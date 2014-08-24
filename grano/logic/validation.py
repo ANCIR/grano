@@ -14,7 +14,10 @@ class All(object):
 
 
 FORBIDDEN = ['project', 'source', 'target', 'id', 'created_at', 'updated_at',
-             'author', 'author_id']
+             'author', 'author_id', 'entity', 'relation', 'entities'
+             'relations', 'project', 'projects', 'grano', 'account',
+             'accounts', 'graph', 'attribute', 'attributes', 'schema',
+             'schemata', 'import', 'imports']
 database_format = colander.Regex(r'^[a-zA-Z][a-zA-Z0-9_-]+[a-zA-Z0-9]$')
 database_forbidden = colander.Function(lambda t: t not in FORBIDDEN)
 database_name = All(database_format, database_forbidden)

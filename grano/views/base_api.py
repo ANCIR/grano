@@ -44,7 +44,7 @@ def status():
         'service': app_name,
         'status': 'ok',
         'version': app_version,
-        'docs': 'http://docs.grano.cc/rest_api.html',
+        'docs': 'http://granoproject.org/docs',
         'api_url': url_for('base_api.status'),
         'services': {
             'projects_index_url': url_for('projects_api.index'),
