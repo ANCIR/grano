@@ -1,3 +1,6 @@
+Plugin extension points
+=======================
+
 
 System startup
 ++++++++++++++
