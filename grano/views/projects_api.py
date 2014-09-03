@@ -1,6 +1,6 @@
 from StringIO import StringIO
 
-from flask import Blueprint, Response, request
+from flask import Blueprint, request
 from flask import send_file
 
 from grano.lib.serialisation import jsonify
@@ -9,7 +9,6 @@ from grano.model import Project
 from grano.logic import projects
 from grano.logic.aliases import export_aliases
 from grano.lib.pager import Pager
-from grano.logic.graph import GraphExtractor
 from grano.lib.exc import Gone
 from grano.core import db
 from grano.views.cache import validate_cache
@@ -55,19 +54,6 @@ def aliases(slug):
     res = send_file(sio, mimetype='text/csv')
     res.headers['Content-Disposition'] = 'filename=%s-aliases.csv' % project.slug
     return res
-
-
-@blueprint.route('/api/1/projects/<slug>/graph', methods=['GET'])
-def graph(slug):
-    project = object_or_404(Project.by_slug(slug))
-    authz.require(authz.project_read(project))
-    extractor = GraphExtractor(project_id=project.id)
-    if not project.private:
-        validate_cache(keys=extractor.to_hash())
-    if extractor.format == 'gexf':
-        return Response(extractor.to_gexf(),
-                        mimetype='text/xml')
-    return jsonify(extractor)
 
 
 @blueprint.route('/api/1/projects/<slug>', methods=['POST', 'PUT'])

@@ -1,14 +1,12 @@
-from flask import Blueprint, request, Response
-from sqlalchemy import or_, and_
+from flask import Blueprint, request
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
 from grano.lib.exc import BadRequest, Gone
 from grano.lib.args import object_or_404, request_data
-from grano.model import Entity, Property, Project, Permission
+from grano.model import Entity, Property, Project
 from grano.logic import entities
 from grano.logic.references import ProjectRef
-from grano.logic.graph import GraphExtractor
 from grano.lib.pager import Pager
 from grano.core import db, url_for
 from grano.views import filters, facets
@@ -49,20 +47,6 @@ def view(id):
     return jsonify(entity)
 
 
-@blueprint.route('/api/1/entities/<id>/graph', methods=['GET'])
-def graph(id):
-    entity = object_or_404(Entity.by_id(id))
-    authz.require(authz.entity_read(entity))
-    entity_properties = request.args.getlist('entity_property')
-    extractor = GraphExtractor(root_id=entity.id,
-                               entity_properties=entity_properties)
-    validate_cache(keys=extractor.to_hash())
-    if extractor.format == 'gexf':
-        return Response(extractor.to_gexf(),
-                        mimetype='text/xml')
-    return jsonify(extractor)
-
-
 @blueprint.route('/api/1/entities/_suggest', methods=['GET'])
 def suggest():
     if 'q' not in request.args or not len(request.args.get('q').strip()):
@@ -70,11 +54,7 @@ def suggest():
 
     q = db.session.query(Property)
     q = q.join(Entity)
-    q = q.join(Project)
-    q = q.outerjoin(Permission)
-    q = q.filter(or_(Project.private == False,
-                 and_(Permission.reader == True,
-                      Permission.account == request.account)))
+    q = q.filter(Entity.project_id.in_(authz.permissions().get('reader')))
     q = q.filter(Property.name == 'name')
     q = q.filter(Property.active == True)
     q = q.filter(Property.entity_id != None)

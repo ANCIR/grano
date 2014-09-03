@@ -31,13 +31,6 @@ def permissions():
     return request.permissions
 
 
-def _find_permission(project):
-    q = Permission.all()
-    q = q.filter_by(project=project)
-    q = q.filter_by(account=request.account)
-    return q
-
-
 def logged_in():
     return request.account is not None
 
