@@ -1,9 +1,34 @@
 from flask import request
 
-from grano.model import Permission
+from grano.core import db
+from grano.model import Permission, Project
 from grano.lib.exc import Forbidden
 
-PUBLISHED_THRESHOLD = 5  # minimum status value for publication
+
+def permissions():
+    """ Cache the full matrix of which projects this user has access to. """
+    if not hasattr(request, 'permissions'):
+        matrix = {
+            'reader': set(),
+            'editor': set(),
+            'admin': set()
+        }
+        q = db.session.query(Project.id)
+        q = q.filter(Project.private == False)
+        matrix['reader'].update([id for id, in q.all()])
+
+        if logged_in():
+            q = Permission.all()
+            q = q.filter_by(account=request.account)
+            for perm in q.all():
+                if perm.reader:
+                    matrix['reader'].add(perm.project_id)
+                if perm.editor:
+                    matrix['editor'].add(perm.project_id)
+                if perm.admin:
+                    matrix['admin'].add(perm.project_id)
+        request.permissions = matrix
+    return request.permissions
 
 
 def _find_permission(project):
@@ -22,24 +47,15 @@ def project_create():
 
 
 def project_read(project):
-    if not project.private:
-        return True
-    q = _find_permission(project).filter_by(reader=True)
-    return q.count() > 0
+    return project.id in permissions().get('reader')
 
 
 def project_edit(project):
-    if not logged_in():
-        return False
-    q = _find_permission(project).filter_by(editor=True)
-    return q.count() > 0
+    return project.id in permissions().get('editor')
 
 
 def project_manage(project):
-    if not logged_in():
-        return False
-    q = _find_permission(project).filter_by(admin=True)
-    return q.count() > 0
+    return project.id in permissions().get('admin')
 
 
 def project_delete(project):
@@ -53,23 +69,15 @@ def entity_create():
 
 
 def entity_read(entity):
-    if not entity.project.private and entity.status >= PUBLISHED_THRESHOLD:
-        return True
-    q = _find_permission(entity.project).first()
-    if q:
-        if q.editor or q.admin:
-            return True
-        elif q.reader and entity.status >= PUBLISHED_THRESHOLD:
-            return True
-    return False
+    return entity.project_id in permissions().get('reader')
 
 
 def entity_edit(entity):
-    return project_edit(entity.project)
+    return entity.project_id in permissions().get('editor')
 
 
 def entity_manage(entity):
-    return project_manage(entity.project)
+    return entity.project_id in permissions().get('admin')
 
 
 def entity_delete(entity):
@@ -77,15 +85,15 @@ def entity_delete(entity):
 
 
 def relation_read(relation):
-    return entity_read(relation.source) and entity_read(relation.target)
+    return relation.project_id in permissions().get('reader')
 
 
 def relation_edit(relation):
-    return entity_edit(relation.source) and entity_edit(relation.target)
+    return relation.project_id in permissions().get('editor')
 
 
 def relation_manage(relation):
-    return entity_manage(relation.source) and entity_manage(relation.target)
+    return relation.project_id in permissions().get('admin')
 
 
 def require(pred):

@@ -123,7 +123,7 @@ def make_facets(parent_alias, filter_func, parser_func):
     for facet in request.args.getlist('facet'):
         parent_obj = parent_alias()
         q = db.session.query()
-        facet_count = func.count(func.distinct(parent_obj.id))
+        facet_count = func.count(parent_obj.id)
         q = q.add_columns(facet_count)
         q = q.order_by(facet_count.desc())
         q = filter_func(q, parent_obj)

@@ -22,7 +22,6 @@ def index():
     alias = aliased(Relation)
     q = db.session.query(alias)
     query = filters.for_relations(q, alias)
-    query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     result = pager.to_dict()

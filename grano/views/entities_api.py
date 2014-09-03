@@ -24,7 +24,6 @@ def index():
     alias = aliased(Entity)
     q = db.session.query(alias)
     query = filters.for_entities(q, alias)
-    query = query.distinct()
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     result = pager.to_dict()

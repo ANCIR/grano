@@ -2,9 +2,9 @@ from flask import request
 from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
+from grano.authz import permissions
 from grano.model import Project, Permission, Attribute, Relation
 from grano.model import Entity, Property, Schema
-from grano.authz import PUBLISHED_THRESHOLD
 from grano.lib.args import single_arg
 
 
@@ -34,37 +34,17 @@ def property_filters(cls, q):
 
 
 def for_relations(q, Rel):
-    Proj = aliased(Project)
-    Perm = aliased(Permission)
-    Source = aliased(Entity)
-    Target = aliased(Entity)
-    q = q.join(Proj, Rel.project)
-    q = q.join(Source, Rel.source)
-    q = q.join(Target, Rel.target)
-    q = q.outerjoin(Perm, Proj.permissions)
+    #Source = aliased(Entity)
+    #Target = aliased(Entity)
+    #q = q.join(Source, Rel.source)
+    #q = q.join(Target, Rel.target)
 
-    q = q.filter(or_(Proj.private == False,
-        and_(Perm.reader == True, Perm.account == request.account)))
-    q = q.filter(or_(
-        and_(
-            Proj.private == False,
-            Source.status >= PUBLISHED_THRESHOLD,
-            Target.status >= PUBLISHED_THRESHOLD,
-        ),
-        and_(
-            Perm.reader == True,
-            Source.status >= PUBLISHED_THRESHOLD,
-            Target.status >= PUBLISHED_THRESHOLD,
-            Perm.account == request.account
-        ),
-        and_(
-            Perm.editor == True,
-            Perm.account == request.account
-        )
-    ))
+    q = q.filter(Rel.project_id.in_(permissions().get('reader')))
 
     project = single_arg('project')
     if project:
+        Proj = aliased(Project)
+        q = q.join(Proj, Rel.project)
         q = q.filter(Proj.slug == project)
 
     q = property_filters(Relation, q)
@@ -90,28 +70,12 @@ def for_entities(q, Ent):
     # NOTE: I'm passing in the query and entity alias so that this
     # function can be re-used from the facetting code to constrain
     # the results of the facet sub-query.
-    Proj = aliased(Project)
-    Perm = aliased(Permission)
-    q = q.join(Proj, Ent.project).outerjoin(Perm, Proj.permissions)
     q = q.filter(Ent.same_as == None)
-
-    q = q.filter(or_(
-        and_(
-            Proj.private == False,
-            Ent.status >= PUBLISHED_THRESHOLD,
-        ),
-        and_(
-            Perm.reader == True,
-            Ent.status >= PUBLISHED_THRESHOLD,
-            Perm.account == request.account
-        ),
-        and_(
-            Perm.editor == True,
-            Perm.account == request.account
-        )
-    ))
+    q = q.filter(Ent.project_id.in_(permissions().get('reader')))
 
     if 'project' in request.args:
+        Proj = aliased(Project)
+        q = q.join(Proj, Ent.project)
         q = q.filter(Proj.slug == single_arg('project'))
 
     q = property_filters(Entity, q)
