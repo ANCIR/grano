@@ -108,6 +108,8 @@ class Pager(object):
         return url
 
     def __iter__(self):
+        if self.limit == 0:
+            return iter([])
         if self._results is None:
             query = self.query
             query = query.limit(self.limit)
