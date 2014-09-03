@@ -1,18 +1,17 @@
 from StringIO import StringIO
 
-from flask import Blueprint, render_template, Response, request
-from flask import redirect, make_response, url_for, send_file
-from sqlalchemy import or_, and_
+from flask import Blueprint, Response, request
+from flask import send_file
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
-from grano.model import Project, Permission
+from grano.model import Project
 from grano.logic import projects
 from grano.logic.aliases import export_aliases
 from grano.lib.pager import Pager
 from grano.logic.graph import GraphExtractor
 from grano.lib.exc import Gone
-from grano.core import app, db
+from grano.core import db
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -23,10 +22,7 @@ blueprint = Blueprint('projects_api', __name__)
 @blueprint.route('/api/1/projects', methods=['GET'])
 def index():
     q = Project.all()
-    q = q.outerjoin(Permission)
-    q = q.filter(or_(Project.private==False,
-        and_(Permission.reader==True, Permission.account==request.account)))
-    q = q.distinct()
+    q = q.filter(Project.id.in_(authz.permissions().get('reader')))
     pager = Pager(q)
     validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=True)
@@ -70,7 +66,7 @@ def graph(slug):
         validate_cache(keys=extractor.to_hash())
     if extractor.format == 'gexf':
         return Response(extractor.to_gexf(),
-                mimetype='text/xml')
+                        mimetype='text/xml')
     return jsonify(extractor)
 
 
