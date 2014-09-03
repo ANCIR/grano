@@ -1,3 +1,6 @@
+from time import time
+import logging
+
 from colander import Invalid
 from flask import request
 from werkzeug.exceptions import HTTPException
@@ -18,6 +21,9 @@ from grano.views.pipelines_api import blueprint as pipelines_api
 from grano.views.log_entries_api import blueprint as log_entries_api
 from grano.views.permissions_api import blueprint as permissions_api
 from grano.views.auth import check_auth
+
+
+log = logging.getLogger(__name__)
 
 
 @app.errorhandler(401)
@@ -56,6 +62,18 @@ def handle_invalid(exc):
     }
     return jsonify(body, status=400)
 
+
+@app.before_request
+def begin_timing():
+    request._begin_time = time()
+
+
+@app.after_request
+def end_timing(response):
+    duration = (time() - request._begin_time) * 1000
+    log.info('Request to \'%s\' (args: %r) took: %dms',
+             request.path, request.args.items(), duration)
+    return response
 
 app.register_blueprint(base_api)
 app.register_blueprint(entities_api)
