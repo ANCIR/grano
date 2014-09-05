@@ -2,6 +2,7 @@ from StringIO import StringIO
 
 from flask import Blueprint, request
 from flask import send_file
+from flask_pager import Pager
 from sqlalchemy import or_, and_
 
 from grano.lib.serialisation import jsonify
@@ -9,7 +10,6 @@ from grano.lib.args import object_or_404, request_data, get_limit
 from grano.model import Project, File, Permission
 from grano.logic import files, entities
 from grano.logic.references import ProjectRef
-from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import db
 from grano.views.cache import validate_cache

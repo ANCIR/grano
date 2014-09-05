@@ -1,9 +1,9 @@
 from flask import Blueprint, request
+from flask_pager import Pager
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404
 from grano.model import Pipeline, LogEntry
-from grano.lib.pager import Pager
 from grano.views.cache import validate_cache
 from grano import authz
 

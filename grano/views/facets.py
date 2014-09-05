@@ -1,10 +1,10 @@
 from flask import request
+from flask_pager import Pager
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 
 from grano.lib.exc import BadRequest
 from grano.lib.args import arg_bool
-from grano.lib.pager import Pager
 from grano.model import Project, Relation
 from grano.model import Entity, Property, Schema, db
 from grano.views import filters

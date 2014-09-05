@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_pager import Pager
 from sqlalchemy.orm import aliased
 
 from grano.lib.serialisation import jsonify
@@ -7,7 +8,6 @@ from grano.model import Relation
 from grano.logic import relations
 from grano.logic.references import ProjectRef
 from grano.views.cache import validate_cache
-from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import db
 from grano.views import filters, facets

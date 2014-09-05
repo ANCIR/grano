@@ -2,13 +2,13 @@ from StringIO import StringIO
 
 from flask import Blueprint, request
 from flask import send_file
+from flask_pager import Pager
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
 from grano.model import Project
 from grano.logic import projects
 from grano.logic.aliases import export_aliases
-from grano.lib.pager import Pager
 from grano.lib.exc import Gone
 from grano.core import db
 from grano.views.cache import validate_cache
