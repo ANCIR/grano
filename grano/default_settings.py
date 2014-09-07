@@ -1,6 +1,7 @@
 
 DEBUG = True
 ASSETS_DEBUG = False
+DEBUG_TIMING = False
 
 # For production, it's essential that this is set:
 

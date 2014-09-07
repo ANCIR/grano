@@ -70,9 +70,10 @@ def begin_timing():
 
 @app.after_request
 def end_timing(response):
-    duration = (time() - request._begin_time) * 1000
-    log.debug('Request to \'%s\' (args: %r) took: %dms',
-              request.path, request.args.items(), duration)
+    if app.config.get('DEBUG_TIMING'):
+        duration = (time() - request._begin_time) * 1000
+        log.debug('Request to \'%s\' (args: %r) took: %dms',
+                  request.path, request.args.items(), duration)
     return response
 
 app.register_blueprint(base_api)
