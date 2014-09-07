@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_pager import Pager
-from sqlalchemy import or_
+from sqlalchemy import or_, not_
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
@@ -22,6 +22,9 @@ def suggest():
     q = q.filter(or_(Account.full_name.ilike(query),
                      Account.login.ilike(query),
                      Account.email.ilike(query)))
+    excluded = request.args.getlist('exclude')
+    if len(excluded):
+        q = q.filter(not_(Account.id.in_(excluded)))
     pager = Pager(q)
 
     def convert(accounts):
