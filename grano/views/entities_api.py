@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from flask_pager import Pager
 from sqlalchemy.orm import aliased
+from sqlalchemy import not_
 
 from grano.lib.serialisation import jsonify
 from grano.lib.exc import BadRequest, Gone
@@ -60,7 +61,11 @@ def suggest():
     q = q.filter(Property.entity_id != None)
     q = q.filter(Property.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
+        q = q.join(Project)
         q = q.filter(Project.slug == request.args.get('project'))
+    if 'exclude' in request.args:
+        ents = request.args.getlist('exclude')
+        q = q.filter(not_(Property.entity_id.in_(ents)))
     q = q.distinct()
     pager = Pager(q)
 
