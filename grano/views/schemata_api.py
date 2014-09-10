@@ -22,7 +22,6 @@ def index(slug):
     query = Schema.all()
     query = query.filter_by(project=project)
     pager = Pager(query, slug=slug)
-    validate_cache(keys=pager.cache_keys())
     return jsonify(pager, index=not arg_bool('full'))
 
 
