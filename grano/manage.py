@@ -11,6 +11,7 @@ from grano.logic import rebuild as rebuild_
 from grano.logic.accounts import console_account
 from grano.logic.projects import save as save_project
 from grano.plugins import list_plugins, notify_plugins
+from grano.background import periodic as periodic_task
 
 
 log = logging.getLogger('grano')
@@ -62,6 +63,12 @@ def alias_export(project, path):
 def rebuild():
     """ Trigger change processing on all relations and entities. """
     rebuild_()
+
+
+@manager.command
+def periodic():
+    """ Trigger the periodic background service. """
+    periodic_task()
 
 
 @manager.command

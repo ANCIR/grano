@@ -8,6 +8,7 @@ log = logging.getLogger(__name__)
 
 NAMESPACES = [
     'grano.startup',
+    'grano.periodic',
     'grano.entity.change',
     'grano.relation.change',
     'grano.schema.change',
@@ -17,7 +18,8 @@ PLUGINS = {'LOADED': False, 'MANAGERS': {}}
 
 
 def _get_manager(namespace):
-    enabled_plugins = app.config.get('PLUGINS', [])
+    default_plugins = app.config.get('DEFAULT_PLUGINS', [])
+    enabled_plugins = app.config.get('PLUGINS', []) + default_plugins
     available_plugins = set()
 
     assert namespace in NAMESPACES, \

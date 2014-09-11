@@ -1,3 +1,4 @@
+from datetime import timedelta
 
 DEBUG = True
 ASSETS_DEBUG = False
@@ -35,9 +36,19 @@ CELERY_ALWAYS_EAGER = True
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
+CELERYBEAT_SCHEDULE = {
+    'periodic-tasks': {
+        'task': 'grano.background.periodic',
+        'schedule': timedelta(minutes=30)
+    },
+}
+
+CELERY_TIMEZONE = 'UTC'
+
 # Otherwise, just set the task broker URI which you intend to
 # use:
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 
+DEFAULT_PLUGINS = ['degrees']
 PLUGINS = []

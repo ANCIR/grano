@@ -37,6 +37,9 @@ setup(
         'grano.project.change': [],
         'grano.schema.change': [],
         'grano.startup': [],
+        'grano.periodic': [
+            'degrees = grano.logic.metrics:Degrees'
+        ],
         'console_scripts': [
             'grano = grano.manage:run',
         ]

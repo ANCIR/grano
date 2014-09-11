@@ -65,3 +65,13 @@ class Startup(object):
     @abc.abstractmethod
     def configure(self, manager):
         """ Run this on startup. """
+
+
+class Periodic(object):
+    """ This interface will be called periodically, to execute house
+    keeping jobs. The exact period is up to the type of deployment.
+    """
+
+    @abc.abstractmethod
+    def run(self):
+        """ Run an action. """
