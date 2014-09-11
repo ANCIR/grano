@@ -16,10 +16,6 @@ log = logging.getLogger(__name__)
 class EntityBaseValidator(colander.MappingSchema):
     author = colander.SchemaNode(AccountRef())
     project = colander.SchemaNode(ProjectRef())
-    status = colander.SchemaNode(colander.Integer(),
-                                 default=20,
-                                 missing=20,
-                                 validator=colander.Range(0, 100))
 
 
 class MergeValidator(colander.MappingSchema):
@@ -76,7 +72,6 @@ def save(data, files=None, entity=None):
         entity.author = data.get('author')
         db.session.add(entity)
 
-    entity.status = data.get('status')
     entity.schemata = data.get('schemata')
 
     prop_names = set()
