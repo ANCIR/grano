@@ -20,6 +20,10 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
+    degree_in = db.Column(db.Integer)
+    degree_out = db.Column(db.Integer)
+    degree = db.Column(db.Integer)
+
     schemata = db.relationship('Schema', secondary=entity_schema,
                                backref=db.backref('entities', lazy='dynamic'))
     inbound = db.relationship('Relation', lazy='dynamic', backref='target',
@@ -89,10 +93,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     def outbound_by_schema(self, schema):
         q = self.outbound.filter_by(schema=schema)
         return q
-
-    @property
-    def degree(self):
-        return self.inbound.count() + self.outbound.count()
 
     def to_dict_index(self):
         """ Convert an entity to the REST API form. """
