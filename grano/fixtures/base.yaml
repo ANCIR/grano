@@ -5,13 +5,14 @@
 #
 
 
-# Overwrite the base model to add some common properties.
-- name: 'base'
-  label: 'Common base schema'
+#####################################################################
+# Entity: Entity (base schema)
+#####################################################################
+- name: 'Entity'
+  label: 'Entity base schema'
   obj: 'entity'
   hidden: true
   attributes:
-
     # Core identifier.
     - name: name
       label: Name
@@ -58,6 +59,7 @@
 #####################################################################
 - name: 'Person'
   label: 'Person'
+  parent: 'Entity'
   description: 'A natural person'
   hidden: false
   obj: entity
@@ -96,6 +98,7 @@
 #####################################################################
 - name: 'Organization'
   label: 'Organization'
+  parent: 'Entity'
   description: 'A legal entity or state institution'
   hidden: false
   obj: 'entity'
@@ -125,6 +128,7 @@
 #####################################################################
 - name: 'PublicBody'
   label: 'Public body'
+  parent: 'Organization'
   description: 'Government statutory corporation or public body'
   hidden: false
   obj: 'entity'
@@ -141,8 +145,9 @@
 #####################################################################
 # Entity: PublicCompany
 #####################################################################
-- name: 'PublicCompany'
+- name: 'Company'
   label: 'Publicly-traded company'
+  parent: 'Organization'
   description: 'A company traded on a public stock market'
   hidden: false
   obj: 'entity'
@@ -161,6 +166,7 @@
 #####################################################################
 - name: 'PoliticalParty'
   label: 'Political party'
+  parent: 'Organization'
   description: 'A political party'
   hidden: false
   obj: 'entity'
@@ -169,16 +175,14 @@
   attributes: []
 
 
+
 #####################################################################
-# Relation: Membership
+# Relation: Relation (base schema)
 #####################################################################
-- name: 'Membership'
-  label: 'Member'
-  description: 'An entity is a member of an organization'
-  hidden: false
+- name: 'Relation'
+  label: 'Relation base schema'
+  hidden: true
   obj: relation
-  meta:
-    see_also: 'http://popoloproject.com/specs/membership.html'
   attributes:
     - name: date_start
       label: 'Start date'
@@ -186,6 +190,20 @@
     - name: date_end
       label: 'End date'
       datatype: datetime
+
+
+#####################################################################
+# Relation: Membership
+#####################################################################
+- name: 'Membership'
+  label: 'Member'
+  parent: 'Relation'
+  description: 'An entity is a member of an organization'
+  hidden: false
+  obj: relation
+  meta:
+    see_also: 'http://popoloproject.com/specs/membership.html'
+  attributes:
     - name: role
       label: 'Role'
 
@@ -195,16 +213,11 @@
 #####################################################################
 - name: 'Partnership'
   label: 'Partner'
+  parent: 'Relation'
   description: 'Two entities are associated by some type of agreement'
   hidden: false
   obj: relation
   attributes:
-    - name: date_start
-      label: 'Start date'
-      datatype: datetime
-    - name: date_end
-      label: 'End date'
-      datatype: datetime
     - name: extent
       label: 'Extent'
 
@@ -214,16 +227,11 @@
 #####################################################################
 - name: 'Personal'
   label: 'Personal'
+  parent: 'Relation'
   description: 'Personal relationships, such as friendship or family'
   hidden: false
   obj: relation
   attributes:
-    - name: date_start
-      label: 'Start date'
-      datatype: datetime
-    - name: date_end
-      label: 'End date'
-      datatype: datetime
     - name: type
       label: 'Type'
 
@@ -233,15 +241,11 @@
 #####################################################################
 - name: 'FinancialInterest'
   label: 'Financial interest'
+  parent: 'Relation'
   description: 'An entity has a financial interest (e.g. shares) in another'
   hidden: false
   obj: relation
   attributes:
-    - name: date_start
-      label: 'Start date'
-      datatype: datetime
-    - name: date_end
-      label: 'End date'
       datatype: datetime
     - name: nature
       label: 'Nature of the interest'

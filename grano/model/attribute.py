@@ -18,6 +18,7 @@ class Attribute(db.Model, IntBase):
     label = db.Column(db.Unicode())
     description = db.Column(db.Unicode())
     hidden = db.Column(db.Boolean())
+    inherited = db.Column(db.Boolean(), default=False)
     datatype = db.Column(db.Unicode())
 
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
@@ -46,6 +47,7 @@ class Attribute(db.Model, IntBase):
         return {
             'name': self.name,
             'label': self.label,
+            'inherited': self.inherited,
             'datatype': self.datatype
         }
 

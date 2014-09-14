@@ -5,7 +5,8 @@ from grano.model.attribute import Attribute
 from grano.model.property import Property
 
 
-ENTITY_DEFAULT_SCHEMA = 'base'
+ENTITY_DEFAULT = 'Entity'
+RELATION_DEFAULT = 'Relation'
 
 
 class Schema(db.Model, IntBase):
@@ -16,6 +17,9 @@ class Schema(db.Model, IntBase):
     hidden = db.Column(db.Boolean())
     obj = db.Column(db.Unicode())
     meta = db.Column(MutableDict.as_mutable(JSONEncodedDict))
+    project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
+    parent_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'),
+                          nullable=True)
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic',
                                  cascade='all, delete, delete-orphan')
@@ -23,12 +27,23 @@ class Schema(db.Model, IntBase):
                                  cascade='all, delete, delete-orphan')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic',
                                 cascade='all, delete, delete-orphan')
-    project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
+    children = db.relationship('Schema', backref='parent', lazy='dynamic')
 
     def get_attribute(self, name):
         for attribute in self.attributes:
             if attribute.name == name:
                 return attribute
+
+    def is_circular(self, path=None):
+        if path is None:
+            path = []
+        if self.name in path:
+            return True
+        elif self.parent is None:
+            return False
+        else:
+            path.append(self.name)
+            return self.parent.is_circular(path)
 
     @classmethod
     def by_name(cls, project, name):
@@ -47,7 +62,6 @@ class Schema(db.Model, IntBase):
     def to_dict_index(self):
         return {
             'name': self.name,
-            'default': self.name == ENTITY_DEFAULT_SCHEMA,
             'label': self.label,
             'hidden': self.hidden,
             'meta': self.meta,
@@ -60,6 +74,7 @@ class Schema(db.Model, IntBase):
     def to_dict(self):
         data = self.to_dict_index()
         data['id'] = self.id
+        data['parent'] = self.parent.to_dict_index()
         data['project'] = self.project.to_dict_index()
         data['attributes'] = [a.to_dict() for a in self.attributes]
         return data
