@@ -7,8 +7,10 @@ DEFAULT_SOURCE_URL = 'http://www.opennews.org/'
 # Any settings (free-form dict):
 PROJECT_SETTINGS = {}
  
-loader = Loader('opennews2', project_label='opennews',
-    project_settings=PROJECT_SETTINGS, source_url=DEFAULT_SOURCE_URL)
+loader = Loader('opennews',
+                project_label='opennews',
+                project_settings=PROJECT_SETTINGS,
+                source_url=DEFAULT_SOURCE_URL)
  
 reader = unicodecsv.reader(open('fellows.csv'))
 reader.next()
@@ -21,12 +23,12 @@ for record in reader:
  
     news_org = loader.make_entity(['news_organization'])
     news_org.set('name', record[4])
-    news_org.set('url', record[5])
+    news_org.set('contact_url', record[5])
     news_org.save()
  
     fellowship = loader.make_relation('fellowship', fellow, news_org)
-    fellowship.set('start_date', record[2])
-    fellowship.set('end_date', record[3])
+    fellowship.set('date_start', record[2])
+    fellowship.set('date_end', record[3])
     fellowship.save()
 
 loader.persist()

@@ -115,7 +115,7 @@ def update_attributes(schema, create=None, operation='update'):
     # process local attributes
     if create is not None:
         for attribute in create:
-            if attribute.name not in names:
+            if attribute.get('name') not in names:
                 attribute['schema'] = schema
                 attr = attributes.save(attribute)
                 schema.attributes.append(attr)
@@ -125,7 +125,7 @@ def update_attributes(schema, create=None, operation='update'):
             if attr.name not in names:
                 attributes.delete(attr)
 
-    db.session.flush(schema)
+    db.session.flush()
     _schema_changed(schema.project.slug, schema.name, operation)
 
     # propagate changes

@@ -27,7 +27,8 @@ class Schema(db.Model, IntBase):
                                  cascade='all, delete, delete-orphan')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic',
                                 cascade='all, delete, delete-orphan')
-    children = db.relationship('Schema', backref='parent', lazy='dynamic')
+    children = db.relationship('Schema', lazy='dynamic',
+                               backref=db.backref('parent', remote_side='Schema.id'))
 
     def get_attribute(self, name):
         for attribute in self.attributes:
