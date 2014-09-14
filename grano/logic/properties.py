@@ -33,34 +33,32 @@ def validate_name(project, obj):
     return colander.All(name_unique, colander.Length(min=1))
 
 
-def validate(obj_type, obj, schemata, project, properties):
+def validate(obj_type, obj, schema, project, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
 
     validator = colander.SchemaNode(colander.Mapping(), name='properties')
-    for schema in schemata:
-        for attr in schema.attributes:
-            attrib = colander.SchemaNode(colander.Mapping(),
-                                         name=attr.name,
-                                         missing=colander.null)
+    for attr in schema.attributes:
+        attrib = colander.SchemaNode(colander.Mapping(),
+                                     name=attr.name,
+                                     missing=colander.null)
 
-            if attr.name == 'name' and obj_type == 'entity':
-                attrib.add(colander.SchemaNode(colander.String(),
-                           missing=colander.required, name='value',
-                           validator=validate_name(project, obj)))
-            else:
-                T = DATATYPE_TYPES.get(attr.datatype)
-                attrib.add(colander.SchemaNode(T, missing=None, name='value'))
-
-            attrib.add(colander.SchemaNode(colander.Boolean(),
-                                           default=True, missing=True,
-                                           name='active'))
-            attrib.add(colander.SchemaNode(FixedValue(schema), name='schema'))
-            attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
-
+        if attr.name == 'name' and obj_type == 'entity':
             attrib.add(colander.SchemaNode(colander.String(),
-                                           missing=None, name='source_url'))
-            validator.add(attrib)
+                       missing=colander.required, name='value',
+                       validator=validate_name(project, obj)))
+        else:
+            T = DATATYPE_TYPES.get(attr.datatype)
+            attrib.add(colander.SchemaNode(T, missing=None, name='value'))
+
+        attrib.add(colander.SchemaNode(colander.Boolean(),
+                                       default=True, missing=True,
+                                       name='active'))
+        attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
+
+        attrib.add(colander.SchemaNode(colander.String(),
+                                       missing=None, name='source_url'))
+        validator.add(attrib)
 
     properties = validator.deserialize(properties)
     out = {}
@@ -113,13 +111,11 @@ def save(obj, data, files=None):
 
     prop.name = data.get('name')
     prop.author = data.get('author')
-    prop.schema = data.get('schema')
     prop.attribute = data.get('attribute')
     prop.active = data.get('active')
     prop.source_url = data.get('source_url')
     prop.updated_at = datetime.utcnow()
     obj.updated_at = datetime.utcnow()
-
     return prop
 
 

@@ -46,7 +46,7 @@ def parse_entity_facets(entity_obj, full_facet, facet, q):
         facet_obj = aliased(Schema)
         if not arg_bool('facet_%s_hidden' % full_facet, default=False):
             q = q.filter(facet_obj.hidden == False)
-        q = q.join(facet_obj, entity_obj.schemata)
+        q = q.join(facet_obj, entity_obj.schema)
         return apply_facet_obj(q, facet_obj)
     elif facet.startswith('properties.'):
         return apply_property_facet(q, facet, Property,

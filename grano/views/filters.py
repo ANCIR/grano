@@ -1,9 +1,8 @@
 from flask import request
-from sqlalchemy import or_, and_
 from sqlalchemy.orm import aliased
 
 from grano.authz import permissions
-from grano.model import Project, Permission, Attribute, Relation
+from grano.model import Project, Attribute, Relation
 from grano.model import Entity, Property, Schema
 from grano.lib.args import single_arg
 
@@ -70,7 +69,7 @@ def for_entities(q, Ent):
     # NOTE: I'm passing in the query and entity alias so that this
     # function can be re-used from the facetting code to constrain
     # the results of the facet sub-query.
-    q = q.filter(Ent.same_as == None)
+    q = q.filter(Ent.same_as == None) # noqa
     q = q.filter(Ent.project_id.in_(permissions().get('reader')))
 
     if 'project' in request.args:
@@ -91,7 +90,6 @@ def for_entities(q, Ent):
         if not len(schema.strip()):
             continue
         alias = aliased(Schema)
-        q = q.join(alias, Ent.schemata)
+        q = q.join(alias, Ent.schema)
         q = q.filter(alias.name.in_(schema.split(',')))
-
     return q

@@ -12,9 +12,9 @@ log = logging.getLogger(__name__)
 class ObjectLoader(object):
     # Abstract parent
 
-    def _setup(self, loader, schemata):
+    def _setup(self, loader, schema):
         self.loader = loader
-        self.schemata = schemata
+        self.schema = schema
         self.properties = {}
         self.update_criteria = set()
 
@@ -54,8 +54,8 @@ class EntityLoader(ObjectLoader):
     """ A factory object for entities, used to set the schemata and
     properties for an entity. """
 
-    def __init__(self, loader, schemata, source_url=None):
-        self._setup(loader, schemata)
+    def __init__(self, loader, schema, source_url=None):
+        self._setup(loader, schema)
         self.unique('name', only_active=False)
         self.source_url = source_url
         self._entity = None
@@ -83,7 +83,7 @@ class EntityLoader(ObjectLoader):
             data = {
                 'project': self.loader.project,
                 'author': self.loader.account,
-                'schemata': self.schemata,
+                'schema': self.schema,
                 'properties': self.properties
             }
             self._entity = entities.save(data, entity=entity)
@@ -99,7 +99,7 @@ class RelationLoader(ObjectLoader):
     its schema, source entity, target entity and a set of properties. """
 
     def __init__(self, loader, schema, source, target, source_url=None):
-        self._setup(loader, [schema])
+        self._setup(loader, schema)
         self.source_url = source_url
         self.source = source
         self.target = target
@@ -125,7 +125,7 @@ class RelationLoader(ObjectLoader):
             data = {
                 'project': self.loader.project,
                 'author': self.loader.account,
-                'schema': self.schemata.pop(),
+                'schema': self.schema,
                 'properties': self.properties,
                 'source': self.source.entity,
                 'target': self.target.entity
@@ -160,18 +160,17 @@ class Loader(object):
             'settings': project_settings
             }, project=project)
 
-    def make_entity(self, schemata, source_url=None):
+    def make_entity(self, schema, source_url=None):
         """ Create an entity loader, i.e. a construction helper for entities.
 
-        :param schemata: A list of schema names for all the schemata that
-            the entity should be associated with.
+        :param schema: The schema that the entity should be associated with.
         :param source_url: A URL which will be made the default source for all
             properties defined on this entity.
 
         :returns: :py:class:`EntityLoader <grano.logic.loader.EntityLoader>`
         """
-        entity = EntityLoader(self, schemata,
-                              source_url=source_url or self.source_url)
+        source_url = source_url or self.source_url
+        entity = EntityLoader(self, schema, source_url=source_url)
         return entity
 
     def make_relation(self, schema, source, target, source_url=None):
@@ -190,7 +189,6 @@ class Loader(object):
         :returns: :py:class:`RelationLoader
             <grano.logic.loader.RelationLoader>`
         """
-
         relation = RelationLoader(self, schema, source, target,
                                   source_url=source_url or self.source_url)
         return relation

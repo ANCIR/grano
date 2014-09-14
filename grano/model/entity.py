@@ -6,12 +6,6 @@ from grano.model.schema import Schema
 from grano.model.property import Property, PropertyBase
 
 
-entity_schema = db.Table('grano_entity_schema',
-    db.Column('entity_id', db.Unicode, db.ForeignKey('grano_entity.id')),
-    db.Column('schema_id', db.Integer, db.ForeignKey('grano_schema.id'))
-)
-
-
 class Entity(db.Model, UUIDBase, PropertyBase):
     __tablename__ = 'grano_entity'
 
@@ -19,13 +13,13 @@ class Entity(db.Model, UUIDBase, PropertyBase):
                         nullable=True)
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
+    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'),
+                          index=True)
 
     degree_in = db.Column(db.Integer)
     degree_out = db.Column(db.Integer)
     degree = db.Column(db.Integer)
 
-    schemata = db.relationship('Schema', secondary=entity_schema,
-                               backref=db.backref('entities', lazy='dynamic'))
     inbound = db.relationship('Relation', lazy='dynamic', backref='target',
                               primaryjoin='Entity.id==Relation.target_id',
                               cascade='all, delete, delete-orphan')
@@ -55,55 +49,33 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         q = cls._filter_property(q, [attr], name, only_active=only_active)
         return q
 
-    @classmethod
-    def by_id_many(cls, ids, account=None):
-        from grano.model import Project, Permission
-        q = db.session.query(cls)
-        q = q.filter(cls.id.in_(ids))
-        if account is not None:
-            q = q.join(Project)
-            q = q.outerjoin(Permission)
-            q = q.filter(or_(Project.private == False, # noqa
-                and_(Permission.reader == True, Permission.account == account)))
-        id_map = {}
-        for e in q.all():
-            id_map[e.id] = e
-        return id_map
-
-    @property
-    def inbound_schemata(self):
-        from grano.model.relation import Relation
-        q = db.session.query(Schema)
-        q = q.join(Schema.relations)
-        q = q.filter(Relation.target_id == self.id)
-        return q.distinct()
-
-    def inbound_by_schema(self, schema):
-        q = self.inbound.filter_by(schema=schema)
-        return q
-
-    @property
-    def outbound_schemata(self):
-        from grano.model.relation import Relation
-        q = db.session.query(Schema)
-        q = q.join(Schema.relations)
-        q = q.filter(Relation.source_id == self.id)
-        return q.distinct()
-
-    def outbound_by_schema(self, schema):
-        q = self.outbound.filter_by(schema=schema)
-        return q
+    # @classmethod
+    # def by_id_many(cls, ids, account=None):
+    #     from grano.model import Project, Permission
+    #     q = db.session.query(cls)
+    #     q = q.filter(cls.id.in_(ids))
+    #     if account is not None:
+    #         q = q.join(Project)
+    #         q = q.outerjoin(Permission)
+    #         q = q.filter(or_(Project.private == False, # noqa
+    #             and_(Permission.reader == True, Permission.account == account)))
+    #     id_map = {}
+    #     for e in q.all():
+    #         id_map[e.id] = e
+    #     return id_map
 
     def to_dict_index(self):
         """ Convert an entity to the REST API form. """
         data = {
             'id': self.id,
+            'degree': self.degree,
+            'degree_in': self.degree_in,
+            'degree_out': self.degree_out,
             'project': self.project.to_dict_index(),
+            'schema': self.schema.to_dict_index(),
             'api_url': url_for('entities_api.view', id=self.id),
             'properties': {}
         }
-
-        data['schemata'] = [s.to_dict_index() for s in self.schemata]
 
         for prop in self.active_properties:
             name, prop = prop.to_dict_kv()
@@ -120,19 +92,16 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         data['created_at'] = self.created_at
         data['updated_at'] = self.updated_at
 
-        data['inbound_relations'] = self.inbound.count()
-        if data['inbound_relations'] > 0:
+        if data['degree_in'] > 0:
             data['inbound_url'] = url_for('relations_api.index', target=self.id)
 
-        data['outbound_relations'] = self.outbound.count()
-        if data['outbound_relations'] > 0:
+        if data['degree_out'] > 0:
             data['outbound_url'] = url_for('relations_api.index', source=self.id)
         return data
 
     def to_index(self):
         """ Convert an entity to a form appropriate for search indexing. """
         data = self.to_dict()
-        data['degree'] = self.degree
 
         data['names'] = []
         for prop in self.properties:

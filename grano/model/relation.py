@@ -21,10 +21,6 @@ class Relation(db.Model, UUIDBase, PropertyBase):
                                  cascade='all, delete, delete-orphan',
                                  backref='relation', lazy='dynamic')
 
-    @property
-    def schemata(self):
-        return [self.schema]
-
     def to_dict_base(self):
         return {
             'id': self.id,

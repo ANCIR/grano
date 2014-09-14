@@ -9,7 +9,6 @@ from grano.model.attribute import Attribute
 class Property(db.Model, IntBase):
     __tablename__ = 'grano_property'
 
-    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
     attribute_id = db.Column(db.Integer, db.ForeignKey('grano_attribute.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 

@@ -55,8 +55,7 @@ class SchemaValidator(colander.MappingSchema):
 
 def validate(data):
     """ Validate the incoming data. """
-    schema_val = SchemaValidator(validator=check_attributes)
-    sane = schema_val.deserialize(data)
+    sane = SchemaValidator().deserialize(data)
 
     class ParentValidator(colander.MappingSchema):
         parent = SchemaNode(SchemaRef(sane.get('project')),
@@ -97,12 +96,7 @@ def save(data, schema=None):
 
 def update_attributes(schema, create=None, operation='update'):
     names = []
-
-    # reset parent attributes
-    for attr in schema.attributes:
-        if attr.inherited:
-            attributes.delete(attr)
-
+    
     # get all parent attributes
     if schema.parent:
         for pattr in schema.parent.attributes:
@@ -120,10 +114,14 @@ def update_attributes(schema, create=None, operation='update'):
                 attr = attributes.save(attribute)
                 schema.attributes.append(attr)
                 names.append(attr.name)
-
+    else:
         for attr in schema.attributes:
-            if attr.name not in names:
-                attributes.delete(attr)
+            if not attr.inherited:
+                names.append(attr.name)
+
+    for attr in schema.attributes:
+        if attr.name not in names:
+            attributes.delete(attr)
 
     db.session.flush()
     _schema_changed(schema.project.slug, schema.name, operation)
@@ -174,24 +172,3 @@ def export_schema(project, path):
                                     default_flow_style=False,
                                     indent=4)
             fh.write(dumped)
-
-
-def check_attributes(form, value):
-    """ Form validator to check that the all attribute names used
-    by this schema are unused. """
-
-    if value.get('obj') == 'relation':
-        return
-
-    for attr in value.get('attributes', []):
-        q = db.session.query(Attribute)
-        q = q.filter(Attribute.name == attr.get('name'))
-        q = q.join(Schema)
-        q = q.filter(Schema.obj == value.get('obj'))
-        q = q.filter(Schema.name != value.get('name'))
-        q = q.filter(Schema.project == value.get('project'))
-        attrib = q.first()
-        if attrib is not None:
-            raise Invalid(form,
-                          "Attribute '%s' already declared in schema '%s'"
-                          % (attr.get('name'), attrib.schema.name))
