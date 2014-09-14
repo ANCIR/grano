@@ -13,7 +13,7 @@ entities:
      - column: 'organization_name'
        property: 'name'
      - column: 'organization_url'
-       property: 'url'
+       property: 'contact_url'
 
 relations:
   fellowship:
@@ -22,8 +22,8 @@ relations:
     target: 'newsorg'
     columns:
       - column: 'start_date'
-        property: 'start_date'
+        property: 'date_start'
         type: 'date'
       - column: 'end_date'
-        property: 'end_date'
+        property: 'date_end'
         type: 'date'

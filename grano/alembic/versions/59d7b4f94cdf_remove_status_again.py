@@ -1,14 +1,14 @@
 """remove status again
 
 Revision ID: 59d7b4f94cdf
-Revises: 3ab60d7d74a1
+Revises: 5143617349b9
 Create Date: 2014-09-11 20:28:20.938462
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '59d7b4f94cdf'
-down_revision = '3ab60d7d74a1'
+down_revision = '5143617349b9'
 
 from alembic import op
 import sqlalchemy as sa

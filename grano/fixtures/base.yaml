@@ -234,22 +234,3 @@
   attributes:
     - name: type
       label: 'Type'
-
-
-#####################################################################
-# Relation: FinancialInterest
-#####################################################################
-- name: 'FinancialInterest'
-  label: 'Financial interest'
-  parent: 'Relation'
-  description: 'An entity has a financial interest (e.g. shares) in another'
-  hidden: false
-  obj: relation
-  attributes:
-      datatype: datetime
-    - name: nature
-      label: 'Nature of the interest'
-    - name: shares_number
-      label: 'Number of shares'
-    - name: nominal_value
-      label: 'Nominal value'
