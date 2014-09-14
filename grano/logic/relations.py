@@ -35,9 +35,9 @@ def validate(data, relation):
 
     sane.update(schema_validator.deserialize(data))
 
-    sane['properties'] = properties_logic.validate(
-        'relation', relation, [sane.get('schema')], project,
-        data.get('properties', []))
+    sane['properties'] = properties_logic.validate('relation', relation,
+                                                   project, sane.get('schema'),
+                                                   data.get('properties', []))
     return sane
 
 

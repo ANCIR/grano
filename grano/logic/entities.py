@@ -27,29 +27,19 @@ def validate(data, entity):
     """ Due to some fairly weird interdependencies between the different
     elements of the model, validation of entities has to happen in three
     steps. """
-
-    # a bit hacky
-    data['schemata'] = data.get('schemata', []) + [ENTITY_DEFAULT]
-
     validator = EntityBaseValidator()
     sane = validator.deserialize(data)
+    project = sane.get('project')
 
-    schemata_validator = colander.SchemaNode(colander.Mapping())
-    schemata_node = colander.SchemaNode(SchemaRef(sane.get('project')))
-    schemata_validator.add(colander.SchemaNode(colander.Sequence(),
-                           schemata_node, name='schemata'))
+    schema_validator = colander.SchemaNode(colander.Mapping())
+    schema_validator.add(colander.SchemaNode(SchemaRef(project),
+                         name='schema'))
+    
+    sane.update(schema_validator.deserialize(data))
 
-    sane['schemata'] = []
-    ids = set()
-    for schema in schemata_validator.deserialize(data).get('schemata'):
-        if schema is None or schema.id in ids:
-            continue
-        ids.add(schema.id)
-        sane['schemata'].append(schema)
-
-    sane['properties'] = properties_logic.validate(
-        'entity', entity, sane['schemata'], sane.get('project'),
-        data.get('properties', []))
+    sane['properties'] = properties_logic.validate('entity', entity,
+                                                   project, sane.get('schema'),
+                                                   data.get('properties', []))
     return sane
 
 
@@ -72,7 +62,7 @@ def save(data, files=None, entity=None):
         entity.author = data.get('author')
         db.session.add(entity)
 
-    entity.schemata = data.get('schemata')
+    entity.schema = data.get('schema')
 
     prop_names = set()
     for name, prop in data.get('properties').items():
