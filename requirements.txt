@@ -22,4 +22,4 @@ certifi==1.0.0
 networkx==1.8.1
 grano-client>=0.2.2
 psycopg2>=2.5.2
-flask-pager>=0.1
+restpager>=0.1

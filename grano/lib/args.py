@@ -1,7 +1,7 @@
 import json
 
 from flask import request
-from flask_pager.args import arg_bool, arg_int, get_limit, get_offset
+from restpager.args import arg_bool, arg_int, get_limit, get_offset
 from grano.lib.exc import BadRequest, NotFound
 
 

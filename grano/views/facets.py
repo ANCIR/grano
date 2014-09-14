@@ -1,5 +1,5 @@
 from flask import request
-from flask_pager import Pager
+from restpager import Pager
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 

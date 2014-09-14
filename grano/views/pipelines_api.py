@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from flask_pager import Pager
+from restpager import Pager
 from sqlalchemy import or_, and_
 
 from grano.lib.serialisation import jsonify

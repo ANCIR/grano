@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_pager import Pager
+from restpager import Pager
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data, arg_bool

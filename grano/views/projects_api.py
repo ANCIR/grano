@@ -2,7 +2,7 @@ from StringIO import StringIO
 
 from flask import Blueprint, request
 from flask import send_file
-from flask_pager import Pager
+from restpager import Pager
 
 from grano.lib.serialisation import jsonify
 from grano.lib.args import object_or_404, request_data
