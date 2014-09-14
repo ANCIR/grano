@@ -7,15 +7,18 @@ class Relation(db.Model, UUIDBase, PropertyBase):
     __tablename__ = 'grano_relation'
     #PropertyClass = RelationProperty
 
-    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'), index=True)
-    source_id = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'), index=True)
-    target_id = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'), index=True)
+    schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'),
+                          index=True)
+    source_id = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'),
+                          index=True)
+    target_id = db.Column(db.Unicode, db.ForeignKey('grano_entity.id'),
+                          index=True)
     project_id = db.Column(db.Integer, db.ForeignKey('grano_project.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('grano_account.id'))
 
     properties = db.relationship(Property,
                                  order_by=Property.created_at.desc(),
-                                 cascade='all, delete, delete-orphan',                                 
+                                 cascade='all, delete, delete-orphan',
                                  backref='relation', lazy='dynamic')
 
     @property

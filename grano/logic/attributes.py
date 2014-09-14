@@ -3,7 +3,7 @@ from grano.model import Attribute, Property
 
 
 def save(data):
-    """ Create or update an attribute. 
+    """ Create or update an attribute.
     CAUTION: This does not, on its own, validate any data."""
 
     schema = data.get('schema')
@@ -17,6 +17,7 @@ def save(data):
 
     obj.label = data.get('label')
     obj.hidden = data.get('hidden')
+    obj.inherited = data.get('inherited')
     obj.description = data.get('description')
     db.session.add(obj)
 
@@ -26,6 +27,6 @@ def save(data):
 def delete(attribute):
     """ Delete the attribute and all related properties. """
     q = db.session.query(Property)
-    q = q.filter(Property.attribute==attribute)
+    q = q.filter(Property.attribute == attribute)
     q.delete()
     db.session.delete(attribute)
