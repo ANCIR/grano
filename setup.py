@@ -36,9 +36,12 @@ setup(
         'grano.relation.change': [],
         'grano.project.change': [],
         'grano.schema.change': [],
-        'grano.startup': [],
+        'grano.startup': [
+            'bidi_create = grano.query.bidi:GenerateBidi'
+        ],
         'grano.periodic': [
-            'degrees = grano.logic.metrics:Degrees'
+            'degrees = grano.logic.metrics:Degrees',
+            'bidi_refresh = grano.query.bidi:GenerateBidi'
         ],
         'console_scripts': [
             'grano = grano.manage:run',

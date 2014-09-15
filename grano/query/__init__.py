@@ -6,9 +6,9 @@ from sqlalchemy import or_
 
 from grano.core import db
 from grano.model import Account, Schema, Entity, Property
+from grano.model import BidiRelation
 from grano.model.entity import entity_schema
-from grano.ql.model import BidiRelation
-from grano.ql.parser import EXTRA_FIELDS, EntityParserNode
+from grano.query.parser import EXTRA_FIELDS, EntityParserNode
 
 
 class Query(object):
