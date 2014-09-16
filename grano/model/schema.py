@@ -103,5 +103,9 @@ class Schema(db.Model, IntBase):
         else:
             data['parent'] = None
         data['project'] = self.project.to_dict_index()
-        data['attributes'] = [a.to_dict() for a in self.attributes]
+        data['attributes'] = [a.to_dict() for a in self.local_attributes]
+        for attr in self.inherited_attributes:
+            d = attr.to_dict()
+            d['inherited'] = True
+            data['attributes'].append(d)
         return data

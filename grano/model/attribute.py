@@ -46,7 +46,6 @@ class Attribute(db.Model, IntBase):
         return {
             'name': self.name,
             'label': self.label,
-            'inherited': self.inherited,
             'datatype': self.datatype
         }
 
