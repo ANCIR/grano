@@ -7,7 +7,6 @@ from sqlalchemy import or_
 from grano.core import db
 from grano.model import Account, Schema, Entity, Property
 from grano.model import BidiRelation
-from grano.model.entity import entity_schema
 from grano.query.parser import EXTRA_FIELDS, EntityParserNode
 
 
@@ -281,17 +280,6 @@ class SchemaQuery(ObjectQuery):
                              isouter=self.optional)
 
 
-class SchemataQuery(SchemaQuery):
-
-    def join_parent(self, from_obj):
-        jt = entity_schema.alias()
-        from_obj = from_obj.join(jt, self.parent.alias.c.id == jt.c.entity_id,
-                                 isouter=self.optional)
-        return from_obj.join(self.alias,
-                             onclause=self.alias.c.id == jt.c.schema_id,
-                             isouter=self.optional)
-
-
 class PropertyQuery(ObjectQuery):
     """ Property queries are the second level in querying a set of
     properties, they are called by the PropertiesQuery. This is somewhat
@@ -508,7 +496,6 @@ class EntityQuery(ObjectQuery):
         'degree_in': FieldQuery,
         'degree_out': FieldQuery,
         'degree': FieldQuery,
-        'schemata': SchemataQuery,
         'schema': SchemaQuery,
         'author': AuthorQuery,
         'inbound': InboundRelationQuery,

@@ -134,14 +134,12 @@ class EntityParserNode(ParserNode):
     defaults = {
         'id': None,
         'degree': None,
-        'schemata': [{}],
+        'schema': {},
         'properties': {}
     }
     child_types = {
         'author': AccountParserNode,
         'project': ProjectParserNode,
-        'schemata': SchemaParserNode,
-        'schema': SchemaParserNode,
         'schema': SchemaParserNode,
         'properties': PropertiesParserNode
     }
