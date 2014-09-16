@@ -76,7 +76,10 @@ class Schema(db.Model, IntBase):
     def to_dict(self):
         data = self.to_dict_index()
         data['id'] = self.id
-        data['parent'] = self.parent.to_dict_index()
+        if self.parent is not None:
+            data['parent'] = self.parent.to_dict_index()
+        else:
+            data['parent'] = None
         data['project'] = self.project.to_dict_index()
         data['attributes'] = [a.to_dict() for a in self.attributes]
         return data
