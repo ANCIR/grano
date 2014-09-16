@@ -23,8 +23,6 @@ class Schema(db.Model, IntBase):
 
     attributes = db.relationship(Attribute, backref='schema', lazy='dynamic',
                                  cascade='all, delete, delete-orphan')
-    properties = db.relationship(Property, backref='schema', lazy='dynamic',
-                                 cascade='all, delete, delete-orphan')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic',
                                 cascade='all, delete, delete-orphan')
     entities = db.relationship('Entity', backref='schema', lazy='dynamic',

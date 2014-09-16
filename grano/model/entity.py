@@ -1,8 +1,5 @@
-from sqlalchemy import or_, and_
-
 from grano.core import db, url_for
 from grano.model.common import UUIDBase
-from grano.model.schema import Schema
 from grano.model.property import Property, PropertyBase
 
 
