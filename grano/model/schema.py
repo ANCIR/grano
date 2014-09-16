@@ -2,7 +2,6 @@ from grano.core import db, url_for
 from grano.model.common import IntBase
 from grano.model.util import MutableDict, JSONEncodedDict
 from grano.model.attribute import Attribute
-from grano.model.property import Property
 
 
 ENTITY_DEFAULT = 'Entity'
