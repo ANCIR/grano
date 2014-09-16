@@ -156,7 +156,6 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
             known_names.add(prop.value)
 
             # make sure the canonical name is actually active
-            # TODO: is this desirable?
             if prop.value == canonical_name:
                 prop.active = True
             else:
@@ -166,9 +165,6 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
             canonical = merge(existing, canonical)
         else:
             canonical = existing
-
-    schema = Schema.by_name(project, ENTITY_DEFAULT)
-    attribute = schema.get_attribute('name')
 
     # Find aliases, i.e. entities with the alias name which are not
     # the canonical entity.
@@ -183,8 +179,7 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
         if alias_name not in known_names:
             data = {
                 'value': alias_name,
-                'schema': schema,
-                'attribute': attribute,
+                'attribute': canonical.schema.get_attribute('name'),
                 'active': False,
                 'name': 'name',
                 'source_url': source_url
@@ -198,8 +193,7 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
             # Rename an alias to its new, canonical name.
             data = {
                 'value': canonical_name,
-                'schema': schema,
-                'attribute': attribute,
+                'attribute': alias.schema.get_attribute('name'),
                 'active': True,
                 'name': 'name',
                 'source_url': source_url
