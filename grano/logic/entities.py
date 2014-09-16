@@ -2,8 +2,7 @@ import logging
 import colander
 
 from grano.core import db, celery
-from grano.model import Entity, Schema
-from grano.model.schema import ENTITY_DEFAULT
+from grano.model import Entity
 from grano.logic import properties as properties_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
@@ -34,7 +33,6 @@ def validate(data, entity):
     schema_validator = colander.SchemaNode(colander.Mapping())
     schema_validator.add(colander.SchemaNode(SchemaRef(project),
                          name='schema'))
-    
     sane.update(schema_validator.deserialize(data))
 
     sane['properties'] = properties_logic.validate('entity', entity,
@@ -88,50 +86,50 @@ def delete(entity):
     _entity_changed.delay(entity.id, 'delete')
 
 
-def merge(orig, dest):
+def merge(source, dest):
     """ Copy all properties and relations from one entity onto another, then
     mark the source entity as an ID alias for the destionation entity. """
-    if orig.id == dest.id:
-        return orig
+    if source.id == dest.id:
+        return source
 
-    if dest.same_as == orig.id:
-        return orig
+    if dest.same_as == source.id:
+        return source
 
-    if orig.same_as == dest.id:
+    if source.same_as == dest.id:
         return dest
 
     if dest.same_as is not None:
         # potential infinite recursion here.
-        resolved_dest = Entity.by_id(dest.same_as)
-        if resolved_dest is not None:
-            return merge(orig, resolved_dest)
+        canonical = Entity.by_id(dest.same_as)
+        if canonical is not None:
+            return merge(source, canonical)
 
-    schemata, seen_schemata = list(), set()
-    for schema in dest.schemata + orig.schemata:
-        if schema.id in seen_schemata:
-            continue
-        seen_schemata.add(schema.id)
-        schemata.append(schema)
+    source_schema = source.schema
+    if dest.schema.is_parent(source_schema):
+        dest.schema = source_schema
+    else:
+        source_schema = dest.common_parent(source_schema)
 
-    dest.schemata = schemata
-
+    source_valid = [a.name for a in source_schema.attributes]
     dest_active = [p.name for p in dest.active_properties]
-    for prop in orig.properties:
-        if prop.name in dest_active:
-            prop.active = False
-        prop.entity = dest
+    for prop in source.properties:
+        if prop.name in source_valid:
+            if prop.name in dest_active:
+                prop.active = False
+            prop.entity = dest
+        else:
+            properties_logic.delete(prop)
 
-    for rel in orig.inbound:
+    for rel in source.inbound:
         rel.target = dest
 
-    for rel in orig.outbound:
+    for rel in source.outbound:
         rel.source = dest
 
-    orig.same_as = dest.id
-    dest.same_as = None
+    source.same_as = dest.id
     db.session.flush()
     _entity_changed.delay(dest.id, 'update')
-    _entity_changed.delay(orig.id, 'delete')
+    _entity_changed.delay(source.id, 'delete')
     return dest
 
 
@@ -179,7 +177,6 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
         if alias_name not in known_names:
             data = {
                 'value': alias_name,
-                'attribute': canonical.schema.get_attribute('name'),
                 'active': False,
                 'name': 'name',
                 'source_url': source_url
@@ -193,7 +190,6 @@ def apply_alias(project, author, canonical_name, alias_name, source_url=None):
             # Rename an alias to its new, canonical name.
             data = {
                 'value': canonical_name,
-                'attribute': alias.schema.get_attribute('name'),
                 'active': True,
                 'name': 'name',
                 'source_url': source_url

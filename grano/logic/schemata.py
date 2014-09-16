@@ -90,45 +90,23 @@ def save(data, schema=None):
     schema.project.updated_at = datetime.utcnow()
     db.session.add(schema)
 
-    return update_attributes(schema, data.get('attributes', []),
-                             operation)
-
-
-def update_attributes(schema, create=None, operation='update'):
+    inherited = [a.name for a in schema.inherited_attributes]
     names = []
+
+    for attribute in data.get('attributes', []):
+        if attribute.get('name') in inherited:
+            continue
+        attribute['schema'] = schema
+        attr = attributes.save(attribute)
+        schema.local_attributes.append(attr)
+        names.append(attr.name)
     
-    # get all parent attributes
-    if schema.parent:
-        for pattr in schema.parent.attributes:
-            data = pattr.to_dict()
-            data['inherited'] = True
-            attr = attributes.save(data)
-            schema.attributes.append(attr)
-            names.append(pattr.name)
-
-    # process local attributes
-    if create is not None:
-        for attribute in create:
-            if attribute.get('name') not in names:
-                attribute['schema'] = schema
-                attr = attributes.save(attribute)
-                schema.attributes.append(attr)
-                names.append(attr.name)
-    else:
-        for attr in schema.attributes:
-            if not attr.inherited:
-                names.append(attr.name)
-
-    for attr in schema.attributes:
+    for attr in schema.local_attributes:
         if attr.name not in names:
             attributes.delete(attr)
 
     db.session.flush()
     _schema_changed(schema.project.slug, schema.name, operation)
-
-    # propagate changes
-    for child in schema.children:
-        update_attributes(child)
     return schema
 
 

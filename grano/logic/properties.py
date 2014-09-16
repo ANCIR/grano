@@ -5,7 +5,6 @@ from flask import url_for
 
 from grano.core import db
 from grano.logic import files as files_logic
-from grano.logic.validation import FixedValue
 from grano.model import Entity, Property
 
 
@@ -33,7 +32,7 @@ def validate_name(project, obj):
     return colander.All(name_unique, colander.Length(min=1))
 
 
-def validate(obj_type, obj, schema, project, properties):
+def validate(obj_type, obj, project, schema, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
 
@@ -54,8 +53,6 @@ def validate(obj_type, obj, schema, project, properties):
         attrib.add(colander.SchemaNode(colander.Boolean(),
                                        default=True, missing=True,
                                        name='active'))
-        attrib.add(colander.SchemaNode(FixedValue(attr), name='attribute'))
-
         attrib.add(colander.SchemaNode(colander.String(),
                                        missing=None, name='source_url'))
         validator.add(attrib)
@@ -94,7 +91,8 @@ def save(obj, data, files=None):
         else:
             prop.relation = obj
 
-    if data.get('attribute').datatype == 'file':
+    attribute = obj.schema.get_attribute(data.get('name'))
+    if attribute.datatype == 'file':
         # if there is a file with the property name in `files`
         # a new file is created and the property updated
         file_key = data.get('name')
@@ -106,12 +104,11 @@ def save(obj, data, files=None):
         elif data.get('value') is None:
             raise TypeError("File for property '%s' is required" % file_key)
     else:
-        setattr(prop, data.get('attribute').value_column,
-                data.get('value'))
+        setattr(prop, attribute.value_column, data.get('value'))
 
     prop.name = data.get('name')
     prop.author = data.get('author')
-    prop.attribute = data.get('attribute')
+    prop.attribute = attribute
     prop.active = data.get('active')
     prop.source_url = data.get('source_url')
     prop.updated_at = datetime.utcnow()

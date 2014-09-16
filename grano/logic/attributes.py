@@ -20,7 +20,6 @@ def save(data):
     obj.inherited = data.get('inherited')
     obj.description = data.get('description')
     db.session.add(obj)
-
     return obj
 
 

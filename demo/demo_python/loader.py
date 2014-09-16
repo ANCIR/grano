@@ -16,12 +16,12 @@ reader = unicodecsv.reader(open('fellows.csv'))
 reader.next()
  
 for record in reader:
-    fellow = loader.make_entity(['fellow'])
+    fellow = loader.make_entity('fellow')
     fellow.set('name', record[0])
     fellow.set('twitter_handle', record[1])
     fellow.save()
  
-    news_org = loader.make_entity(['news_organization'])
+    news_org = loader.make_entity('news_organization')
     news_org.set('name', record[4])
     news_org.set('contact_url', record[5])
     news_org.save()

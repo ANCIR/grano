@@ -9,13 +9,14 @@ from kombu import Exchange, Queue
 from celery import Celery
 
 from grano import default_settings
-from grano import constants, logs
+from grano import constants, logs # noqa
 
 
 app = Flask(__name__)
 app.config.from_object(default_settings)
 app.config.from_object(constants)
 app.config.from_envvar('GRANO_SETTINGS', silent=True)
+
 app_name = app.config.get('APP_NAME', 'grano')
 app_version = pkg_resources.require("grano")[0].version
 

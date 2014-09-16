@@ -20,8 +20,9 @@ class Schema(db.Model, IntBase):
     parent_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'),
                           nullable=True)
 
-    attributes = db.relationship(Attribute, backref='schema', lazy='dynamic',
-                                 cascade='all, delete, delete-orphan')
+    local_attributes = db.relationship(Attribute, backref='schema',
+                                       lazy='dynamic',
+                                       cascade='all, delete, delete-orphan')
     relations = db.relationship('Relation', backref='schema', lazy='dynamic',
                                 cascade='all, delete, delete-orphan')
     entities = db.relationship('Entity', backref='schema', lazy='dynamic',
@@ -29,6 +30,16 @@ class Schema(db.Model, IntBase):
     children = db.relationship('Schema', lazy='dynamic',
                                backref=db.backref('parent',
                                                   remote_side='Schema.id'))
+
+    @property
+    def inherited_attributes(self):
+        if self.parent is None:
+            return []
+        return self.parent.attributes
+
+    @property
+    def attributes(self):
+        return list(self.local_attributes) + self.inherited_attributes
 
     def get_attribute(self, name):
         for attribute in self.attributes:
@@ -45,6 +56,18 @@ class Schema(db.Model, IntBase):
         else:
             path.append(self.name)
             return self.parent.is_circular(path)
+
+    def is_parent(self, other):
+        if self.parent is None:
+            return False
+        if self.parent == other:
+            return True
+        return self.parent.is_parent(other)
+
+    def common_parent(self, other):
+        if self == other or self.is_parent(other):
+            return self
+        return self.common_parent(other.parent)
 
     @classmethod
     def by_name(cls, project, name):
