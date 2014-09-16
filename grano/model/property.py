@@ -1,9 +1,18 @@
-from sqlalchemy import or_, and_
+from datetime import datetime
+
 from sqlalchemy.orm import aliased
 
 from grano.core import db
 from grano.model.common import IntBase
 from grano.model.attribute import Attribute
+
+VALUE_COLUMNS = {
+    'value_string': basestring,
+    'value_datetime': datetime,
+    'value_integer': int,
+    'value_float': float,
+    'value_boolean': bool
+}
 
 
 class Property(db.Model, IntBase):
@@ -39,6 +48,13 @@ class Property(db.Model, IntBase):
             value = getattr(self, column)
             if value is not None:
                 return value
+
+    @classmethod
+    def type_column(self, value):
+        for name, typ in VALUE_COLUMNS.items():
+            if isinstance(value, typ):
+                return name
+        return 'value_string'
 
     def to_dict_index(self):
         data = {
@@ -79,32 +95,13 @@ class PropertyBase(object):
     def has_property(self, name):
         return self[name] is not None
 
-    def get_attribute(self, prop_name):
-        for schema in self.schemata:
-            for attribute in schema.attributes:
-                if attribute.name == prop_name:
-                    return attribute
-
-    def has_schema(self, name):
-        for schema in self.schemata:
-            if schema.name == name:
-                return True
-        return False
-
     @classmethod
-    def _filter_property(cls, q, attributes, value, only_active=True):
-        # TODO: this is a steaming pile of shit and needs to be fixed
-        # at a fundamental level.
+    def _filter_property(cls, q, name, value, only_active=True):
         Prop = aliased(Property)
         q = q.join(Prop, cls.properties)
-
-        nvs = []
-        for attribute in attributes:
-            column = getattr(Prop, attribute.value_column)
-            nvs.append(and_(Prop.attribute==attribute,
-                            column==value))
-
-        q = q.filter(or_(*nvs))
+        q = q.filter(Property.name == name)
+        column = getattr(Prop, Property.type_column(value))
+        q = q.filter(column == value)
         if only_active:
-            q = q.filter(Prop.active==True)
+            q = q.filter(Prop.active == True) # noqa
         return q

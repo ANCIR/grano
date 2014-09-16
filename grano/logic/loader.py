@@ -73,10 +73,8 @@ class EntityLoader(ObjectLoader):
         q = Entity.all()
         q = q.filter(Entity.project == self.loader.project)
         for name, only_active in self.update_criteria:
-            value = self.properties.get(name).get('value')
-            attr = self.loader.project.get_attribute('entity', name)
-            q = Entity._filter_property(q, [attr], value,
-                                        only_active=only_active)
+            v = self.properties.get(name).get('value')
+            q = Entity._filter_property(q, name, v, only_active=only_active)
         entity = q.first()
 
         try:
@@ -115,10 +113,8 @@ class RelationLoader(ObjectLoader):
         q = q.filter(Relation.target == self.target.entity)
 
         for name, only_active in self.update_criteria:
-            value = self.properties.get(name).get('value')
-            attr = self.loader.project.get_attribute('relation', name)
-            q = Entity._filter_property(q, [attr], value,
-                                        only_active=only_active)
+            v = self.properties.get(name).get('value')
+            q = Entity._filter_property(q, name, v, only_active=only_active)
         relation = q.first()
 
         try:

@@ -2,7 +2,7 @@ from flask import request
 from sqlalchemy.orm import aliased
 
 from grano.authz import permissions
-from grano.model import Project, Attribute, Relation
+from grano.model import Project, Relation
 from grano.model import Entity, Property, Schema
 from grano.lib.args import single_arg
 
@@ -25,10 +25,8 @@ def property_filters(cls, q):
             prop = prop[len(ALIASES):]
             only_active = False
 
-        attributes = Attribute.all_named(prop)
         value = single_arg(key)
-        q = cls._filter_property(q, attributes, value,
-                                 only_active=only_active)
+        q = cls._filter_property(q, prop, value, only_active=only_active)
     return q
 
 

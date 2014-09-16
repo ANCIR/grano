@@ -5,8 +5,9 @@ from sqlalchemy.sql.expression import select, func
 from sqlalchemy import or_
 
 from grano.core import db
-from grano.model import Account, Schema, Entity, Property
+from grano.model import Account, Schema, Entity
 from grano.model import BidiRelation
+from grano.model.property import Property, VALUE_COLUMNS
 from grano.query.parser import EXTRA_FIELDS, EntityParserNode
 
 
@@ -288,13 +289,6 @@ class PropertyQuery(ObjectQuery):
     one that holds a value. """
 
     domain_object = Property
-    value_columns = {
-        'value_string': basestring,
-        'value_datetime': datetime,
-        'value_integer': int,
-        'value_float': float,
-        'value_boolean': bool
-    }
     model = {
         'id': FieldQuery,
         'name': FieldQuery,
@@ -311,12 +305,10 @@ class PropertyQuery(ObjectQuery):
         if 'value' in node.value:
             obj = node.value.pop('value')
             if obj is None:
-                for col in self.value_columns:
+                for col in VALUE_COLUMNS:
                     node.value[col] = None
             else:
-                for col, type_ in self.value_columns.items():
-                    if isinstance(obj, type_):
-                        node.value[col] = obj
+                node.value[Property.type_column(obj)] = obj
 
         if name == '*':
             node.value['name'] = None
@@ -340,7 +332,7 @@ class PropertyQuery(ObjectQuery):
     def filtered(self):
         for name, child in self.children.items():
             if child.filtered:
-                if name in self.value_columns:
+                if name in VALUE_COLUMNS:
                     return True
             #if name == 'name' and child.filtered:
             #    return True
