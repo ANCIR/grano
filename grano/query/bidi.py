@@ -13,7 +13,7 @@ CREATE MATERIALIZED VIEW grano_relation_bidi
             source_id, target_id, author_id, project_id,
             'false'::boolean AS reverse FROM grano_relation
         UNION
-        SELECT created_at, updated_at, CONCAT(id, ':rev') as id,
+        SELECT created_at, updated_at, CONCAT(id, '-rev') as id,
             id AS relation_id, schema_id, target_id AS source_id,
             source_id AS target_id, author_id, project_id,
             'true'::boolean AS reverse FROM grano_relation

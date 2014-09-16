@@ -242,7 +242,7 @@ class IdFieldQuery(FieldQuery):
 
     def assemble(self, parent_id):
         id = super(IdFieldQuery, self).assemble(parent_id)
-        return id.split(':', 1)[0]
+        return id.split('-', 1)[0]
 
 
 class AuthorQuery(ObjectQuery):
