@@ -108,7 +108,7 @@ def merge(source, dest):
     if dest.schema.is_parent(source_schema):
         dest.schema = source_schema
     else:
-        source_schema = dest.common_parent(source_schema)
+        source_schema = dest.schema.common_parent(source_schema)
 
     source_valid = [a.name for a in source_schema.attributes]
     dest_active = [p.name for p in dest.active_properties]
