@@ -99,7 +99,7 @@ class PropertyBase(object):
     def _filter_property(cls, q, name, value, only_active=True):
         Prop = aliased(Property)
         q = q.join(Prop, cls.properties)
-        q = q.filter(Property.name == name)
+        q = q.filter(Prop.name == name)
         column = getattr(Prop, Property.type_column(value))
         q = q.filter(column == value)
         if only_active:

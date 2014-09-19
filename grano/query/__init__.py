@@ -342,7 +342,7 @@ class PropertyQuery(ObjectQuery):
         props = {}
         for prop in super(PropertyQuery, self).assemble(parent_id):
             prop['value'] = None
-            for col in self.value_columns:
+            for col in VALUE_COLUMNS:
                 col_val = prop.pop(col, None)
                 if col_val is not None:
                     prop['value'] = col_val
