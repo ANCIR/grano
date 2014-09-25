@@ -67,7 +67,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
             'degree': self.degree,
             'degree_in': self.degree_in,
             'degree_out': self.degree_out,
-            'project': self.project.to_dict_index(),
+            'project': self.project.to_dict_short(),
             'schema': self.schema.to_dict_index(),
             'api_url': url_for('entities_api.view', id=self.id),
             'properties': {}

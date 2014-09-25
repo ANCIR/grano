@@ -42,7 +42,7 @@ class Pipeline(db.Model, IntBase):
         return {
             'id': self.id,
             'label': self.label,
-            'project': self.project.to_dict_index() if self.project else None,
+            'project': self.project.to_dict_short() if self.project else None,
             'author': self.author.to_dict_index(),
             'api_url': url_for('pipelines_api.view', id=self.id),
             'operation': self.operation,

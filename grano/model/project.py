@@ -35,15 +35,19 @@ class Project(db.Model, IntBase):
         q = q.filter(func.lower(cls.slug) == slug.lower())
         return q.first()
 
-    def to_dict_index(self):
+    def to_dict_short(self):
         return {
             'slug': self.slug,
             'label': self.label,
             'private': self.private,
-            'api_url': url_for('projects_api.view', slug=self.slug),
-            'entities_count': self.entities.count(),
-            'relations_count': self.relations.count()
+            'api_url': url_for('projects_api.view', slug=self.slug)
         }
+
+    def to_dict_index(self):
+        data = self.to_dict_short()
+        data['entities_count'] = self.entities.count()
+        data['relations_count'] = self.relations.count()
+        return data
 
     def to_dict(self):
         data = self.to_dict_index()

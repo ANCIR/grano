@@ -25,7 +25,7 @@ class Relation(db.Model, UUIDBase, PropertyBase):
         return {
             'id': self.id,
             'properties': {},
-            'project': self.project.to_dict_index(),
+            'project': self.project.to_dict_short(),
             'api_url': url_for('relations_api.view', id=self.id),
             'schema': self.schema.to_dict_index(),
             'source': self.source.to_dict_index(),

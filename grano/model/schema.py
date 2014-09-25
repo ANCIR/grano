@@ -88,7 +88,6 @@ class Schema(db.Model, IntBase):
             'name': self.name,
             'label': self.label,
             'hidden': self.hidden,
-            'meta': self.meta,
             'obj': self.obj,
             'api_url': url_for('schemata_api.view',
                                slug=self.project.slug,
@@ -98,11 +97,12 @@ class Schema(db.Model, IntBase):
     def to_dict(self):
         data = self.to_dict_index()
         data['id'] = self.id
+        data['meta'] = self.meta
         if self.parent is not None:
             data['parent'] = self.parent.to_dict_index()
         else:
             data['parent'] = None
-        data['project'] = self.project.to_dict_index()
+        data['project'] = self.project.to_dict_short()
         data['attributes'] = [a.to_dict() for a in self.local_attributes]
         for attr in self.inherited_attributes:
             d = attr.to_dict()
