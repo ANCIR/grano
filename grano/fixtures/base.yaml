@@ -41,6 +41,7 @@
       label: 'Telephone number'
     - name: contact_fax
       label: 'Fax number'
+      hidden: true
     - name: contact_address_physical
       label: 'Physical address'
     - name: contact_address_postal
@@ -115,10 +116,10 @@
     - name: classification
       label: 'Classification'
     - name: date_founding
-      label: 'Date of founding'
+      label: 'Founding date'
       datatype: datetime
     - name: date_dissolution
-      label: 'Date of dissolution'
+      label: 'Dissolution date'
       datatype: datetime
     - name: legal_form
       label: 'Legal form'
@@ -134,13 +135,7 @@
   obj: 'entity'
   meta:
     plural: 'Public bodies'
-  attributes:
-    - name: date_founded
-      label: 'Date founded'
-      datatype: datetime
-    - name: date_dissolutioned
-      label: 'Date of dissolutioned'
-      datatype: datetime
+  attributes: []
 
 #####################################################################
 # Entity: PublicCompany
