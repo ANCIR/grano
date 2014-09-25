@@ -57,8 +57,8 @@ def suggest():
     q = q.join(Entity)
     q = q.filter(Entity.project_id.in_(authz.permissions().get('reader')))
     q = q.filter(Property.name == 'name')
-    q = q.filter(Property.active == True)
-    q = q.filter(Property.entity_id != None)
+    q = q.filter(Property.active == True) # noqa
+    q = q.filter(Property.entity_id != None) # noqa
     q = q.filter(Property.value_string.ilike(request.args.get('q') + '%'))
     if 'project' in request.args:
         q = q.join(Project)
@@ -74,7 +74,9 @@ def suggest():
     def convert(props):
         for prop in props:
             data.append({
-                'name': prop.value,
+                'properties': {
+                    'name': prop.to_dict_index(),
+                },
                 'id': prop.entity_id,
                 'api_url': url_for('entities_api.view', id=prop.entity_id)
             })
