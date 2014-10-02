@@ -35,7 +35,10 @@ def make_importer(project, account, data):
         'file': sane.get('file').id,
         'source_url': sane.get('source_url'),
         'mapping': data.get('mapping'),
-        'relation_schema': data.get('relation_schema')
+        'relation_schema': data.get('relation_schema'),
+        'source_schema': data.get('source_schema'),
+        'target_schema': data.get('target_schema'),
+        'entity_schema': data.get('entity_schema')
     }
     pipeline = pipelines.create(project, 'import',
                                 sane.get('file').file_name, config, account)
@@ -104,19 +107,6 @@ def import_aliases(pipeline, fh):
             db.session.commit()
 
 
-def _mapping_schemata(project, mapping, obj):
-    schemata = set()
-    for column, spec in mapping.items():
-        attr = spec.get('attribute')
-        if not attr or not len(attr.strip()):
-            continue
-        if spec.get('object') == obj:
-            attr_obj = project.get_attribute('entity', attr)
-            if attr_obj is not None:
-                schemata.add(attr_obj.schema.name)
-    return list(schemata)
-
-
 def import_objects(pipeline, fh):
     """ Import objects - either individual entities or relations
     and their involved entities (the target and source) - from a
@@ -125,15 +115,9 @@ def import_objects(pipeline, fh):
     # Code is a bit ugly as this handles two cases at once:
     #  mode 'relations' where we import a source, target and relation
     #  mode 'entities' where we only import a single entity
-
-    mode = pipeline.config.get('mode')
-    mapping = pipeline.config.get('mapping')
-    relation_schema = pipeline.config.get('relation_schema')
-
-    # This will identify the unique set of schemata per entity.
-    source_schemata = _mapping_schemata(pipeline.project, mapping, 'source')
-    target_schemata = _mapping_schemata(pipeline.project, mapping, 'target')
-    entity_schemata = _mapping_schemata(pipeline.project, mapping, '')
+    config = pipeline.config
+    mode = config.get('mode')
+    mapping = config.get('mapping')
 
     importer = CSVImporter(fh)
     loader_ = loader.Loader(pipeline.project.slug, account=pipeline.author,
@@ -143,9 +127,12 @@ def import_objects(pipeline, fh):
         try:
             url = _row_source_url(pipeline, row)
             rel_data = {}
-            source = loader_.make_entity(source_schemata, source_url=url)
-            target = loader_.make_entity(target_schemata, source_url=url)
-            entity = loader_.make_entity(entity_schemata, source_url=url)
+            source = loader_.make_entity(config.get('source_schema'),
+                                         source_url=url)
+            target = loader_.make_entity(config.get('target_schema'),
+                                         source_url=url)
+            entity = loader_.make_entity(config.get('entity_schema'),
+                                         source_url=url)
 
             # Try to assign each column to the appropriate object in this
             # loader.
@@ -172,8 +159,8 @@ def import_objects(pipeline, fh):
             if mode == 'relations':
                 source.save()
                 target.save()
-                rel = loader_.make_relation(relation_schema, source,
-                                            target, source_url=url)
+                rel = loader_.make_relation(config.get('relation_schema'),
+                                            source, target, source_url=url)
                 for k, v in rel_data.items():
                     rel.set(k, v)
                 rel.save()

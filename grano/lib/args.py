@@ -1,7 +1,7 @@
 import json
 
 from flask import request
-from restpager.args import arg_bool, arg_int, get_limit, get_offset
+from restpager.args import arg_bool, arg_int, get_limit, get_offset # noqa
 from grano.lib.exc import BadRequest, NotFound
 
 
@@ -9,7 +9,10 @@ def request_data(overlay={}):
     """ Decode a JSON-formatted POST body. """
     data = request.json
     if data is None:
-        data = json.loads(request.form.get('data'))
+        try:
+            data = json.loads(request.form.get('data'))
+        except (ValueError, TypeError):
+            data = dict(request.form.items())
     data.update(overlay)
     return data
 
