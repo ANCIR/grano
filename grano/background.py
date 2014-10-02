@@ -2,6 +2,7 @@ import logging
 
 from grano.core import celery as app
 from grano.plugins import notify_plugins
+from grano.logic.imports import run_importer # noqa
 
 
 log = logging.getLogger(__name__)

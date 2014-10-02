@@ -42,6 +42,7 @@ def make_importer(project, account, data):
     }
     pipeline = pipelines.create(project, 'import',
                                 sane.get('file').file_name, config, account)
+    db.session.commit()
     run_importer.delay(pipeline.id)
     return pipeline
 
@@ -115,13 +116,14 @@ def import_objects(pipeline, fh):
     # Code is a bit ugly as this handles two cases at once:
     #  mode 'relations' where we import a source, target and relation
     #  mode 'entities' where we only import a single entity
+
     config = pipeline.config
     mode = config.get('mode')
     mapping = config.get('mapping')
 
     importer = CSVImporter(fh)
     loader_ = loader.Loader(pipeline.project.slug, account=pipeline.author,
-                            ignore_errors=False)
+                            ignore_errors=True)
 
     for i, row in enumerate(importer):
         try:
