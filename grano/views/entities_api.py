@@ -10,7 +10,7 @@ from grano.model import Entity, Property, Project
 from grano.logic import entities
 from grano.logic.references import ProjectRef
 from grano.core import db, url_for
-from grano.views import filters, facets
+from grano.views import filters, facets, sorters
 from grano.views.cache import validate_cache
 from grano import authz
 
@@ -23,6 +23,7 @@ def index():
     alias = aliased(Entity)
     query = db.session.query(alias)
     query = filters.for_entities(query, alias)
+    query = sorters.for_entities(query, alias)
     pager = Pager(query)
     validate_cache(keys=pager.cache_keys())
     result = pager.to_dict()
