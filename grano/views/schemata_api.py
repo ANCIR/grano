@@ -62,6 +62,9 @@ def delete(slug, name):
     project = object_or_404(Project.by_slug(slug))
     authz.require(authz.project_manage(project))
     schema = object_or_404(Schema.by_name(project, name))
-    schemata.delete(schema)
+    deleted = schemata.delete(schema)
     db.session.commit()
-    raise Gone()
+    if deleted:
+        raise Gone()
+    else:
+        return jsonify(schema)
