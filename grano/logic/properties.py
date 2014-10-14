@@ -9,8 +9,11 @@ from grano.model import Entity, Property, DATETIME_PRECISION
 
 
 class DatetimeValidator(colander.MappingSchema):
-    datetime = colander.DateTime(default_tzinfo=None)
-    precision = colander.String(validator=colander.OneOf(DATETIME_PRECISION))
+    datetime = colander.SchemaNode(colander.DateTime(default_tzinfo=None))
+    precision = colander.SchemaNode(
+        colander.String(),
+        validator=colander.OneOf(DATETIME_PRECISION)
+    )
 
 
 DATATYPE_TYPES = {
