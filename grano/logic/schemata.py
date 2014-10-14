@@ -111,14 +111,15 @@ def save(data, schema=None):
 
 
 def delete(schema):
-    if schema.parent is None:
-        return
+    if schema.parent is None and schema.children.count():
+        return False
     _schema_changed(schema.project.slug, schema.name, 'delete')
     for child in schema.children:
         child.parent = schema.parent
     for attr in schema.local_attributes:
         attributes.delete(attr)
     db.session.delete(schema)
+    return True
 
 
 @celery.task
