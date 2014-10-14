@@ -20,7 +20,7 @@ def import_aliases(project, author, path):
         }}
         name = os.path.basename(path)
         pipeline = pipelines.create(project, 'import',
-            name, config, author)
+                                    name, config, author)
         pipelines.start(pipeline)
         imports.import_aliases(pipeline, fh)
         pipelines.finish(pipeline)
@@ -28,26 +28,31 @@ def import_aliases(project, author, path):
 
 ## Export commands
 def export_aliases(project, fh):
-    """ Dump a list of all entity names to a CSV file. The table will contain the 
-    active name of each entity, and one of the other existing names as an alias. """
+    """ Dump a list of all entity names to a CSV file. The table will contain
+    the active name of each entity, and one of the other existing names as an
+    alias. """
 
-    writer = DictWriter(fh, ['entity_id', 'alias', 'canonical'])
+    writer = DictWriter(fh, ['entity_id', 'schema', 'alias', 'canonical'])
     writer.writeheader()
 
     alias = aliased(Property)
     canonical = aliased(Property)
+    schema = aliased(Schema)
     q = db.session.query(alias.value_string.label('alias'), alias.entity_id)
     q = q.join(Entity)
+    q = q.join(schema)
     q = q.join(canonical)
     q = q.filter(Entity.project_id == project.id)
-    q = q.filter(alias.entity_id != None)
+    q = q.filter(alias.entity_id != None) # noqa
     q = q.filter(alias.name == 'name')
     q = q.filter(canonical.name == 'name')
-    q = q.filter(canonical.active == True)
+    q = q.filter(canonical.active == True) # noqa
     q = q.add_columns(canonical.value_string.label('canonical'))
+    q = q.add_columns(schema.name.label('schema'))
     for row in q.all():
         writer.writerow({
             'entity_id': str(row.entity_id),
+            'schema': row.schema,
             'alias': row.alias,
             'canonical': row.canonical
         })
