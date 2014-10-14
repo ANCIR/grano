@@ -9,10 +9,20 @@ from grano.model.attribute import Attribute
 VALUE_COLUMNS = {
     'value_string': basestring,
     'value_datetime': datetime,
+    'value_datetime_precision': basestring,
     'value_integer': int,
     'value_float': float,
     'value_boolean': bool
 }
+DATETIME_PRECISION_ENUM = [
+    'year',
+    'month',
+    'day',
+    'hour',
+    'minute',
+    'second',
+    'microsecond'
+]
 
 
 class Property(db.Model, IntBase):
@@ -32,6 +42,7 @@ class Property(db.Model, IntBase):
     value_integer = db.Column(db.Integer())
     value_float = db.Column(db.Float())
     value_datetime = db.Column(db.DateTime())
+    value_datetime_precision = db.Column(db.Enum(*DATETIME_PRECISION_ENUM, native_enum=False))
     value_boolean = db.Column(db.Boolean())
     value_file_id = db.Column(db.Integer(), db.ForeignKey('grano_file.id'))
 
