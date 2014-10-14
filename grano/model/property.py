@@ -9,12 +9,11 @@ from grano.model.attribute import Attribute
 VALUE_COLUMNS = {
     'value_string': basestring,
     'value_datetime': datetime,
-    'value_datetime_precision': basestring,
     'value_integer': int,
     'value_float': float,
     'value_boolean': bool
 }
-DATETIME_PRECISION_ENUM = [
+DATETIME_PRECISION = [
     'year',
     'month',
     'day',
@@ -42,7 +41,7 @@ class Property(db.Model, IntBase):
     value_integer = db.Column(db.Integer())
     value_float = db.Column(db.Float())
     value_datetime = db.Column(db.DateTime())
-    value_datetime_precision = db.Column(db.Enum(*DATETIME_PRECISION_ENUM, native_enum=False))
+    value_datetime_precision = db.Column(db.Enum(*DATETIME_PRECISION, native_enum=False))
     value_boolean = db.Column(db.Boolean())
     value_file_id = db.Column(db.Integer(), db.ForeignKey('grano_file.id'))
 
@@ -55,10 +54,22 @@ class Property(db.Model, IntBase):
         # value_string and value_file_id
         if self.value_file_id is not None:
             return self.value_file_id
+        elif self.value_datetime is not None:
+            return {
+                'datetime': self.value_datetime,
+                'precision': self.value_datetime_precision
+            }
         for column in Attribute.DATATYPES.values():
             value = getattr(self, column)
             if value is not None:
                 return value
+
+    def __setattr__(self, name, value):
+        if name == 'value_datetime' and isinstance(value, dict):
+            self.value_datetime_precision = value.get('precision', None)
+            super(Property, self).__setattr__(name, value.get('datetime', None))
+        else:
+            super(Property, self).__setattr__(name, value)
 
     @classmethod
     def type_column(self, value):

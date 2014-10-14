@@ -5,7 +5,12 @@ from flask import url_for
 
 from grano.core import db
 from grano.logic import files as files_logic
-from grano.model import Entity, Property
+from grano.model import Entity, Property, DATETIME_PRECISION
+
+
+class DatetimeValidator(colander.MappingSchema):
+    datetime = colander.DateTime(default_tzinfo=None)
+    precision = colander.String(validator=colander.OneOf(DATETIME_PRECISION))
 
 
 DATATYPE_TYPES = {
@@ -13,7 +18,7 @@ DATATYPE_TYPES = {
     'float': colander.Float(),
     'boolean': colander.Boolean(),
     'string': colander.String(),
-    'datetime': colander.DateTime(default_tzinfo=None),
+    'datetime': DatetimeValidator(),
     'file': colander.Integer()
 }
 
