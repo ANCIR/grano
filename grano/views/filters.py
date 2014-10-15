@@ -52,8 +52,8 @@ def for_relations(q, Rel):
     if 'target' in request.args:
         q = q.filter(Rel.target_id == single_arg('target'))
 
-    if 'schema' in request.args:
-        schemata = request.args.get('schema').split(',')
+    schemata = request.args.getlist('schema')
+    if len(schemata):
         alias = aliased(Schema)
         q = q.join(alias, Rel.schema)
         q = q.filter(alias.name.in_(schemata))
@@ -84,10 +84,10 @@ def for_entities(q, Ent):
         q = q.filter(EntProp.name == 'name')
         q = q.filter(EntProp.value_string.ilike(q_text))
 
-    for schema in request.args.getlist('schema'):
-        if not len(schema.strip()):
-            continue
+    schemata = request.args.getlist('schema')
+    if len(schemata):
         alias = aliased(Schema)
         q = q.join(alias, Ent.schema)
-        q = q.filter(alias.name.in_(schema.split(',')))
+        q = q.filter(alias.name.in_(schemata))
+
     return q
