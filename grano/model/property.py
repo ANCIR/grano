@@ -17,10 +17,7 @@ DATETIME_PRECISION = [
     'year',
     'month',
     'day',
-    'hour',
-    'minute',
-    'second',
-    'microsecond'
+    'time',
 ]
 
 
@@ -54,22 +51,10 @@ class Property(db.Model, IntBase):
         # value_string and value_file_id
         if self.value_file_id is not None:
             return self.value_file_id
-        elif self.value_datetime is not None:
-            return {
-                'datetime': self.value_datetime,
-                'precision': self.value_datetime_precision
-            }
         for column in Attribute.DATATYPES.values():
             value = getattr(self, column)
             if value is not None:
                 return value
-
-    def __setattr__(self, name, value):
-        if name == 'value_datetime' and isinstance(value, dict):
-            self.value_datetime_precision = value.get('precision', None)
-            super(Property, self).__setattr__(name, value.get('datetime', None))
-        else:
-            super(Property, self).__setattr__(name, value)
 
     @classmethod
     def type_column(self, value):
@@ -85,6 +70,8 @@ class Property(db.Model, IntBase):
         }
         if self.value_file_id is not None:
             data['file_url'] = self.value_string
+        elif self.value_datetime is not None:
+            data['value_precision'] = self.value_datetime_precision
         return data
 
     def to_dict_kv(self):

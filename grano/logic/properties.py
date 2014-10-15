@@ -8,20 +8,12 @@ from grano.logic import files as files_logic
 from grano.model import Entity, Property, DATETIME_PRECISION
 
 
-class DatetimeValidator(colander.MappingSchema):
-    datetime = colander.SchemaNode(colander.DateTime(default_tzinfo=None))
-    precision = colander.SchemaNode(
-        colander.String(),
-        validator=colander.OneOf(DATETIME_PRECISION)
-    )
-
-
 DATATYPE_TYPES = {
     'integer': colander.Integer(),
     'float': colander.Float(),
     'boolean': colander.Boolean(),
     'string': colander.String(),
-    'datetime': DatetimeValidator(),
+    'datetime': colander.DateTime(default_tzinfo=None),
     'file': colander.Integer()
 }
 
@@ -57,6 +49,14 @@ def validate(obj_type, obj, project, schema, properties):
         else:
             T = DATATYPE_TYPES.get(attr.datatype)
             attrib.add(colander.SchemaNode(T, missing=None, name='value'))
+            # add precision field to datetime attribute validator
+            if attr.datatype == 'datetime':
+                attrib.add(colander.SchemaNode(
+                    colander.String(),
+                    missing=None,
+                    name='value_precision',
+                    validator=colander.OneOf(DATETIME_PRECISION)
+                ))
 
         attrib.add(colander.SchemaNode(colander.Boolean(),
                                        default=True, missing=True,
@@ -113,6 +113,9 @@ def save(obj, data, files=None):
             raise TypeError("File for property '%s' is required" % file_key)
     else:
         setattr(prop, attribute.value_column, data.get('value'))
+        # set value of precision field for datetime property
+        if attribute.datatype == 'datetime':
+            prop.value_datetime_precision = data.get('value_precision')
 
     prop.name = data.get('name')
     prop.author = data.get('author')
