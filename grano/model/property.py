@@ -13,6 +13,12 @@ VALUE_COLUMNS = {
     'value_float': float,
     'value_boolean': bool
 }
+DATETIME_PRECISION = [
+    'year',
+    'month',
+    'day',
+    'time',
+]
 
 
 class Property(db.Model, IntBase):
@@ -32,6 +38,7 @@ class Property(db.Model, IntBase):
     value_integer = db.Column(db.Integer())
     value_float = db.Column(db.Float())
     value_datetime = db.Column(db.DateTime())
+    value_datetime_precision = db.Column(db.Enum(*DATETIME_PRECISION, native_enum=False))
     value_boolean = db.Column(db.Boolean())
     value_file_id = db.Column(db.Integer(), db.ForeignKey('grano_file.id'))
 
@@ -63,6 +70,8 @@ class Property(db.Model, IntBase):
         }
         if self.value_file_id is not None:
             data['file_url'] = self.value_string
+        elif self.value_datetime is not None:
+            data['value_precision'] = self.value_datetime_precision
         return data
 
     def to_dict_kv(self):
