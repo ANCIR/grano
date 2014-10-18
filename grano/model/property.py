@@ -82,8 +82,6 @@ class PropertyBase(object):
 
     @property
     def active_properties(self):
-        #q = self.properties.filter_by(active=True)
-        #q = q.order_by(self.PropertyClass.name.desc())
         q = [p for p in self.properties if p.active]
         return q
 

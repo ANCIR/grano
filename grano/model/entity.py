@@ -45,21 +45,6 @@ class Entity(db.Model, UUIDBase, PropertyBase):
         q = cls._filter_property(q, 'name', name, only_active=only_active)
         return q
 
-    # @classmethod
-    # def by_id_many(cls, ids, account=None):
-    #     from grano.model import Project, Permission
-    #     q = db.session.query(cls)
-    #     q = q.filter(cls.id.in_(ids))
-    #     if account is not None:
-    #         q = q.join(Project)
-    #         q = q.outerjoin(Permission)
-    #         q = q.filter(or_(Project.private == False, # noqa
-    #             and_(Permission.reader == True, Permission.account == account)))
-    #     id_map = {}
-    #     for e in q.all():
-    #         id_map[e.id] = e
-    #     return id_map
-
     def to_dict_index(self):
         """ Convert an entity to the REST API form. """
         data = {

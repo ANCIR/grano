@@ -50,5 +50,5 @@ CELERY_TIMEZONE = 'UTC'
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 
-DEFAULT_PLUGINS = ['degrees', 'bidi_create', 'bidi_refresh']
+DEFAULT_PLUGINS = ['degrees', 'bidi_create', 'bidi_refresh', 'levenshtein']
 PLUGINS = []

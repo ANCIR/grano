@@ -37,7 +37,8 @@ setup(
         'grano.project.change': [],
         'grano.schema.change': [],
         'grano.startup': [
-            'bidi_create = grano.query.bidi:GenerateBidi'
+            'bidi_create = grano.query.bidi:GenerateBidi',
+            'levenshtein = grano.logic.reconcile:ConfigurePostgres'
         ],
         'grano.periodic': [
             'degrees = grano.logic.metrics:Degrees',

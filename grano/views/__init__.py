@@ -20,6 +20,7 @@ from grano.views.imports_api import blueprint as imports_api
 from grano.views.pipelines_api import blueprint as pipelines_api
 from grano.views.log_entries_api import blueprint as log_entries_api
 from grano.views.permissions_api import blueprint as permissions_api
+from grano.views.reconcile_api import blueprint as reconcile_api
 from grano.views.auth import check_auth
 
 
@@ -89,3 +90,4 @@ app.register_blueprint(permissions_api)
 app.register_blueprint(imports_api)
 app.register_blueprint(pipelines_api)
 app.register_blueprint(log_entries_api)
+app.register_blueprint(reconcile_api)
