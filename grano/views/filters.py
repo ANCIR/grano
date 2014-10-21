@@ -1,5 +1,6 @@
 from flask import request
 from sqlalchemy.orm import aliased
+from sqlalchemy import or_
 
 from grano.authz import permissions
 from grano.model import Project, Relation
@@ -51,6 +52,10 @@ def for_relations(q, Rel):
 
     if 'target' in request.args:
         q = q.filter(Rel.target_id == single_arg('target'))
+
+    if 'entity' in request.args:
+        id = single_arg('entity')
+        q = q.filter(or_(Rel.target_id == id, Rel.source_id == id))
 
     schemata = request.args.getlist('schema')
     if len(schemata):
