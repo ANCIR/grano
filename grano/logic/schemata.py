@@ -56,12 +56,8 @@ class SchemaValidator(colander.MappingSchema):
 def validate(data):
     """ Validate the incoming data. """
     sane = SchemaValidator().deserialize(data)
-
-    class ParentValidator(colander.MappingSchema):
-        parent = SchemaNode(SchemaRef(sane.get('project')),
-                            missing=None)
-
-    sane.update(ParentValidator().deserialize(data))
+    sref = SchemaRef(sane.get('project'))
+    sane['parent'] = sref.decode(None, data.get('parent'))
     return sane
 
 
