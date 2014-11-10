@@ -12,7 +12,7 @@ PROPERTY = 'property-'
 ALIASES = 'aliases-'
 
 
-def property_filters(cls, q):
+def property_filters(cls, q, alias):
     """ Parse the query arguments and apply any specified property
     filters to the given query ``q``. The property-holding object
     (a relation or entity) is given as ``cls``. """
@@ -27,7 +27,9 @@ def property_filters(cls, q):
             only_active = False
 
         value = single_arg(key)
-        q = cls._filter_property(q, prop, value, only_active=only_active)
+        q = cls._filter_property(q, prop, value,
+                                 only_active=only_active,
+                                 alias=alias)
     return q
 
 
@@ -45,7 +47,7 @@ def for_relations(q, Rel):
         q = q.join(Proj, Rel.project)
         q = q.filter(Proj.slug == project)
 
-    q = property_filters(Relation, q)
+    q = property_filters(Relation, q, Rel)
 
     if 'source' in request.args:
         q = q.filter(Rel.source_id == single_arg('source'))
@@ -80,7 +82,7 @@ def for_entities(q, Ent):
         q = q.join(Proj, Ent.project)
         q = q.filter(Proj.slug == single_arg('project'))
 
-    q = property_filters(Entity, q)
+    q = property_filters(Entity, q, Ent)
 
     if 'q' in request.args and single_arg('q'):
         EntProp = aliased(Property)

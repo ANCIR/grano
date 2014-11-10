@@ -103,9 +103,11 @@ class PropertyBase(object):
         return self[name] is not None
 
     @classmethod
-    def _filter_property(cls, q, name, value, only_active=True):
+    def _filter_property(cls, q, name, value, only_active=True, alias=None):
+        if alias is None:
+            alias = cls
         Prop = aliased(Property)
-        q = q.join(Prop, cls.properties)
+        q = q.join(Prop, alias.properties)
         q = q.filter(Prop.name == name)
         column = getattr(Prop, Property.type_column(value))
         q = q.filter(column == value)
