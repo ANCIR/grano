@@ -19,6 +19,7 @@ class Attribute(db.Model, IntBase):
     description = db.Column(db.Unicode())
     hidden = db.Column(db.Boolean())
     datatype = db.Column(db.Unicode())
+    unique = db.Column(db.Boolean())
 
     schema_id = db.Column(db.Integer, db.ForeignKey('grano_schema.id'))
     properties = db.relationship('Property', backref='attribute',
@@ -46,7 +47,8 @@ class Attribute(db.Model, IntBase):
         return {
             'name': self.name,
             'label': self.label,
-            'datatype': self.datatype
+            'datatype': self.datatype,
+            'unique': self.unique,
         }
 
     def to_dict(self):
