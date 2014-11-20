@@ -32,6 +32,8 @@ class AttributeValidator(colander.MappingSchema):
                           missing='string')
     hidden = SchemaNode(colander.Boolean(),
                         missing=False)
+    unique = SchemaNode(colander.Boolean(),
+                        missing=False)
 
 
 class Attributes(colander.SequenceSchema):

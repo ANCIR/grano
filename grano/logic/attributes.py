@@ -19,6 +19,7 @@ def save(data):
     obj.hidden = data.get('hidden')
     obj.inherited = data.get('inherited')
     obj.description = data.get('description')
+    obj.unique = data.get('unique')
     db.session.add(obj)
     return obj
 
