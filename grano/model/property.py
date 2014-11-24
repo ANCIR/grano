@@ -114,3 +114,15 @@ class PropertyBase(object):
         if only_active:
             q = q.filter(Prop.active == True) # noqa
         return q
+
+    @classmethod
+    def by_unique_properties(cls, project, schema, properties, only_active=True):
+        q = db.session.query(cls)
+        q = q.filter(cls.project == project)
+        for attr in schema.attributes:
+            if not attr.unique:
+                continue
+            q = cls._filter_property(q, attr.name,
+                                     properties[attr.name]['value'],
+                                     only_active=only_active)
+        return q

@@ -35,3 +35,15 @@ class FixedValue(object):
 
     def cstruct_children(self, node, cstruct):
         return []
+
+
+class SaveOptionsValidator(colander.MappingSchema):
+    onconflict = colander.SchemaNode(
+        colander.String(),
+        validator=colander.OneOf(['error', 'merge', 'update']),
+        missing='merge'
+    )
+
+
+def validate_saveoptions(data):
+    return SaveOptionsValidator().deserialize(data)

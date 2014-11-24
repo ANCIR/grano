@@ -18,20 +18,6 @@ DATATYPE_TYPES = {
 }
 
 
-def validate_name(project, obj):
-    """ Make sure that an entity's `name` attribute is unique
-    within the scope of the project. """
-    def check(name):
-        entity = Entity.by_name(project, name)
-        if entity is not None:
-            if obj is None or obj.id != entity.id:
-                return False
-        return True
-    name_unique = colander.Function(check,
-                                    message="An entity with this name exists")
-    return colander.All(name_unique, colander.Length(min=1))
-
-
 def validate(obj_type, obj, project, schema, properties):
     """ Compile a validator for the given set of properties, based on
     the available schemata. """
@@ -45,7 +31,7 @@ def validate(obj_type, obj, project, schema, properties):
         if attr.name == 'name' and obj_type == 'entity':
             attrib.add(colander.SchemaNode(colander.String(),
                        missing=colander.required, name='value',
-                       validator=validate_name(project, obj)))
+                       validator=colander.Length(min=1)))
         else:
             T = DATATYPE_TYPES.get(attr.datatype)
             attrib.add(colander.SchemaNode(T, missing=None, name='value'))

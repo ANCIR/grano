@@ -37,7 +37,7 @@ def create():
     project = ProjectRef().get(data.get('project'))
     data['project'] = project
     authz.require(authz.project_edit(project))
-    entity = entities.save(data, files=request.files)
+    entity = entities.save(data, files=request.files, options=request.args)
     db.session.commit()
     return jsonify(entity)
 

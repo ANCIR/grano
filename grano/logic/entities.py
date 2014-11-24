@@ -3,9 +3,11 @@ import colander
 
 from grano.core import db, celery
 from grano.model import Entity
+from grano.lib.exc import Conflict
 from grano.logic import properties as properties_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
+from grano.logic.validation import validate_saveoptions
 from grano.plugins import notify_plugins
 
 
@@ -49,16 +51,31 @@ def _entity_changed(entity_id, operation):
     notify_plugins('grano.entity.change', _handle)
 
 
-def save(data, files=None, entity=None):
+def save(data, files=None, entity=None, options=None):
     """ Save or update an entity. """
+    options = validate_saveoptions(options)
     data = validate(data, entity)
 
     operation = 'create' if entity is None else 'update'
+    deactivate_props = True
     if entity is None:
-        entity = Entity()
-        entity.project = data.get('project')
-        entity.author = data.get('author')
-        db.session.add(entity)
+        entity = Entity.by_unique_properties(
+            project=data.get('project'),
+            schema=data.get('schema'),
+            properties=data.get('properties')
+        ).first()
+        if entity is None:
+            entity = Entity()
+            entity.project = data.get('project')
+            entity.author = data.get('author')
+            db.session.add(entity)
+        else:
+            conflict_action = options.get('onconflict')
+            operation = 'update'
+            if conflict_action == 'merge':
+                deactivate_props = False
+            elif conflict_action == 'error':
+                raise Conflict("Entity with unique properties already exists")
 
     entity.schema = data.get('schema')
 
@@ -70,9 +87,10 @@ def save(data, files=None, entity=None):
         prop['author'] = data.get('author')
         properties_logic.save(entity, prop, files=files)
 
-    for prop in entity.properties:
-        if prop.name not in prop_names:
-            prop.active = False
+    if deactivate_props:
+        for prop in entity.properties:
+            if prop.name not in prop_names:
+                prop.active = False
 
     db.session.flush()
     _entity_changed.delay(entity.id, operation)
