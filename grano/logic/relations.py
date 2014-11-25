@@ -73,7 +73,7 @@ def save(data, relation=None, options=None):
             relation.author = data.get('author')
             db.session.add(relation)
         else:
-            conflict_action = options.geT('onconflict')
+            conflict_action = options.get('onconflict')
             operation = 'update'
             if conflict_action == 'merge':
                 deactivate_props = False

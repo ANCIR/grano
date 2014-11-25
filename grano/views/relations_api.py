@@ -36,7 +36,7 @@ def create():
     project = ProjectRef().get(data.get('project'))
     data['project'] = project
     authz.require(authz.project_edit(project))
-    relation = relations.save(data)
+    relation = relations.save(data, options=request.args)
     db.session.commit()
     return jsonify(relation)
 
