@@ -3,9 +3,11 @@ import colander
 
 from grano.core import db, celery
 from grano.model import Relation
+from grano.lib.exc import Conflict
 from grano.logic import properties as properties_logic
 from grano.logic.references import ProjectRef, AccountRef
 from grano.logic.references import SchemaRef, EntityRef
+from grano.logic.validation import validate_saveoptions
 from grano.plugins import notify_plugins
 
 
@@ -49,16 +51,35 @@ def _relation_changed(relation_id, operation):
     notify_plugins('grano.relation.change', _handle)
 
 
-def save(data, relation=None):
+def save(data, relation=None, options=None):
     """ Save or update a relation with the given properties. """
+    options = validate_saveoptions(options)
     data = validate(data, relation)
 
     operation = 'create' if relation is None else 'update'
+    deactivate_props = True
     if relation is None:
-        relation = Relation()
-        relation.project = data.get('project')
-        relation.author = data.get('author')
-        db.session.add(relation)
+        q = Relation.by_unique_properties(
+            project=data.get('project'),
+            schema=data.get('schema'),
+            properties=data.get('properties')
+        )
+        q = q.filter(Relation.source == data.get('source'))
+        q = q.filter(Relation.target == data.get('target'))
+        relation = q.first()
+        if relation is None:
+            relation = Relation()
+            relation.project = data.get('project')
+            relation.author = data.get('author')
+            db.session.add(relation)
+        else:
+            conflict_action = options.geT('onconflict')
+            operation = 'update'
+            if conflict_action == 'merge':
+                deactivate_props = False
+            elif conflict_action == 'error':
+                raise Conflict("Relation with source, target and unique"
+                               "properties already exists")
 
     relation.source = data.get('source')
     relation.target = data.get('target')
@@ -71,9 +92,10 @@ def save(data, relation=None):
         prop['author'] = data.get('author')
         properties_logic.save(relation, prop)
 
-    for prop in relation.properties:
-        if prop.name not in prop_names:
-            prop.active = False
+    if deactivate_props:
+        for prop in relation.properties:
+            if prop.name not in prop_names:
+                prop.active = False
 
     db.session.flush()
     _relation_changed.delay(relation.id, operation)
