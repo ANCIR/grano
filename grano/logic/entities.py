@@ -104,27 +104,25 @@ def merge(source, dest):
         if canonical is not None:
             return merge(source, canonical)
 
-    source_schema = source.schema
-    if dest.schema.is_parent(source_schema):
-        dest.schema = source_schema
-    else:
-        source_schema = dest.schema.common_parent(source_schema)
+    if dest.schema.is_parent(source.schema):
+        dest.schema = source.schema
 
-    source_valid = [a.name for a in source_schema.attributes]
+    dest_valid = [a.name for a in dest.schema.attributes]
     dest_active = [p.name for p in dest.active_properties]
     for prop in source.properties:
-        if prop.name in source_valid:
-            if prop.name in dest_active:
-                prop.active = False
-            prop.entity = dest
-        else:
+        prop.entity = dest
+        if prop.name in dest_active:
+            prop.active = False
+        if prop.name not in dest_valid:
             properties_logic.delete(prop)
 
     for rel in source.inbound:
         rel.target = dest
+        db.session.add(rel)
 
     for rel in source.outbound:
         rel.source = dest
+        db.session.add(rel)
 
     source.same_as = dest.id
     db.session.flush()

@@ -41,6 +41,7 @@ class Entity(db.Model, UUIDBase, PropertyBase):
     @classmethod
     def by_name_many(cls, project, name, only_active=False):
         q = db.session.query(cls)
+        q = q.filter(cls.same_as == None) # noqa
         q = q.filter(cls.project == project)
         q = cls._filter_property(q, 'name', name, only_active=only_active)
         return q
