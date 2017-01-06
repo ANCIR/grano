@@ -1,0 +1,13 @@
+name: 'organization'
+label: 'Senegal Companies'
+obj: 'entity'
+hidden: no
+attributes:
+  - name: 'address'
+    label: 'Address'
+  - name: 'source'
+    label: 'Source'
+  - name: 'companyname'
+    label: 'CompanyName'
+  - name: 'date'
+    label: 'RegistrationDate'
