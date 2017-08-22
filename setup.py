@@ -32,7 +32,8 @@ setup(
     zip_safe=False,
     install_requires=REQUIREMENTS,
     dependency_links=[
-        'https://github.com/CodeForAfrica/grano-client/tarball/master#egg=grano-client'
+        'https://github.com/CodeForAfrica/grano-client/tarball/master#egg=grano-client',
+        'https://github.com/CodeForAfrica/grano-ui/tarball/master#egg=grano-ui'
     ],
     entry_points={
         'grano.entity.change': [],
