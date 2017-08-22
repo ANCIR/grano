@@ -1,7 +1,7 @@
 FROM granoproject/base:latest
 
 # Node dependencies
-RUN npm --quiet --silent install -g bower uglifyjs less
+RUN npm --quiet --silent install -g bower uglify-js less
 
 COPY . /grano
 WORKDIR /grano
