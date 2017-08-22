@@ -13,7 +13,7 @@ CACHE_AGE = 84600
 
 # Configure the database
 
-SQLALCHEMY_DATABASE_URI = os.getenv("GRANO_DATABASE")
+SQLALCHEMY_DATABASE_URI = os.getenv("GRANO_DATABASE", "postgresql://grano:grano@postgres/grano")
 APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
 
 # You need to create an application on GitHub which can be used
@@ -49,7 +49,7 @@ CELERY_TIMEZONE = 'UTC'
 # Otherwise, just set the task broker URI which you intend to
 # use:
 
-CELERY_BROKER_URL = os.getenv("GRANO_CELERY_BROKER")
+CELERY_BROKER_URL = os.getenv("GRANO_CELERY_BROKER", "amqp://guest:guest@rabbitmq:5672")
 
 DEFAULT_PLUGINS = ['degrees', 'bidi_create', 'bidi_refresh', 'levenshtein']
 PLUGINS = ['ui']

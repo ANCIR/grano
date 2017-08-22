@@ -20,7 +20,8 @@ lxml>=3.2.5
 celery==3.1.9
 certifi==1.0.0
 networkx==1.8.1
-grano-client>=0.2.2
+grano-client
 psycopg2>=2.5.2
 restpager>=0.1
 normality
+gunicorn

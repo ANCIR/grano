@@ -21,9 +21,9 @@ setup(
         "Programming Language :: Python",
     ],
     keywords='sql graph sna networks journalism ddj entities',
-    author='Friedrich Lindenberg',
-    author_email='friedrich@pudo.org',
-    url='http://granoproject.org',
+    author='Code for Africa',
+    author_email='support@codeforafrica.org',
+    url='http://github.com/CodeForAfrica/grano',
     license='MIT',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     namespace_packages=['grano'],
@@ -31,6 +31,9 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,
+    dependency_links=[
+        'https://github.com/CodeForAfrica/grano-client/tarball/master#egg=grano-client'
+    ],
     entry_points={
         'grano.entity.change': [],
         'grano.relation.change': [],
