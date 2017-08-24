@@ -1,26 +1,26 @@
 from datetime import timedelta
 import os
 
-DEBUG = True
+DEBUG = os.getenv("GRANO_DEBUG", True)
 ASSETS_DEBUG = False
 DEBUG_TIMING = False
 
 # For production, it's essential that this is set:
 
-SECRET_KEY = 'test'
+SECRET_KEY = os.getenv("GRANO_SECRET_KEY", "test")
 CACHE = True
 CACHE_AGE = 84600
 
 # Configure the database
 
 SQLALCHEMY_DATABASE_URI = os.getenv("GRANO_DATABASE", "postgresql://grano:grano@postgres/grano")
-APP_NAME = CELERY_APP_NAME = ES_INDEX = 'grano'
+APP_NAME = CELERY_APP_NAME = ES_INDEX = os.getenv("GRANO_APP_NAME", "grano")
 
 # You need to create an application on GitHub which can be used
 # for OAuth sign-in.
 
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "da79a6b5868e690ab984")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "1701d3bd20bbb29012592fd3a9c64b827e0682d6")
+GITHUB_CLIENT_ID = os.getenv("GRANO_GITHUB_CLIENT_ID", "da79a6b5868e690ab984")
+GITHUB_CLIENT_SECRET = os.getenv("GRANO_GITHUB_CLIENT_SECRET", "1701d3bd20bbb29012592fd3a9c64b827e0682d6")
 
 # TWITTER_API_KEY = 'UZYoBAfBzNluBlmBwPOGYw'
 # TWITTER_API_SECRET = 'ngHaeaRPKA5BDQNXhPFmLWA1PvTA1kBGDaAJmc517E'
