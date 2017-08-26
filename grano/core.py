@@ -1,7 +1,7 @@
 import os
 import pkg_resources
 
-from flask import Flask, url_for as _url_for
+from flask import Flask, url_for as flask_url_for
 from flask_oauth import OAuth
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -41,7 +41,11 @@ oauth = OAuth()
 
 
 def url_for(*a, **kw):
+    """Generate external URLs with HTTPS (if configured)."""
     try:
-        return _url_for(*a, _external=True, **kw)
+        kw['_external'] = True
+        if app.config.get('PREFERRED_URL_SCHEME'):
+            kw['_scheme'] = app.config.get('PREFERRED_URL_SCHEME')
+        return flask_url_for(*a, **kw)
     except RuntimeError:
         return None
