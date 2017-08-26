@@ -1,8 +1,8 @@
 Flask==0.12.2
-Flask-OAuth==0.12
-Flask-Script==0.6.7
-Flask-Migrate==1.2.0
-Flask-Login==0.2.7
+Flask-OAuth
+Flask-Script
+Flask-Migrate
+Flask-Login
 oauth2==1.5.211
 Unidecode==0.04.14
 blinker==1.3

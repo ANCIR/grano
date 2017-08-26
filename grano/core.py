@@ -2,9 +2,9 @@ import os
 import pkg_resources
 
 from flask import Flask, url_for as _url_for
-from flask.ext.oauth import OAuth
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.migrate import Migrate
+from flask_oauth import OAuth
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from kombu import Exchange, Queue
 from celery import Celery
 
