@@ -16,6 +16,9 @@ CACHE_AGE = 84600
 SQLALCHEMY_DATABASE_URI = os.getenv("GRANO_DATABASE", "postgresql://grano:grano@postgres/grano")
 APP_NAME = CELERY_APP_NAME = ES_INDEX = os.getenv("GRANO_APP_NAME", "grano")
 
+# Force HTTPS here:
+PREFERRED_URL_SCHEME = env.get('GRANO_URL_SCHEME', 'http')
+
 # You need to create an application on GitHub which can be used
 # for OAuth sign-in.
 
