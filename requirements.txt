@@ -24,4 +24,4 @@ grano-ui
 psycopg2>=2.5.2
 restpager>=0.1
 normality
-gunicorn
+gunicorn==19.7.1
