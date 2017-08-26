@@ -15,13 +15,13 @@ colander==0.9.9
 stevedore==0.14.1
 dataset>=0.5.2
 unicodecsv==0.9.4
-requests>=2.2.0
+requests>=2.18.4
 lxml>=3.2.5
-celery==3.1.9
-networkx==1.8.1
+celery>=4.1.0
+networkx>=1.1
 grano-client
 grano-ui
-psycopg2>=2.5.2
+psycopg2>=2.7.3
 restpager>=0.1
 normality
 gunicorn==19.7.1
