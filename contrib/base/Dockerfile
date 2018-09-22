@@ -1,4 +1,4 @@
-FROM python:2.7.13
+FROM python:2.7.15
 MAINTAINER Code for Africa <support@codeforafrica.org>
 ENV DEBIAN_FRONTEND noninteractive
 
