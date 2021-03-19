@@ -7,7 +7,7 @@ oauth2==1.5.211
 Unidecode==0.04.14
 blinker==1.3
 Flask-SQLAlchemy>=1.0
-Jinja2==2.7.3
+Jinja2==2.11.3
 SQLAlchemy>=0.9.7
 python-slugify==0.0.7
 PyYAML==3.10
