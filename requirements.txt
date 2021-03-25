@@ -10,7 +10,7 @@ Flask-SQLAlchemy>=1.0
 Jinja2==2.7.3
 SQLAlchemy>=0.9.7
 python-slugify==0.0.7
-PyYAML==3.10
+PyYAML==5.4
 colander==0.9.9
 stevedore==0.14.1
 dataset>=0.5.2
